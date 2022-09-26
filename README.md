@@ -1,5 +1,5 @@
 # Dart Formatter Server [![Formatter](https://shields.io/badge/dart-Formatter_Server-green?logo=dart&style=flat-square)](https://github.com/tekert/dart-formatter) ![Issues](https://img.shields.io/github/issues/tekert/dart_formatter)
- Dart Formatter Server usign [Xnfo Formatter] over an [API] Protocol
+ `stdio` Dart formatter server using [Xnfo Formatter] over an [API] Protocol
  
 For use in IDE integration.
 
