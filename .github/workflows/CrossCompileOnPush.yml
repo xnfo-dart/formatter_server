@@ -34,21 +34,25 @@ jobs:
       # https://github.com/actions/checkout
       - name: "Checkout local repository"
         uses: actions/checkout@v3
+        with:
+          path: formatter_server
       - name: "Checkout Local Xnfo Formatter package"
         uses: actions/checkout@v3
         with:
           repository: xnfo-dart/xnfo_formatter
-          path: ../xnfo_formatter
+          path: xnfo_formatter
       
       # Uses https://github.com/dart-lang/setup-dart to get dart
       - name: "Dowload dart-sdk"
         uses: dart-lang/setup-dart@v1.3
-
+        
+      - run: cd formatter_server
+      
       - name: Install pub dependencies
         run: dart pub get
 
       # Build (TODO: create dart grinder task for this particular build method)
-      - name: "Create output dir"
+      - name: "Create build dir"
         run: mkdir build
       - name : "Compile"
         run: dart compile exe bin/listen.dart -v -o build/${{ matrix.output-name }}
