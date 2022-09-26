@@ -41,6 +41,7 @@ jobs:
         with:
           repository: xnfo-dart/xnfo_formatter
           path: xnfo_formatter
+          token: ${{ secrets.GH_PAT }}
           ref: master
       
       # Uses https://github.com/dart-lang/setup-dart to get dart
