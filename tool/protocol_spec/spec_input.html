@@ -1,0 +1,616 @@
+<!doctype html>
+
+<html>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Formatter Server API Specification</title>
+</head>
+
+<body>
+  <h1>Formatter Server API Specification</h1>
+  <h1 style="color:#999999">Version
+    <version>0.6.1</version>
+  </h1>
+  <p>
+    This document contains a specification of the API provided by the
+    formatter server. The API in this document is currently under
+    development. Changes to the API will be accompanied by an update to the
+    protocol version number according to the principles of semantic
+    versioning (<a href="https://semver.org/">semver.org</a>).
+  </p>
+  <h2>Overview</h2>
+  <p>
+    The formatter server API is a bi-directional client-server
+    API. The API is independent of the transport mechanism used, but
+    is heavily influenced by a model in which sockets or character
+    streams are used to transport JSON-RPC encoded information.
+  </p>
+  <h3>Transport Mechanism</h3>
+  <p>
+    The characters passed to the server are expected to be encoded
+    using UTF-8.
+  </p>
+  <p>
+    When character streams are used as the transport, messages are
+    delineated by newlines. This means, in particular, that the JSON
+    encoding process must not introduce newlines within a
+    message. Note however that newlines are used in this document
+    for readability.
+  </p>
+  <p>
+    It is the client's responsibility to read output from the server to
+    avoid its blocking.
+  </p>
+  <p>
+    To ease interoperability with Lisp-based clients (which may not
+    be able to easily distinguish between empty lists, empty maps,
+    and null), client-to-server communication is allowed to replace
+    any instance of "<tt>{}</tt>" or "<tt>[]</tt>" with null. The
+    server will always properly represent empty lists as
+    "<tt>[]</tt>" and empty maps as "<tt>{}</tt>".
+  </p>
+  <h3>Communication Structure</h3>
+  <p>
+    Clients can make a request of the server and the server will
+    provide a response for each request that it receives. While many
+    of the requests that can be made by a client are informational
+    in nature, we have chosen to always return a response so that
+    clients can know whether the request was received and was
+    correct.
+  </p>
+  <p>
+    There is no guarantee concerning the order in which responses
+    will be returned, but there is a guarantee that the server will
+    process requests in the order in which they are sent as long as
+    the transport mechanism also makes this guarantee. Responses can
+    be returned in an order that is different from the order in
+    which the requests were received because some requests take
+    longer to process than others.
+  </p>
+  <p>
+    Every request is required to have two fields and may have two
+    additional optional fields. The first required field is the ‘id’
+    field, which is only used by the server to associate a response
+    with the request that generated the response. The second
+    required field is the ‘method’ field, which is used to determine
+    what the server is being requested to do. One optional field is
+    the ‘params’ field, whose structure is dependent on the method
+    being requested. The structure of this field is described with
+    each request for which it is required. The other optional field
+    is the 'clientRequestTime' field, which is a number indicating
+    the time at which the client made the request (milliseconds
+    since epoch). Providing clientRequestTime helps us track
+    how responsive formatter server is to client requests
+    and better address any issues that occur.
+    NOTE: [clientRequestTime] is not used in this fork at the time.
+  </p>
+  <p>
+    Every response has up to three fields. The first field is the
+    ‘id’ field, which is always present and whose value is the
+    identifier that was passed to the request that generated the
+    response. The second field is the ‘error’ field, which is only
+    present if an error was encountered while processing the
+    request. The third field is the ‘result’ field, whose structure
+    is dependent on the method being responded to, and is described
+    with each request that will produce it.
+  </p>
+  <p>
+    The server can also communicate to the clients by sending a
+    notification. The purpose of these notifications is to provide
+    information to clients as it becomes available rather than to
+    require that clients poll for it. Unless explicitly stated, all
+    notifications are designed to return the complete information
+    available at the time the notification is sent; clients are not
+    required to update previously communicated
+    results. Consequently, the server can and should return partial
+    results before all results are available. For example, the
+    syntactic errors for a file can be returned as soon as the
+    syntactic analysis is complete, and both syntactic and semantic
+    errors can be returned together at a later time.
+  </p>
+  <p>
+    Each notification has two fields. The first field is the ‘event’
+    field, which identifies the kind of notification. The second
+    field is the ‘params’ field, whose structure is dependent on the
+    kind of notification being sent. The structure of this field is
+    described with each notification.
+  </p>
+  <p>
+    In order to be backward compatible, clients should ignore fields that were
+    not specified in the version of the API on which they were based. Clients
+    should also use the server.getVersion request to test that the version of
+    the server supports an API before using it.
+  </p>
+  <h3>Eventual Consistency</h3>
+  <p>
+    The formatter server satisfies requests under the principle of
+    <a href="https://en.wikipedia.org/wiki/Eventual_consistency">eventual
+      consistency</a>.
+    That is, in some cases it may return responses with the currently available
+    results while it's catching up with unprocessed changes.
+  </p>
+  <h3>Enumerations</h3>
+  <p>
+    Responses from the server may include enumerations indicating the kind of a
+    specific item. The enums may be extended with new values in future versions of
+    the server so clients should ensure unknown values are handled gracefully, either
+    ignoring the item or treating it with some default/fallback handling.
+  </p>
+  <h3>Changelog</h3>
+  <h4>0.8.0</h4>
+  <ul>
+    <li>Initial Version.</li>
+  </ul>
+  <h3>Domains</h3>
+  <p>
+    For convenience, the API is divided into domains. Each domain is specified
+    in a separate section below. The specifications of the API’s refer to data
+    structures beyond the standard JSON primitives. These data structures are
+    documented in the section titled <a href="#types">Types</a>.
+  </p>
+  <toc></toc>
+  <h3>Command-line Arguments</h3>
+  <p>
+    The command-line arguments that can be passed to the server.
+  </p>
+  <h4>Options</h4>
+  <blockquote>
+    <dl>
+      <dt>--client-id</dt>
+      <dd>
+        <p>
+          Specifies an identifier associated with the client. Used when
+          generating error reports.
+        </p>
+        <p>
+          Clients are strongly encouraged to provide this information in
+          order to improve the quality of information that can be provided
+          to them.
+        </p>
+      </dd>
+    </dl>
+    <dl>
+      <dt>--client-version</dt>
+      <dd>
+        <p>
+          Specifies the version of the client that is communicating with
+          the server. Used when generating error reports.
+        </p>
+        <p>
+          Clients are strongly encouraged to provide this information in
+          order to improve the quality of information that can be provided
+          to them.
+        </p>
+      </dd>
+    </dl>
+  </blockquote>
+  <domains></domains>
+  <domain name="server">
+    <p>
+      The server domain contains API’s related to the execution of
+      the server.
+    </p>
+    <request method="getVersion">
+      <p>Return the version number of the formatter server.</p>
+      <result>
+        <field name="version">
+          <ref>String</ref>
+          <p>The version number of the formatter server.</p>
+        </field>
+      </result>
+    </request>
+    <request method="shutdown">
+      <p>
+        Cleanly shutdown the formatter server. Requests that are
+        received after this request will not be processed. Requests
+        that were received before this request, but for which a
+        response has not yet been sent, will not be responded to. No
+        further responses or notifications will be sent after the
+        response to this request has been sent.
+      </p>
+    </request>
+    <request method="updateContent">
+      <p>
+        Update the content of one or more files. Files that were
+        previously updated but not included in this update remain
+        unchanged. This effectively represents an overlay of the
+        filesystem. The files whose content is overridden are
+        therefore seen by server as being files with the given
+        content, even if the files do not exist on the filesystem or
+        if the file path represents the path to a directory on the
+        filesystem.
+      </p>
+      <params>
+        <field name="files">
+          <map>
+            <key>
+              <ref>FilePath</ref>
+            </key>
+            <value>
+              <union field="type">
+                <ref>AddContentOverlay</ref>
+                <ref>ChangeContentOverlay</ref>
+                <ref>RemoveContentOverlay</ref>
+              </union>
+            </value>
+          </map>
+          <p>
+            A table mapping the files whose content has changed to a
+            description of the content change.
+          </p>
+        </field>
+      </params>
+      <result>
+      </result>
+    </request>
+    <notification event="connected">
+      <p>
+        Reports that the server is running. This notification is
+        issued once after the server has started running but before
+        any requests are processed to let the client know that it
+        started correctly.
+      </p>
+      <p>
+        It is not possible to subscribe to or unsubscribe from this
+        notification.
+      </p>
+      <params>
+        <field name="version">
+          <ref>String</ref>
+          <p>The version number of the formatter server.</p>
+        </field>
+        <field name="pid">
+          <ref>int</ref>
+          <p>The process id of the formatter server process.</p>
+        </field>
+      </params>
+    </notification>
+    <notification event="error">
+      <p>
+        Reports that an unexpected error has occurred while
+        executing the server. This notification is not used for
+        problems with specific requests (which are returned as part
+        of the response) but is used for exceptions that occur while
+        performing other tasks, such as analysis or preparing
+        notifications.
+      </p>
+      <p>
+        It is not possible to subscribe to or unsubscribe from this
+        notification.
+      </p>
+      <params>
+        <field name="isFatal">
+          <ref>bool</ref>
+          <p>
+            True if the error is a fatal error, meaning that the
+            server will shutdown automatically after sending this
+            notification.
+          </p>
+        </field>
+        <field name="message">
+          <ref>String</ref>
+          <p>
+            The error message indicating what kind of error was
+            encountered.
+          </p>
+        </field>
+        <field name="stackTrace">
+          <ref>String</ref>
+          <p>
+            The stack trace associated with the generation of the
+            error, used for debugging the server.
+          </p>
+        </field>
+      </params>
+    </notification>
+  </domain>
+  <domain name="edit">
+    <p>
+      The edit domain contains commands related to edits that can be
+      applied to the code.
+    </p>
+    <request method="format">
+      <p>
+        Format the contents of a single file. The currently selected region of
+        text is passed in so that the selection can be preserved across the
+        formatting operation. The updated selection will be as close to
+        matching the original as possible, but whitespace at the beginning or
+        end of the selected region will be ignored. If preserving selection
+        information is not required, zero (0) can be specified for both the
+        selection offset and selection length.
+      </p>
+      <p>
+        If a request is made for a file which does not exist, or which is not
+        currently subject to analysis (e.g. because it is not associated with
+        any analysis root specified to analysis.setAnalysisRoots), an error of
+        type <tt>FORMAT_INVALID_FILE</tt> will be generated. If the source
+        contains syntax errors, an error of type <tt>FORMAT_WITH_ERRORS</tt>
+        will be generated. If the selection range is outside of the file
+        character lenght and error off type <tt>FORMAT_RANGE_ERROR</tt>
+        will be generated.
+      </p>
+      <params>
+        <field name="file">
+          <ref>String</ref>
+          <p>
+            The file containing the code to be formatted.
+          </p>
+        </field>
+        <field name="selectionOffset">
+          <ref>int</ref>
+          <p>
+            The offset of the current selection in the file.
+          </p>
+        </field>
+        <field name="selectionLength">
+          <ref>int</ref>
+          <p>
+            The length of the current selection in the file.
+          </p>
+        </field>
+        <field name="selectionOnly" optional="true">
+          <ref>bool</ref>
+          <p>
+            True if the code to be formatted should be limited to the selected
+            text (or the smallest portion of text that encloses the selected
+            text that can be formatted).<br>
+            defaults to false if not set.
+          </p>
+        </field>
+        <field name="lineLength" optional="true">
+          <ref>int</ref>
+          <p>
+            The line length to be used by the formatter.<br>
+            defaults to 90 if not set.
+          </p>
+        </field>
+        <field name="tabSize" optional="true">
+          <ref>TabSize</ref>
+          <p>
+            The tab size in spaces to be used by the formatter.<br>
+            defaults all indents to 4 if not set.
+          </p>
+        </field>
+        <field name="insertSpaces" optional="true">
+          <ref>bool</ref>
+          <p>
+            True if the code to be formatted should use spaces for indentations,<br>
+            false to use tab stops. ignores [tabSize] if false.<br>
+            defaults to true if not set.
+          </p>
+        </field>
+        <field name="codeStyle" optional="true">
+          <ref>CodeStyle</ref>
+          <p>
+            Set of common code styles.
+            default to 0 = dart_style with unlocked indent sizes.
+            for more info check [CodeStyle] type.<br>
+            defaults to 0 if not set.
+          </p>
+        </field>
+      </params>
+      <result>
+        <field name="edits">
+          <list>
+            <ref>SourceEdit</ref>
+          </list>
+          <p>
+            The edit(s) to be applied in order to format the code. The list
+            will be empty if the code was already formatted (there are no
+            changes).
+          </p>
+        </field>
+        <field name="selectionOffset">
+          <ref>int</ref>
+          <p>
+            The offset of the selection after formatting the code.
+          </p>
+        </field>
+        <field name="selectionLength">
+          <ref>int</ref>
+          <p>
+            The length of the selection after formatting the code.
+          </p>
+        </field>
+      </result>
+    </request>
+
+  </domain>
+  <types>
+    <h2 class="domain"><a name="types">Types</a></h2>
+    <p>
+      This section contains descriptions of the data types referenced
+      in the API’s of the various domains.
+    </p>
+
+    <include path="analyzer_plugin_pkg/tool/spec/common_types_spec.html"
+      import="package:analyzer_plugin/protocol/protocol_common.dart"></include>
+
+      <type name="CodeStyle">
+        <p>
+          Set of common code styles.
+        </p>
+        <object>
+          <field name="code">
+            <ref>int</ref>
+            <p>
+              0 = dart_style, original style with unlocked indents<br>
+              1 = dart_expanded, based on dart_style with outer braces on blocks that are not collection literals.<br>
+              2 = [not available yet]<br>
+              3 = [not available yet]<br>
+            </p>
+          </field>
+        </object>
+      </type>
+
+      <type name="TabSize">
+        <p>
+          Set of space indentations for different code expressions.
+        </p>
+        <object>
+          <field name="block">
+            <ref>int</ref>
+            <p>The number of spaces in a block or collection body.</p>
+          </field>
+          <field name="cascade">
+            <ref>int</ref>
+            <p>How much wrapped cascade sections indent.</p>
+          </field>
+          <field name="expression">
+            <ref>int</ref>
+            <p>The number of spaces in a single level of expression nesting.</p>
+          </field>
+          <field name="constructorInitializer">
+            <ref>int</ref>
+            <p>The ":" on a wrapped constructor initialization list.</p>
+          </field>
+        </object>
+      </type>
+
+
+    <type name="RequestError">
+      <p>
+        An indication of a problem with the execution of the server,
+        typically in response to a request.
+      </p>
+      <object>
+        <field name="code">
+          <ref>RequestErrorCode</ref>
+          <p>
+            A code that uniquely identifies the error that occurred.
+          </p>
+        </field>
+        <field name="message">
+          <ref>String</ref>
+          <p>
+            A short description of the error.
+          </p>
+        </field>
+        <field name="stackTrace" optional="true">
+          <ref>String</ref>
+          <p>
+            The stack trace associated with processing the request,
+            used for debugging the server.
+          </p>
+        </field>
+      </object>
+    </type>
+    <type name="RequestErrorCode">
+      <p>
+        An enumeration of the types of errors that can occur in the
+        execution of the server.
+      </p>
+      <enum>
+        <value>
+          <code>FORMAT_INVALID_FILE</code>
+          <p>
+            An "edit.format" request specified a FilePath
+            which does not match a Dart file in an analysis root.
+          </p>
+        </value>
+        <value>
+          <code>FORMAT_WITH_ERRORS</code>
+          <p>
+            An "edit.format" request specified a file that contains syntax
+            errors.
+          </p>
+        </value>
+        <value>
+          <code>FORMAT_RANGE_ERROR</code>
+          <p>
+            An "edit.format" request specified an invalid selection range.
+          </p>
+        </value>
+        <value>
+          <code>INVALID_FILE_PATH_FORMAT</code>
+          <p>
+            The format of the given file path is invalid, e.g. is not
+            absolute and normalized.
+          </p>
+        </value>
+        <value>
+          <code>INVALID_OVERLAY_CHANGE</code>
+          <p>
+            An "server.updateContent" request contained a
+            ChangeContentOverlay object which can't be applied, due
+            to not having a matching AddContentOverlay for this file.
+            This happens if the clients does not send an "add" before
+            subsecuent changes.
+          </p>
+        </value>
+        <value>
+          <code>INVALID_OVERLAY_RANGE</code>
+          <p>
+            An "server.updateContent" request contained a
+            ChangeContentOverlay object which can't be applied, due
+            to an edit having an offset or length that is out of
+            range.
+          </p>
+        </value>
+        <value>
+          <code>INVALID_PARAMETER</code>
+          <p>
+            One of the method parameters was invalid.
+          </p>
+        </value>
+        <value>
+          <code>INVALID_REQUEST</code>
+          <p>
+            A malformed request was received.
+          </p>
+        </value>
+        <value>
+          <code>SERVER_ALREADY_STARTED</code>
+          <p>
+            The formatter server has already been started (and hence
+            won't accept new connections).
+          </p>
+          <p>
+            This error is included for future expansion; at present
+            the formatter server can only speak to one client at a
+            time so this error will never occur.
+          </p>
+        </value>
+        <value>
+          <code>SERVER_ERROR</code>
+          <p>
+            An internal error occurred in the formatter server.
+            Also see the server.error notification.
+          </p>
+        </value>
+        <value>
+          <code>UNKNOWN_REQUEST</code>
+          <p>
+            A request was received which the formatter server does
+            not recognize, or cannot handle in its current
+            configuration.
+          </p>
+        </value>
+        <value>
+          <code>UNSUPPORTED_FEATURE</code>
+          <p>
+            The formatter server was requested to perform an action
+            which is not supported.
+          </p>
+          <p>
+            This is a legacy error; it will be removed before the
+            API reaches version 1.0.
+          </p>
+        </value>
+      </enum>
+    </type>
+  </types>
+  <h2>Errors</h2>
+  <p>
+    This section contains a list of all of the errors that are
+    produced by the server and the data that is returned with each.
+  </p>
+  <p>
+    TODO: TBD
+  </p>
+  <h2 class="domain"><a name="index">Index</a></h2>
+  <index></index>
+</body>
+
+</html>

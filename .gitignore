@@ -1,0 +1,17 @@
+# Files and directories created by pub.
+.dart_tool/
+.packages
+
+# Conventional directory for build output.
+build/
+
+.vscode/
+*.dart1
+*.dill
+
+# For testing
+/tool/protocol_spec/generated/**
+
+# Everything in bin exept listen.dart
+/bin/**
+!/bin/listen.dart
