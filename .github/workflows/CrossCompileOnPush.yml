@@ -1,0 +1,70 @@
+name: Build on Push
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow
+  push:
+    branches: [ "master" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+  
+# run action will be from this dir
+defaults:
+  run:
+    working-directory: ./formatter_server
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on:  ${{ matrix.os }}
+    
+    # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        include:
+          - os: ubuntu-latest
+            output-name: dartcfmt-linux
+          - os: macOS-latest
+            output-name: dartcfmt-mac
+          - os: windows-latest
+            output-name: dartcfmt-windows.exe
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # https://github.com/actions/checkout
+      - name: "Checkout local repository"
+        uses: actions/checkout@v3
+        with:
+          path: formatter_server
+      - name: "Checkout Local Xnfo Formatter package"
+        uses: actions/checkout@v3
+        with:
+          repository: xnfo-dart/xnfo_formatter
+          path: xnfo_formatter
+          token: ${{ secrets.GH_PAT }}
+          ref: master
+      
+      # Uses https://github.com/dart-lang/setup-dart to get dart
+      - name: "Dowload dart-sdk"
+        uses: dart-lang/setup-dart@v1.3
+      
+      - name: Install pub dependencies
+        run: dart pub get
+
+      # Build (TODO: create dart grinder task for this particular build method)
+      - name: "Create build dir"
+        run: mkdir build
+      - name : "Compile"
+        run: dart compile exe bin/listen.dart -v -o build/${{ matrix.output-name }}
+
+      # https://github.com/actions/upload-artifact#zipped-artifact-downloads
+      - name: "Upload Artifacts"
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: native-executables
+          path: formatter_server/build
