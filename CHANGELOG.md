@@ -1,5 +1,5 @@
 # Changelog
-StdIO server for handling requests from IDEs using the Dart Xnfo Formatter.
+Stdio server for handling requests from IDEs using the Dart Polisher formatter.
 
 ----
 ## [Unreleased]
@@ -13,6 +13,7 @@ StdIO server for handling requests from IDEs using the Dart Xnfo Formatter.
 - Small versioning changes.
 - Listen API protocol bumped to listen/0.6.1
 - Fix better error reporting messages on overlay range checks.
+- Updated dependencies.
 
 ----
 ## 0.8.8
@@ -27,6 +28,6 @@ StdIO server for handling requests from IDEs using the Dart Xnfo Formatter.
 
 - Some refactoring
 
-[Unreleased]: https://github.com/tekert/dart_formatter/compare/v0.0.2...HEAD
-
-[0.0.1]: https://github.com/tekert/dart_formatter/releases/tag/v0.0.1
+[Unreleased]: https://github.com/xnfo-dart/formatter_server/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/xnfo-dart/formatter_server/releases/tag/v0.9.0
+[0.8.8]: https://github.com/xnfo-dart/formatter_server/releases/tag/v0.8.8
