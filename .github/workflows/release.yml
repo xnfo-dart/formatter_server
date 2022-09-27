@@ -1,0 +1,71 @@
+name: Create a Release
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      versionName:
+        description: 'Name of version  (ie 5.5.0)'
+        required: true
+      isDraft:
+        description: 'Should we create a draft release?'
+        required: false
+        default: 'true'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on:  ubuntu-latest
+    # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
+
+    steps:
+      # To have access to CHANGELOG.md
+      - name: "Checkout local repository"
+        uses: actions/checkout@v3
+
+      - run: mkdir releases
+
+      # Download artifacts from the last run of build_on_tag
+      - name: Download artifact Linux
+        uses: dawidd6/action-download-artifact@v2
+        with:
+          workflow: build_on_tag.yml
+          branch: master
+          github_token: ${{secrets.GH_PAT}}
+          path: releases
+          skip_unpack: true
+
+      - name: Display structure of downloaded files
+        run: ls -R
+        working-directory: releases
+
+      # Extracts between 2nd H2 - 3rd H2
+      - name: Extract release notes
+        id: extract-release-notes
+        uses: ffurrer2/extract-release-notes@v1
+
+      # https://github.com/yashanand1910/standard-release-notes
+      #- name: Extract release notes
+      #  uses: yashanand1910/standard-release-notes@v1.2.1
+      #  id: extract-release-notes
+      #  with:
+      #    changelog_path: ./CHANGELOG.md # Optional
+      #    version: ${{ github.event.inputs.versionName }} # Required
+
+      # https://github.com/softprops/action-gh-release
+      - name: Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          name: Formatter Server v${{ github.event.inputs.versionName }}
+          tag_name: v${{ github.event.inputs.versionName }}
+          draft: ${{ github.event.inputs.isDraft }}
+          prerelease: false
+          body: ${{ steps.extract-release-notes.outputs.release_notes }}
+          token: ${{ secrets.GH_PAT }}
+          files: |
+            releases/**
+
+      # steps.create_release.outputs.upload_url   has the URL

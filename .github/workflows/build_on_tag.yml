@@ -1,13 +1,9 @@
-name: Build on Push
+name: Build binaries on tag
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow only if these files change
   push:
-    branches: [ "master" ]
-    paths:
-      - '**.dart'
-      - '**.yaml'
+    tags:
+      - v*.*.*
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -19,22 +15,22 @@ defaults:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on:  ${{ matrix.os }}
-
     # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
         include:
           - os: ubuntu-latest
-            output-name: dartpolishd-linux
+            output-name: dartpolishd
+            osname: linux
           - os: macOS-latest
-            output-name: dartpolishd-mac
+            output-name: dartpolishd
+            osname: mac
           - os: windows-latest
-            output-name: dartpolishd-windows.exe
+            output-name: dartpolishd.exe
+            osname: windows
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -62,13 +58,15 @@ jobs:
 
       # Build (TODO: create dart grinder task for this particular build method)
       - name: "Create build dir"
-        run: mkdir build
+        run: |
+          mkdir build
+          mkdir build/${{ matrix.osname }}
       - name : "Compile"
-        run: dart compile exe bin/listen.dart -v -o build/${{ matrix.output-name }}
+        run: dart compile exe bin/listen.dart -v -o build/${{ matrix.osname }}/${{ matrix.output-name }}
 
       # https://github.com/actions/upload-artifact#zipped-artifact-downloads
-      - name: "Upload Zipped Artifacts"
+      - name: "Upload OS Artifacts"
         uses: actions/upload-artifact@v3.1.0
         with:
-          name: native-executables
-          path: formatter_server/build
+          name: dartpolishd-${{ matrix.osname }}
+          path: formatter_server/build/${{ matrix.osname }}
