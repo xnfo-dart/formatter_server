@@ -7,14 +7,14 @@ packages:
       name: _fe_analyzer_shared
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "48.0.0"
+    version: "49.0.0"
   analyzer:
     dependency: "direct main"
     description:
       name: analyzer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "5.0.0"
+    version: "5.1.0"
   analyzer_plugin:
     dependency: "direct main"
     description:
@@ -85,6 +85,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.17.2"
+  dart_polisher:
+    dependency: "direct main"
+    description:
+      path: "../dart_polisher"
+      relative: true
+    source: path
+    version: "0.9.1"
   dart_style:
     dependency: transitive
     description:
@@ -358,13 +365,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.0"
-  xnfo_formatter:
-    dependency: "direct main"
-    description:
-      path: "E:\\Sources\\dart\\projects\\dart_format\\xnfo_formatter"
-      relative: false
-    source: path
-    version: "0.9.1"
   yaml:
     dependency: "direct dev"
     description:
