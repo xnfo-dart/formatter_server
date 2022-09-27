@@ -1,20 +1,20 @@
 name: formatter_server
 description: >-
-  Provides Formatting API for IDEs.
+  Provides Formatting API for IDEs. (uses dart_polisher as formatter)
 version: 0.9.0
 issue_tracker: https://github.com/xnfo-dart/formatter_server/issues
 repository: https://github.com/xnfo-dart/formatter_server
 environment:
   sdk: '>=2.17.0 <3.0.0'
-publish_to: none
+publish_to: none # Not intended to be published.
 
 dependencies:
   args: ^2.3.1
   analyzer_plugin: ^0.11.1
   analyzer: '>=4.4.0 <6.0.0'
   _fe_analyzer_shared: any #analyzer will decide wich one to use.
-  xnfo_formatter:
-    path: ../xnfo_formatter #change to git when uploaded
+  dart_polisher:
+    path: ../dart_polisher #change to git when uploaded
 
 dev_dependencies:
   grinder: ^0.9.2
@@ -25,7 +25,7 @@ dev_dependencies:
   yaml: ">=2.0.0 <4.0.0"
 
 executables:
-  dartcfmtd: listen
+  dartpolishd: listen
 
 platforms:
   linux:

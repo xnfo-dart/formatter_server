@@ -12,8 +12,8 @@ import 'package:analyzer/error/listener.dart';
 
 import 'package:analyzer_plugin/protocol/protocol_common.dart' hide Position;
 
-import "package:xnfo_formatter/xnfo_formatter.dart" hide CodeStyle;
-import 'package:xnfo_formatter/xnfo_formatter.dart' as dartformatter
+import "package:dart_polisher/dart_polisher.dart" hide CodeStyle;
+import 'package:dart_polisher/dart_polisher.dart' as dartformatter
     show CodeStyle; // API Protocol uses same name.
 import 'package:formatter_server/src/format_server.dart';
 import 'package:formatter_server/protocol/protocol.dart';

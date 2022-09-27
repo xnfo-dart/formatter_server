@@ -4,7 +4,7 @@ import 'package:args/command_runner.dart';
 import 'package:formatter_server/src/server/listen_command.dart';
 import 'package:formatter_server/src/constants.dart'; // Replace with github import.
 
-import "package:xnfo_formatter/xnfo_formatter.dart";
+import "package:dart_polisher/dart_polisher.dart";
 
 class CLIRunner<T> extends CommandRunner<T>
 {
