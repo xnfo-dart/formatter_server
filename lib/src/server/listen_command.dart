@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:args/command_runner.dart';
-import 'package:formatter_server/src/server_constants.dart';
+import 'package:formatter_server/src/constants.dart';
 import 'package:formatter_server/starter.dart';
 import 'package:formatter_server/src/server/driver.dart';
 
