@@ -1,5 +1,5 @@
-# Dart Formatter Server [![Formatter](https://shields.io/badge/dart-Formatter_Server-green?logo=dart&style=flat-square)](https://github.com/tekert/dart-formatter) ![Issues](https://img.shields.io/github/issues/tekert/dart_formatter)
- `stdio` Dart formatter server using [Xnfo Formatter] over an [API] Protocol
+# Dart Formatter Server [![Formatter](https://shields.io/badge/dart-Formatter_Server-green?logo=dart&style=flat-square)](https://github.com/xnfo-dart/formatter_server) ![Issues](https://img.shields.io/github/issues/xnfo-dart/formatter_server)
+ `stdio` Dart formatter server using [Dart Polisher] over an [API] Protocol
  
 For use in IDE integration.
 
@@ -7,7 +7,7 @@ For use in IDE integration.
 ## Download
 - From [Releases](https://github.com/xnfo-dart/formatter_server/releases)
  ## IDE Extensions
-- [VScode Extension](https://github.com/xnfo-dart/dart-format-vscode)
+- [VScode Extension](https://github.com/xnfo-dart/dart-polisher-vscode)
 
 
 ## Build
@@ -37,4 +37,4 @@ Most of the code is originaly from Dart Authors.
 
 [API]: https://htmlpreview.github.io/?https://github.com/xnfo-dart/formatter_server/blob/master/doc/api.html
 
-[Xnfo Formatter]: https://github.com/xnfo-dart/xnfo_formatter
+[Dart Polisher]: https://github.com/xnfo-dart/dart_polisher
