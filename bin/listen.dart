@@ -2,9 +2,9 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 
 import 'package:formatter_server/src/server/listen_command.dart';
-import 'package:formatter_server/src/constants.dart'; // Replace with github import.
+import 'package:formatter_server/src/constants.dart';
 
-import "package:dart_polisher/dart_polisher.dart";
+import "package:dart_polisher/dart_polisher.dart" as polisher;
 
 class CLIRunner<T> extends CommandRunner<T>
 {
@@ -17,8 +17,8 @@ class CLIRunner<T> extends CommandRunner<T>
         {
             if (topLevelResults['version'] as bool)
             {
-                print("Server / API: $FORMATTER_SERVER_VERSION / $LISTEN_PROTOCOL_VERSION");
-                print(XNFOFMT_VERSION_STRING);
+                print("Server / API: $SERVER_VERSION / $LISTEN_PROTOCOL_VERSION");
+                print(polisher.VERSION_STRING);
                 return null;
             }
         }

@@ -3,6 +3,6 @@
 import 'package:formatter_server/protocol/protocol_constants.dart'
     show PROTOCOL_VERSION;
 
-const String FORMATTER_SERVER_VERSION = "0.9.0";
+const String SERVER_VERSION = "0.9.0";
 
 const String LISTEN_PROTOCOL_VERSION = PROTOCOL_VERSION;
