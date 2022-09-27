@@ -10,7 +10,7 @@ import 'dart:math';
 
 //import 'package:path/path.dart' as path;
 import 'package:args/args.dart';
-import 'package:formatter_server/src/server_constants.dart';
+import 'package:formatter_server/src/constants.dart';
 import 'package:formatter_server/protocol/protocol_constants.dart';
 
 import 'package:formatter_server/starter.dart';

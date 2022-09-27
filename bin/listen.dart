@@ -2,7 +2,7 @@ import 'package:args/args.dart';
 import 'package:args/command_runner.dart';
 
 import 'package:formatter_server/src/server/listen_command.dart';
-import 'package:formatter_server/src/server_constants.dart'; // Replace with github import.
+import 'package:formatter_server/src/constants.dart'; // Replace with github import.
 
 import "package:xnfo_formatter/xnfo_formatter.dart";
 
