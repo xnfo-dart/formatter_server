@@ -5,7 +5,7 @@ on:
     tags:
       - v*.*.*
 
-  # Allows you to run this workflow manually from the Actions tab
+  # Allows you to run this workflow manually from the Actions tab (for testing)
   workflow_dispatch:
 
 # run action will be from this dir

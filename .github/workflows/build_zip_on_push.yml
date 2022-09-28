@@ -9,7 +9,7 @@ on:
       - '**.dart'
       - '**.yaml'
 
-  # Allows you to run this workflow manually from the Actions tab
+  # Allows you to run this workflow manually from the Actions tab (for testing)
   workflow_dispatch:
 
 # run action will be from this dir
@@ -51,7 +51,7 @@ jobs:
           repository: xnfo-dart/dart_polisher
           path: dart_polisher
           token: ${{ secrets.GH_PAT }} # TODO: delete this line when going open source.
-          ref: master
+      #   ref: master
 
       # Uses https://github.com/dart-lang/setup-dart to get dart
       - name: "Dowload dart-sdk"
