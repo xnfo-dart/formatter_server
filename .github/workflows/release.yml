@@ -33,7 +33,7 @@ jobs:
         with:
           workflow: build_on_tag.yml
           branch: master
-        #  github_token: ${{secrets.GITHUB_TOKEN}}
+          github_token: ${{secrets.GH_PAT}}
           path: releases
           skip_unpack: true
 
