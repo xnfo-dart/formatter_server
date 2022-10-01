@@ -80,9 +80,7 @@ class EditFormatHandler extends Handler
                 selectionLength: length);
 
             // Translate CodeStyle from API to dart_formatter.CodeStyle.
-            final style = dartformatter.CodeStyle.values.firstWhere(
-                (element) => element.styleCode == (params.codeStyle?.code),
-                orElse: () => dartformatter.CodeStyle.DartStyle);
+            final style = dartformatter.CodeStyle.getEnum(params.codeStyle?.code);
 
             // Translate tab sizes from API to CodeIndent.
             final tabSizes = CodeIndent.opt(
