@@ -93,7 +93,7 @@ Future<void> bump() async
     var versionFile = getFile('lib/src/server_constants.dart');
     var versionSource = versionFile.readAsStringSync();
     var versionReplaced =
-        updateVersionConstant(versionSource, "FORMATTER_SERVER_VERSION", bumped);
+        updateVersionConstant(versionSource, "SERVER_VERSION", bumped);
     versionFile.writeAsStringSync(versionReplaced);
 
     // Update the version in the CHANGELOG.
