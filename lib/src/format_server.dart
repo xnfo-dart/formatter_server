@@ -23,6 +23,10 @@ import 'package:formatter_server/protocol/protocol.dart';
 import 'package:formatter_server/protocol/protocol_constants.dart';
 import 'package:formatter_server/protocol/protocol_generated.dart';
 
+// Handlers
+import 'package:formatter_server/src/handler/abstract_handler.dart';
+import 'package:formatter_server/src/handler/format_handler.dart';
+
 /// Various IDE options.
 class FormatServerOptions
 {
@@ -30,8 +34,17 @@ class FormatServerOptions
     String? clientVersion;
 }
 
+/// A function that can be executed to create a handler for a request.
+typedef HandlerGenerator = Handler Function(FormatServer, Request);
+
 class FormatServer
 {
+    /// A map from the name of a request to a function used to create a request
+    /// handler.
+    static final Map<String, HandlerGenerator> handlerGenerators = {
+        EDIT_REQUEST_FORMAT: EditFormatHandler.new,
+    };
+
     /// The channel from which requests are received and to which responses should
     /// be sent.
     final ServerCommunicationChannel channel;
@@ -110,7 +123,11 @@ class FormatServer
 
     /// There was an error related to the socket from which requests are being
     /// read.
-    void error(argument) {}
+    void error(Object exception, StackTrace? stackTrace)
+    {
+        // Don't send to instrumentation service; not an internal error.
+        sendServerErrorNotification('Socket error', exception, stackTrace);
+    }
 
     /// Handle a [request] that was read from the communication channel.
     void handleRequest(Request request)
@@ -215,38 +232,51 @@ class FormatServer
     }
 
     /// Sends a `server.error` notification.
-    //TODO (tekert): check for what it was used.
+    // Ported from lsp implemetation of analisys server socket errors.
+    // listen onError parameter, used from FormatServer.error()
     void sendServerErrorNotification(
         String message,
-        dynamic exception,
-        /*StackTrace*/ stackTrace, {
+        Object exception,
+        StackTrace? stackTrace, {
         bool fatal = false,
     })
     {
-        var msg = exception == null ? message : '$message: $exception';
-        if (stackTrace != null && exception is! CaughtException)
-        {
-            stackTrace = StackTrace.current;
-        }
-
-        // send the notification
-        channel.sendNotification(
-            ServerErrorParams(fatal, msg, '$stackTrace').toNotification());
-
-        // remember the last few exceptions
+        var fullMessage = message;
         if (exception is CaughtException)
         {
             stackTrace ??= exception.stackTrace;
+            fullMessage = '$fullMessage: ${exception.exception}';
         }
+        else
+        {
+            fullMessage = '$fullMessage: $exception';
+        }
+        final fullError = stackTrace == null ? fullMessage : '$fullMessage\n$stackTrace';
+        stackTrace ??= StackTrace.current;
+
+        // send the notification
+        channel.sendNotification(
+            ServerErrorParams(fatal, fullMessage, '$stackTrace').toNotification());
 /*
-        TODO (tekert): This was for the diagnostics page of the analysis_server, remove.
+        // remember the last few exceptions
+        //TODO (tekert): This was for the diagnostics page of the analysis_server, remove.
+        // no use here.
         exceptions.add(ServerException(
             message,
             exception,
-            stackTrace is StackTrace ? stackTrace : StackTrace.current,
-            fatal,
+            stackTrace,
+            false,
         ));
 */
+        instrumentationService.logException(
+            FatalException(
+                message,
+                exception,
+                stackTrace,
+            ),
+            null,
+            //crashReportingAttachmentsBuilder.forException(exception),
+        );
     }
 
     Future<void> shutdown()
