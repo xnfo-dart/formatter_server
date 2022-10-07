@@ -108,8 +108,8 @@ class Driver implements ServerStarter
             //! Important note:
             // listen onError is handled by FormatServer.error() wich sends an [Notification] Error to client.
             // Each request is handled in another nested Error Zone for handlers wich logs any exeption error,
-            //   Any unhandled (in Handler from a Request) [RequestFailure] Exeption is logged as a warning
-            //   and sent as a [Response] with Error (please handle them inside each handler).
+            //   Any unhandled (in Handler from a Request) [RequestFailure] Exeption is
+            //   sent as a [Response] with Error (please handle them inside each handler).
             serveResult = stdioServer.serveStdio();
 
             // When stdioServer is closed then..

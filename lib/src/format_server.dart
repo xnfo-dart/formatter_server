@@ -16,8 +16,6 @@ import 'package:analyzer_plugin/protocol/protocol_common.dart'; // for ContentOv
 /*import 'package:analyzer/src/generated/sdk.dart';*/
 
 import 'package:formatter_server/src/channel/channel.dart';
-import 'package:formatter_server/src/edit_domain.dart';
-import 'package:formatter_server/src/domain_server.dart';
 import 'package:formatter_server/src/server/error_notifier.dart';
 import 'package:formatter_server/protocol/protocol.dart';
 import 'package:formatter_server/protocol/protocol_constants.dart';
@@ -25,7 +23,10 @@ import 'package:formatter_server/protocol/protocol_generated.dart';
 
 // Handlers
 import 'package:formatter_server/src/handler/abstract_handler.dart';
-import 'package:formatter_server/src/handler/format_handler.dart';
+import 'package:formatter_server/src/handler/edit_format.dart';
+import 'package:formatter_server/src/handler/server_get_version.dart';
+import 'package:formatter_server/src/handler/server_shutdown.dart';
+import 'package:formatter_server/src/handler/server_update_content.dart';
 
 /// Various IDE options.
 class FormatServerOptions
@@ -43,15 +44,14 @@ class FormatServer
     /// handler.
     static final Map<String, HandlerGenerator> handlerGenerators = {
         EDIT_REQUEST_FORMAT: EditFormatHandler.new,
+        SERVER_REQUEST_GET_VERSION: ServerGetVersionHandler.new,
+        SERVER_REQUEST_SHUTDOWN: ServerShutdownHandler.new,
+        SERVER_REQUEST_UPDATE_CONTENT: ServerUpdateContentHandler.new,
     };
 
     /// The channel from which requests are received and to which responses should
     /// be sent.
     final ServerCommunicationChannel channel;
-
-    /// A list of the request handlers used to handle the requests sent to this
-    /// server.
-    late List<RequestHandler> handlers;
 
     /// The instrumentation service that is to be used by this format server.
     InstrumentationService instrumentationService;
@@ -111,11 +111,6 @@ class FormatServer
 
         channel.requests.listen(handleRequest, onDone: done, onError: error);
         //debounceRequests(channel, discardedRequests).listen(handleRequest, onDone: done, onError: error);
-
-        handlers = <RequestHandler>[
-            EditDomainHandler(this),
-            ServerDomainHandler(this),
-        ];
     }
 
     /// The socket from which requests are being read has been closed.
@@ -133,53 +128,36 @@ class FormatServer
     void handleRequest(Request request)
     {
         // runZonedGuarded (onError) handles sync and async errors.
-        // runZoned (ZoneSpecification handleUncaughtError) hnadles only async (microtask async too).
+        // runZoned (ZoneSpecification handleUncaughtError) handles only async (microtask async too).
+
+        // Because we don't `await` the execution of the handlers, we wrap the
+        // execution in order to have one central place to handle exceptions.
         runZonedGuarded(()
         {
-            var count = handlers.length;
-            for (var i = 0; i < count; i++)
+            //analyticsManager.startedRequest(request: request, startTime: DateTime.now());
+            //performance.logRequestTiming(request.clientRequestTime);
+
+            // Find request name and get the request handler constructor.
+            var generator = handlerGenerators[request.method];
+            if (generator != null)
             {
-                try
-                {
-                    // Ask each registered handler if it can handle it.
-                    var response = handlers[i].handleRequest(request);
-                    if (response == Response.DELAYED_RESPONSE)
-                    {
-                        // Means the request is being handled asyncrhonously,
-                        // the handler will be responsible for sending [Response] when ready.
-                        return;
-                    }
-                    if (response != null)
-                    {
-                        sendResponse(response);
-                        return;
-                    }
-                }
-                on RequestFailure catch (exception)
-                {
-                    sendResponse(exception.response);
-                    return;
-                }
-                catch (exception, stackTrace)
-                {
-                    var error =
-                        RequestError(RequestErrorCode.SERVER_ERROR, exception.toString());
-                    error.stackTrace = stackTrace.toString();
-                    var response = Response(request.id, error: error);
-                    sendResponse(response);
-                    return;
-                }
+                var handler = generator(this, request);
+                handler.handle(); // async,
             }
-            sendResponse(Response.unknownRequest(request));
+            else
+            {
+                sendResponse(Response.unknownRequest(request));
+            }
         }, (exception, stackTrace)
         {
-            // In case an async handler doesnt catch it, send response but log it.
+            // In case an async handler doesnt catch it, send response.
             if (exception is RequestFailure)
             {
                 sendResponse(exception.response);
-                //return; // TODO: test if log is actually logged.
+                return;
             }
 
+            // Log the exception.
             instrumentationService.logException(
                 FatalException(
                     'Failed to handle request: ${request.method}',
@@ -187,7 +165,13 @@ class FormatServer
                     stackTrace,
                 ),
                 null,
+                //crashReportingAttachmentsBuilder.forException(exception),
             );
+            // Then return an error response to the client.
+            var error = RequestError(RequestErrorCode.SERVER_ERROR, exception.toString());
+            error.stackTrace = stackTrace.toString();
+            var response = Response(request.id, error: error);
+            sendResponse(response);
         });
     }
 
