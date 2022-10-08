@@ -51,22 +51,11 @@ Future<void> validate() async
 ///
 ///   3. Commit the change to a branch.
 ///
-///   4. Send it out for review:
-///
-///         git cl upload
-///
-///   5. After the review is complete, land it:
-///
-///         git cl land
-///
-///   6. Tag the commit:
+///   4. Tag the commit:
 ///
 ///         git tag -a "<version>" -m "<version>"
 ///         git push origin <version>
 ///
-///   7. Publish the package:
-///
-///         pub lish
 @Task()
 @Depends(validate)
 Future<void> bump() async

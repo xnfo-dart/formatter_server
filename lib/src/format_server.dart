@@ -98,6 +98,9 @@ class FormatServer
     /// The object used to manage the SDK's known to this server.
     /*final DartSdkManager sdkManager;*/
 
+    /// Handle requests on [channel] using a [baseResourceProvider]
+    /// for overlaying files access with a [OverlayResourceProvider]
+    /// [instrumentationService] is used for logging exceptions.
     FormatServer(this.channel, ResourceProvider baseResourceProvider,
         /*this.sdkManager,*/ this.instrumentationService)
         : resourceProvider = OverlayResourceProvider(baseResourceProvider)
@@ -111,6 +114,15 @@ class FormatServer
 
         channel.requests.listen(handleRequest, onDone: done, onError: error);
         //debounceRequests(channel, discardedRequests).listen(handleRequest, onDone: done, onError: error);
+    }
+
+    /// For tests only
+    Future<void> dispose() async
+    {
+        for (var timer in _pendingFilesToRemoveOverlay.values)
+        {
+            timer.cancel();
+        }
     }
 
     /// The socket from which requests are being read has been closed.
