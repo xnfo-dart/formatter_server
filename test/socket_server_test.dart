@@ -5,14 +5,14 @@
 import 'package:formatter_server/protocol/protocol.dart';
 import 'package:formatter_server/protocol/protocol_constants.dart';
 import 'package:formatter_server/protocol/protocol_generated.dart';
-import 'package:formatter_server/src/format_server.dart';
+//import 'package:formatter_server/src/format_server.dart';
 //import 'package:formatter_server/src/analytics/analytics_manager.dart';
 //import 'package:formatter_server/src/analytics/noop_analytics.dart';
 //import 'package:formatter_server/src/server/crash_reporting_attachments.dart';
 import 'package:formatter_server/src/socket_server.dart';
 
 import 'package:analyzer/src/generated/engine.dart';
-import 'package:analyzer/src/generated/sdk.dart';
+//import 'package:analyzer/src/generated/sdk.dart';
 import 'package:test/test.dart';
 
 //import 'package:formatter_server/src/server/error_notifier.dart'; // transfered to test subdir

@@ -22,7 +22,7 @@ The analyzer has handly classes totally abstracted from the analysis side, for h
 This had to be done because the analysis_plugin doesn't hook in edit.format requests, so forking the stdio server seemed like a balanced aproach.
 the analysis_server now uses [Language Server Provider](https://microsoft.github.io/language-server-protocol/).
 
-Using the LSP for formatting requiered greater work, if this server gets more functionality we may change to uso LSP (its already done in analysis_server, only porting, refactor and testing it is requiered).
+Using the LSP only for formatting was not feasible, if this server gets more functionality we may change to use the LSP protocol (its already done in the analysis_server, only importing, refactoring and testing is requiered).
 ***
 ## API and tool/protocol_spec
 

@@ -17,8 +17,8 @@ final GeneratedFile clientTarget = GeneratedFile(
     return visitor.collectCode(visitor.visitApi);
 });
 
-final GeneratedFile serverTarget = GeneratedFile(
-    'lib/protocol/protocol_constants.dart', (String pkgPath) async
+final GeneratedFile serverTarget =
+    GeneratedFile('lib/protocol/protocol_constants.dart', (String pkgPath) async
 {
     var visitor = CodegenVisitor(readApi(pkgPath));
     return visitor.collectCode(visitor.visitApi);

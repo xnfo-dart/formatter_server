@@ -4,14 +4,16 @@
 
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-//import 'format_if_enabled_test.dart' as format_if_enabled;
-import 'format_test.dart' as format;
+//import 'command_line_options_test.dart' as command_line_options_test;
+import 'get_version_test.dart' as get_version_test;
+import 'shutdown_test.dart' as shutdown_test;
 
 void main()
 {
     defineReflectiveSuite(()
     {
-        format.main();
-        //format_if_enabled.main();
-    }, name: 'edit');
+        //command_line_options_test.main(); //TODO(tekert)
+        get_version_test.main();
+        shutdown_test.main();
+    }, name: 'server');
 }

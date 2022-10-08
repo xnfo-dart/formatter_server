@@ -9,8 +9,10 @@ import 'dart:io';
 import './analyzer_utilities_pkg/tools.dart';
 import 'package:path/path.dart';
 
+import 'codegen_inttest_methods.dart' as codegen_inttest_methods;
 import 'codegen_dart_protocol.dart' as codegen_dart_protocol;
 import 'codegen_protocol_constants.dart' as codegen_protocol_constants;
+import 'codegen_matchers.dart' as codegen_matchers;
 import 'to_html.dart' as to_html;
 
 /// Generate all targets.
@@ -25,6 +27,8 @@ void main() async
 List<GeneratedContent> get allTargets
 {
     var targets = <GeneratedContent>[];
+    targets.add(codegen_inttest_methods.target);
+    targets.add(codegen_matchers.target);
     //targets.add(codegen_dart_protocol.clientTarget(false));
     targets.add(codegen_dart_protocol.serverTarget(false));
     targets.add(codegen_protocol_constants.serverTarget);

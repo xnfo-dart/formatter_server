@@ -6,19 +6,22 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:analysis_server/protocol/protocol.dart';
-import 'package:analysis_server/src/channel/byte_stream_channel.dart';
+import 'package:formatter_server/protocol/protocol.dart';
+import 'package:formatter_server/src/channel/byte_stream_channel.dart';
 import 'package:analyzer/instrumentation/instrumentation.dart';
 import 'package:test/test.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-void main() {
-  defineReflectiveSuite(() {
-    defineReflectiveTests(ByteStreamClientChannelTest);
-    defineReflectiveTests(ByteStreamServerChannelTest);
-  });
+void main()
+{
+    defineReflectiveSuite(()
+    {
+        //defineReflectiveTests(ByteStreamClientChannelTest);
+        defineReflectiveTests(ByteStreamServerChannelTest);
+    });
 }
 
+/*
 @reflectiveTest
 class ByteStreamClientChannelTest {
   late ByteStreamClientChannel channel;
@@ -98,161 +101,180 @@ class ByteStreamClientChannelTest {
     return pumpEventQueue().then((_) => expect(assertCount, equals(2)));
   }
 }
-
+*/
 @reflectiveTest
-class ByteStreamServerChannelTest {
-  late ByteStreamServerChannel channel;
+class ByteStreamServerChannelTest
+{
+    late ByteStreamServerChannel channel;
 
-  /// Sink that may be used to deliver data to the channel, as though it's
-  /// coming from the client.
-  late IOSink inputSink;
+    /// Sink that may be used to deliver data to the channel, as though it's
+    /// coming from the client.
+    late IOSink inputSink;
 
-  /// Stream of lines sent back to the client by the channel.
-  late Stream<String> outputLineStream;
+    /// Stream of lines sent back to the client by the channel.
+    late Stream<String> outputLineStream;
 
-  /// Stream of requests received from the channel via [listen()].
-  late Stream<Request> requestStream;
+    /// Stream of requests received from the channel via [listen()].
+    late Stream<Request> requestStream;
 
-  /// Stream of errors received from the channel via [listen()].
-  late Stream errorStream;
+    /// Stream of errors received from the channel via [listen()].
+    late Stream errorStream;
 
-  /// Future which is completed when then [listen()] reports [onDone].
-  late Future doneFuture;
+    /// Future which is completed when then [listen()] reports [onDone].
+    late Future doneFuture;
 
-  void setUp() {
-    var inputStream = StreamController<List<int>>();
-    inputSink = IOSink(inputStream);
-    var outputStream = StreamController<List<int>>();
-    outputLineStream = outputStream.stream
-        .transform(Utf8Codec().decoder)
-        .transform(LineSplitter());
-    var outputSink = IOSink(outputStream);
-    channel = ByteStreamServerChannel(
-        inputStream.stream, outputSink, InstrumentationService.NULL_SERVICE);
-    var requestStreamController = StreamController<Request>();
-    requestStream = requestStreamController.stream;
-    var errorStreamController = StreamController();
-    errorStream = errorStreamController.stream;
-    var doneCompleter = Completer();
-    doneFuture = doneCompleter.future;
-    channel.requests.listen((Request request) {
-      requestStreamController.add(request);
-    }, onError: (error) {
-      errorStreamController.add(error);
-    }, onDone: () {
-      doneCompleter.complete();
-    });
-  }
+    void setUp()
+    {
+        var inputStream = StreamController<List<int>>();
+        inputSink = IOSink(inputStream);
+        var outputStream = StreamController<List<int>>();
+        outputLineStream =
+            outputStream.stream.transform(Utf8Codec().decoder).transform(LineSplitter());
+        var outputSink = IOSink(outputStream);
+        channel = ByteStreamServerChannel(
+            inputStream.stream, outputSink, InstrumentationService.NULL_SERVICE);
+        var requestStreamController = StreamController<Request>();
+        requestStream = requestStreamController.stream;
+        var errorStreamController = StreamController();
+        errorStream = errorStreamController.stream;
+        var doneCompleter = Completer();
+        doneFuture = doneCompleter.future;
+        channel.requests.listen((Request request)
+        {
+            requestStreamController.add(request);
+        }, onError: (error)
+        {
+            errorStreamController.add(error);
+        }, onDone: ()
+        {
+            doneCompleter.complete();
+        });
+    }
 
-  Future<void> test_closed() {
-    return inputSink
-        .close()
-        .then((_) => channel.closed.timeout(Duration(seconds: 1)));
-  }
+    Future<void> test_closed()
+    {
+        return inputSink
+            .close()
+            .then((_) => channel.closed.timeout(Duration(seconds: 1)));
+    }
 
-  Future<void> test_listen_invalidJson() {
-    inputSink.writeln('{"id":');
-    return inputSink
-        .flush()
-        .then((_) => outputLineStream.first.timeout(Duration(seconds: 1)))
-        .then((String response) {
-      var jsonResponse = JsonCodec().decode(response);
-      expect(jsonResponse, isMap);
-      expect(jsonResponse, contains('error'));
-      expect(jsonResponse['error'], isNotNull);
-    });
-  }
+    Future<void> test_listen_invalidJson()
+    {
+        inputSink.writeln('{"id":');
+        return inputSink
+            .flush()
+            .then((_) => outputLineStream.first.timeout(Duration(seconds: 1)))
+            .then((String response)
+        {
+            var jsonResponse = JsonCodec().decode(response);
+            expect(jsonResponse, isMap);
+            expect(jsonResponse, contains('error'));
+            expect(jsonResponse['error'], isNotNull);
+        });
+    }
 
-  Future<void> test_listen_invalidRequest() {
-    inputSink.writeln('{"id":"0"}');
-    return inputSink
-        .flush()
-        .then((_) => outputLineStream.first.timeout(Duration(seconds: 1)))
-        .then((String response) {
-      var jsonResponse = JsonCodec().decode(response);
-      expect(jsonResponse, isMap);
-      expect(jsonResponse, contains('error'));
-      expect(jsonResponse['error'], isNotNull);
-    });
-  }
+    Future<void> test_listen_invalidRequest()
+    {
+        inputSink.writeln('{"id":"0"}');
+        return inputSink
+            .flush()
+            .then((_) => outputLineStream.first.timeout(Duration(seconds: 1)))
+            .then((String response)
+        {
+            var jsonResponse = JsonCodec().decode(response);
+            expect(jsonResponse, isMap);
+            expect(jsonResponse, contains('error'));
+            expect(jsonResponse['error'], isNotNull);
+        });
+    }
 
-  Future<void> test_listen_streamDone() {
-    return inputSink
-        .close()
-        .then((_) => doneFuture.timeout(Duration(seconds: 1)));
-  }
+    Future<void> test_listen_streamDone()
+    {
+        return inputSink.close().then((_) => doneFuture.timeout(Duration(seconds: 1)));
+    }
 
-  Future<void> test_listen_streamError() {
-    var error = Error();
-    inputSink.addError(error);
-    return inputSink
-        .flush()
-        .then((_) => errorStream.first.timeout(Duration(seconds: 1)))
-        .then((var receivedError) {
-      expect(receivedError, same(error));
-    });
-  }
+    Future<void> test_listen_streamError()
+    {
+        var error = Error();
+        inputSink.addError(error);
+        return inputSink
+            .flush()
+            .then((_) => errorStream.first.timeout(Duration(seconds: 1)))
+            .then((var receivedError)
+        {
+            expect(receivedError, same(error));
+        });
+    }
 
-  Future<void> test_listen_wellFormedRequest() {
-    inputSink.writeln('{"id":"0","method":"server.version"}');
-    return inputSink
-        .flush()
-        .then((_) => requestStream.first.timeout(Duration(seconds: 1)))
-        .then((Request request) {
-      expect(request.id, equals('0'));
-      expect(request.method, equals('server.version'));
-    });
-  }
+    Future<void> test_listen_wellFormedRequest()
+    {
+        inputSink.writeln('{"id":"0","method":"server.version"}');
+        return inputSink
+            .flush()
+            .then((_) => requestStream.first.timeout(Duration(seconds: 1)))
+            .then((Request request)
+        {
+            expect(request.id, equals('0'));
+            expect(request.method, equals('server.version'));
+        });
+    }
 
-  Future<void> test_sendNotification() {
-    channel.sendNotification(Notification('foo'));
-    return outputLineStream.first
-        .timeout(Duration(seconds: 1))
-        .then((String notification) {
-      var jsonNotification = JsonCodec().decode(notification);
-      expect(jsonNotification, isMap);
-      expect(jsonNotification, contains('event'));
-      expect(jsonNotification['event'], equals('foo'));
-    });
-  }
+    Future<void> test_sendNotification()
+    {
+        channel.sendNotification(Notification('foo'));
+        return outputLineStream.first
+            .timeout(Duration(seconds: 1))
+            .then((String notification)
+        {
+            var jsonNotification = JsonCodec().decode(notification);
+            expect(jsonNotification, isMap);
+            expect(jsonNotification, contains('event'));
+            expect(jsonNotification['event'], equals('foo'));
+        });
+    }
 
-  Future<void> test_sendNotification_exceptionInSink() async {
-    // This IOSink asynchronously throws an exception on any writeln().
-    var outputSink = _IOSinkThatAsyncThrowsOnWrite();
+    Future<void> test_sendNotification_exceptionInSink() async
+    {
+        // This IOSink asynchronously throws an exception on any writeln().
+        var outputSink = _IOSinkThatAsyncThrowsOnWrite();
 
-    var channel = ByteStreamServerChannel(StreamController<List<int>>().stream,
-        outputSink, InstrumentationService.NULL_SERVICE);
+        var channel = ByteStreamServerChannel(StreamController<List<int>>().stream,
+            outputSink, InstrumentationService.NULL_SERVICE);
 
-    // Attempt to send a notification.
-    channel.sendNotification(Notification('foo'));
+        // Attempt to send a notification.
+        channel.sendNotification(Notification('foo'));
 
-    // An exception was thrown, it did not leak, but the channel was closed.
-    await channel.closed;
-  }
+        // An exception was thrown, it did not leak, but the channel was closed.
+        await channel.closed;
+    }
 
-  Future<void> test_sendResponse() {
-    channel.sendResponse(Response('foo'));
-    return outputLineStream.first
-        .timeout(Duration(seconds: 1))
-        .then((String response) {
-      var jsonResponse = JsonCodec().decode(response);
-      expect(jsonResponse, isMap);
-      expect(jsonResponse, contains('id'));
-      expect(jsonResponse['id'], equals('foo'));
-    });
-  }
+    Future<void> test_sendResponse()
+    {
+        channel.sendResponse(Response('foo'));
+        return outputLineStream.first.timeout(Duration(seconds: 1)).then((String response)
+        {
+            var jsonResponse = JsonCodec().decode(response);
+            expect(jsonResponse, isMap);
+            expect(jsonResponse, contains('id'));
+            expect(jsonResponse['id'], equals('foo'));
+        });
+    }
 }
 
-class _IOSinkThatAsyncThrowsOnWrite implements IOSink {
-  @override
-  dynamic noSuchMethod(Invocation invocation) {
-    return super.noSuchMethod(invocation);
-  }
+class _IOSinkThatAsyncThrowsOnWrite implements IOSink
+{
+    @override
+    dynamic noSuchMethod(Invocation invocation)
+    {
+        return super.noSuchMethod(invocation);
+    }
 
-  @override
-  void writeln([Object? obj = '']) {
-    Timer(Duration(milliseconds: 10), () {
-      throw '42';
-    });
-  }
+    @override
+    void writeln([Object? obj = ''])
+    {
+        Timer(Duration(milliseconds: 10), ()
+        {
+            throw '42';
+        });
+    }
 }

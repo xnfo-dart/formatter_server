@@ -15,10 +15,10 @@ import 'package:formatter_server/src/format_server.dart';
 //import 'package:formatter_server/src/utilities/mocks.dart'; // transfered to test subdir
 import 'src/utilities/mocks.dart';
 
-import 'package:analyzer/dart/analysis/analysis_options.dart' as analysis;
+//import 'package:analyzer/dart/analysis/analysis_options.dart' as analysis;
 import 'package:analyzer/file_system/file_system.dart';
 import 'package:analyzer/instrumentation/service.dart';
-import 'package:analyzer/src/generated/sdk.dart';
+//import 'package:analyzer/src/generated/sdk.dart';
 import 'package:analyzer/src/test_utilities/mock_sdk.dart';
 import 'package:analyzer/src/test_utilities/package_config_file_builder.dart';
 import 'package:analyzer/src/test_utilities/resource_provider_mixin.dart';
@@ -26,7 +26,7 @@ import 'package:meta/meta.dart';
 import 'package:test/test.dart';
 
 import 'mocks.dart';
-import 'src/utilities/mock_packages.dart';
+//import 'src/utilities/mock_packages.dart';
 
 /// TODO(scheglov) this is duplicate
 class AnalysisOptionsFileConfig
@@ -102,11 +102,8 @@ class ContextResolutionTest with ResourceProviderMixin
 {
     //final TestPluginManager pluginManager = TestPluginManager();
 
-
     late final MockServerChannel serverChannel;
     late final FormatServer server;
-
-
 
     //final List<GeneralAnalysisService> _analysisGeneralServices = [];
     //final Map<AnalysisService, List<String>> _analysisFileSubscriptions = {};
@@ -122,7 +119,6 @@ class ContextResolutionTest with ResourceProviderMixin
         await _setGeneralAnalysisSubscriptions();
     }
 */
-
 
     void assertResponseFailure(
         Response response, {
@@ -172,7 +168,7 @@ class ContextResolutionTest with ResourceProviderMixin
     }
 */
 
-/*
+    // TODO(tekert): not used
     Future<void> setRoots({
         required List<String> included,
         required List<String> excluded,
@@ -180,15 +176,15 @@ class ContextResolutionTest with ResourceProviderMixin
     {
         var includedConverted = included.map(convertPath).toList();
         var excludedConverted = excluded.map(convertPath).toList();
-        await handleSuccessfulRequest(
+        /*await handleSuccessfulRequest(
             AnalysisSetAnalysisRootsParams(
                 includedConverted,
                 excludedConverted,
                 packageRoots: {},
             ).toRequest('0'),
-        );
+        );*/
     }
-*/
+
     @mustCallSuper
     void setUp()
     {
@@ -219,14 +215,13 @@ class ContextResolutionTest with ResourceProviderMixin
         await server.dispose();
     }
 
-/*
     /// Returns a [Future] that completes when the server's analysis is complete.
     Future<void> waitForTasksFinished() async
     {
         await pumpEventQueue(times: 1 << 10);
-        await server.onAnalysisComplete;
+        //await server.onAnalysisComplete;
     }
-
+/*
   Future<void> _setGeneralAnalysisSubscriptions() async {
     await handleSuccessfulRequest(
       AnalysisSetGeneralSubscriptionsParams(
@@ -289,6 +284,7 @@ class PubPackageAnalysisServerTest extends ContextResolutionTest
         newFile(testFilePath, content);
     }
 
+/*
     @override
     void createDefaultFiles()
     {
@@ -300,7 +296,7 @@ class PubPackageAnalysisServerTest extends ContextResolutionTest
             ),
         );
     }
-
+*/
     void deleteTestPackageAnalysisOptionsFile()
     {
         deleteAnalysisOptionsYamlFile(testPackageRootPath);
@@ -349,7 +345,7 @@ class PubPackageAnalysisServerTest extends ContextResolutionTest
             config.toContent(),
         );
     }
-
+/*
     void writeTestPackageConfig({
         PackageConfigFileBuilder? config,
         String? languageVersion,
@@ -397,4 +393,5 @@ class PubPackageAnalysisServerTest extends ContextResolutionTest
     {
         newPubspecYamlFile(testPackageRootPath, content);
     }
+*/
 }

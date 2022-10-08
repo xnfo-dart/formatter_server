@@ -4,14 +4,21 @@
 
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
-//import 'format_if_enabled_test.dart' as format_if_enabled;
-import 'format_test.dart' as format;
+import '../support/integration_tests.dart';
 
 void main()
 {
     defineReflectiveSuite(()
     {
-        format.main();
-        //format_if_enabled.main();
-    }, name: 'edit');
+        defineReflectiveTests(GetVersionTest);
+    });
+}
+
+@reflectiveTest
+class GetVersionTest extends AbstractFormatterServerIntegrationTest
+{
+    Future<void> test_getVersion()
+    {
+        return sendServerGetVersion();
+    }
 }

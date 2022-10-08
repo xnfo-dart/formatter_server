@@ -330,6 +330,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.18"
+  test_reflective_loader:
+    dependency: "direct dev"
+    description:
+      name: test_reflective_loader
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.2.2"
   typed_data:
     dependency: transitive
     description:

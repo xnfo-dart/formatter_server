@@ -8,14 +8,14 @@ import 'package:formatter_server/protocol/protocol.dart';
 import 'package:formatter_server/src/channel/channel.dart';
 //import 'package:formatter_server/src/plugin/notification_manager.dart';
 //import 'package:formatter_server/src/plugin/plugin_manager.dart';
-import 'package:analyzer/dart/analysis/context_root.dart' as analyzer;
-import 'package:analyzer/file_system/file_system.dart';
-import 'package:analyzer/instrumentation/instrumentation.dart';
-import 'package:analyzer_plugin/protocol/protocol.dart' as plugin;
-import 'package:analyzer_plugin/protocol/protocol_generated.dart' as plugin;
-import 'package:analyzer_plugin/src/protocol/protocol_internal.dart' as plugin;
+//import 'package:analyzer/dart/analysis/context_root.dart' as analyzer;
+//import 'package:analyzer/file_system/file_system.dart';
+//import 'package:analyzer/instrumentation/instrumentation.dart';
+//import 'package:analyzer_plugin/protocol/protocol.dart' as plugin;
+//import 'package:analyzer_plugin/protocol/protocol_generated.dart' as plugin;
+//import 'package:analyzer_plugin/src/protocol/protocol_internal.dart' as plugin;
 import 'package:test/test.dart';
-import 'package:watcher/watcher.dart';
+//import 'package:watcher/watcher.dart';
 
 /// A mock [ServerCommunicationChannel] for testing [AnalysisServer].
 class MockServerChannel implements ServerCommunicationChannel

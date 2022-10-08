@@ -6,8 +6,10 @@ import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import 'update_content_test.dart' as update_content;
 
-void main() {
-  defineReflectiveSuite(() {
-    update_content.main();
-  }, name: 'analysis');
+void main()
+{
+    defineReflectiveSuite(()
+    {
+        update_content.main();
+    }, name: 'analysis');
 }

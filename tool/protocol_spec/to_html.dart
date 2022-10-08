@@ -123,8 +123,7 @@ a:focus, a:hover {
 '''
     .trim();
 
-final GeneratedFile target =
-    GeneratedFile('doc/api.html', (String pkgPath) async
+final GeneratedFile target = GeneratedFile('doc/api.html', (String pkgPath) async
 {
     var visitor = ToHtmlVisitor(readApi(pkgPath));
     var document = dom.Document();

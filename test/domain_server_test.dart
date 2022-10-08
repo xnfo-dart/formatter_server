@@ -34,6 +34,7 @@ class ServerDomainTest extends PubPackageAnalysisServerTest
                 Response.RESULT: {VERSION: PROTOCOL_VERSION}
             }));
     }
+
 /*
     Future<void> test_setSubscriptions_invalidServiceName() async
     {

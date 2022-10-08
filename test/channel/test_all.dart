@@ -6,8 +6,10 @@ import 'package:test/test.dart';
 
 import 'byte_stream_channel_test.dart' as byte_stream_channel_test;
 
-void main() {
-  group('computer', () {
-    byte_stream_channel_test.main();
-  });
+void main()
+{
+    group('computer', ()
+    {
+        byte_stream_channel_test.main();
+    });
 }
