@@ -18,7 +18,7 @@ class CLIRunner<T> extends CommandRunner<T>
             if (topLevelResults['version'] as bool)
             {
                 print("Server / API: $SERVER_VERSION / $LISTEN_PROTOCOL_VERSION");
-                print(polisher.VERSION_STRING);
+                print(polisher.DPConst.VERSION_STRING);
                 return null;
             }
         }
@@ -28,13 +28,14 @@ class CLIRunner<T> extends CommandRunner<T>
 
 void main(List<String> args) async
 {
-    var runner = CLIRunner<int>("dartcfmtd", "Formatting Server using Dart Xnfo formatter")
-        ..argParser.addFlag(
-            'version',
-            negatable: false,
-            help: 'Show Dart Formatter server versions.',
-        )
-        ..addCommand(ListenCommand());
+    var runner =
+        CLIRunner<int>("dartcfmtd", "Formatting Server using Dart Xnfo formatter")
+            ..argParser.addFlag(
+                'version',
+                negatable: false,
+                help: 'Show Dart Formatter server versions.',
+            )
+            ..addCommand(ListenCommand());
 
     try
     {

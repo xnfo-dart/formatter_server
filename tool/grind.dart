@@ -26,8 +26,8 @@ Future<void> validate() async
     Analyzer.analyze('bin/listen.dart', fatalWarnings: true);
 
     // Format it.
-   // Dart.run('bin/format.dart',
-       // arguments: ['format', './benchmark/after.dart.txt', '-o', 'none']);
+    // Dart.run('bin/format.dart',
+    // arguments: ['format', './benchmark/after.dart.txt', '-o', 'none']);
 
     // Check if we can get parse all dependencys versions used as constants.
 /*  if (await getDependancyVersion("dart_style") == null)
@@ -45,11 +45,15 @@ Future<void> validate() async
 ///      already be the case since you've already landed patches that change
 ///      the formatter and bumped to that as a consequence.
 ///
-///   2. Run this task:
+///   2. Commit the change to develop and Tag it for candidate to release: vX.X.X-betaY.
 ///
-///         dart run grinder bump
+///   3. Merge to master
 ///
-///   3. Commit the change to a branch.
+///      git merge --no-commit <BETA_TAG>
+///      dart run grinder bump
+///      git commit -a
+///         Version $THE_VERSION_BEING_BUMPED
+///         Merge commit '#DEV_HASH_TO_BASE_RELEASE_OFF' into master
 ///
 ///   4. Tag the commit:
 ///
@@ -81,11 +85,11 @@ Future<void> bump() async
     // Update the version constants in formatter_constants.dart.
     var versionFile = getFile('lib/src/server_constants.dart');
     var versionSource = versionFile.readAsStringSync();
-    var versionReplaced =
-        updateVersionConstant(versionSource, "SERVER_VERSION", bumped);
+    var versionReplaced = updateVersionConstant(versionSource, "SERVER_VERSION", bumped);
     versionFile.writeAsStringSync(versionReplaced);
 
     // Update the version in the CHANGELOG.
+    // TODO(tekert): create bump header and move Unreleased header
     var changelogFile = getFile('CHANGELOG.md');
     var changelog = changelogFile
         .readAsStringSync()

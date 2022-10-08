@@ -7,7 +7,8 @@ import 'package:test_reflective_loader/test_reflective_loader.dart';
 
 import '../support/integration_tests.dart';
 
-//TODO(tekert) more formatting tests with tab options (style is handled by the dart_polisher tests)
+//TODO(tekert): more formatting tests with tab options (style is handled by the dart_polisher tests)
+//TODO(tekert): FORMAT_RANGE_ERROR
 
 void main()
 {

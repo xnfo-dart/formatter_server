@@ -17,8 +17,8 @@ import 'integration_tests.dart';
 ///   "type": "add"
 ///   "content": String
 /// }
-final Matcher isAddContentOverlay = LazyMatcher(() =>
-    MatchesJsonObject('AddContentOverlay', {'type': equals('add'), 'content': isString}));
+final Matcher isAddContentOverlay = LazyMatcher(() => MatchesJsonObject(
+    'AddContentOverlay', {'type': equals('add'), 'content': isString}));
 
 /// ChangeContentOverlay
 ///
@@ -27,7 +27,8 @@ final Matcher isAddContentOverlay = LazyMatcher(() =>
 ///   "edits": List<SourceEdit>
 /// }
 final Matcher isChangeContentOverlay = LazyMatcher(() => MatchesJsonObject(
-    'ChangeContentOverlay', {'type': equals('change'), 'edits': isListOf(isSourceEdit)}));
+    'ChangeContentOverlay',
+    {'type': equals('change'), 'edits': isListOf(isSourceEdit)}));
 
 /// CodeStyle
 ///
@@ -56,8 +57,8 @@ final Matcher isPosition = LazyMatcher(
 /// {
 ///   "type": "remove"
 /// }
-final Matcher isRemoveContentOverlay = LazyMatcher(
-    () => MatchesJsonObject('RemoveContentOverlay', {'type': equals('remove')}));
+final Matcher isRemoveContentOverlay = LazyMatcher(() =>
+    MatchesJsonObject('RemoveContentOverlay', {'type': equals('remove')}));
 
 /// RequestError
 ///
@@ -87,18 +88,18 @@ final Matcher isRequestError = LazyMatcher(() => MatchesJsonObject(
 ///   UNSUPPORTED_FEATURE
 /// }
 final Matcher isRequestErrorCode = MatchesEnum('RequestErrorCode', [
-    'FORMAT_INVALID_FILE',
-    'FORMAT_WITH_ERRORS',
-    'FORMAT_RANGE_ERROR',
-    'INVALID_FILE_PATH_FORMAT',
-    'INVALID_OVERLAY_CHANGE',
-    'INVALID_OVERLAY_RANGE',
-    'INVALID_PARAMETER',
-    'INVALID_REQUEST',
-    'SERVER_ALREADY_STARTED',
-    'SERVER_ERROR',
-    'UNKNOWN_REQUEST',
-    'UNSUPPORTED_FEATURE'
+  'FORMAT_INVALID_FILE',
+  'FORMAT_WITH_ERRORS',
+  'FORMAT_RANGE_ERROR',
+  'INVALID_FILE_PATH_FORMAT',
+  'INVALID_OVERLAY_CHANGE',
+  'INVALID_OVERLAY_RANGE',
+  'INVALID_PARAMETER',
+  'INVALID_REQUEST',
+  'SERVER_ALREADY_STARTED',
+  'SERVER_ERROR',
+  'UNKNOWN_REQUEST',
+  'UNSUPPORTED_FEATURE'
 ]);
 
 /// SourceEdit
@@ -120,7 +121,8 @@ final Matcher isSourceEdit = LazyMatcher(() => MatchesJsonObject(
 ///   "fileStamp": long
 ///   "edits": List<SourceEdit>
 /// }
-final Matcher isSourceFileEdit = LazyMatcher(() => MatchesJsonObject('SourceFileEdit',
+final Matcher isSourceFileEdit = LazyMatcher(() => MatchesJsonObject(
+    'SourceFileEdit',
     {'file': isFilePath, 'fileStamp': isInt, 'edits': isListOf(isSourceEdit)}));
 
 /// TabSize
@@ -132,10 +134,10 @@ final Matcher isSourceFileEdit = LazyMatcher(() => MatchesJsonObject('SourceFile
 ///   "constructorInitializer": int
 /// }
 final Matcher isTabSize = LazyMatcher(() => MatchesJsonObject('TabSize', {
-        'block': isInt,
-        'cascade': isInt,
-        'expression': isInt,
-        'constructorInitializer': isInt
+      'block': isInt,
+      'cascade': isInt,
+      'expression': isInt,
+      'constructorInitializer': isInt
     }));
 
 /// edit.format params
@@ -152,15 +154,15 @@ final Matcher isTabSize = LazyMatcher(() => MatchesJsonObject('TabSize', {
 /// }
 final Matcher isEditFormatParams =
     LazyMatcher(() => MatchesJsonObject('edit.format params', {
-            'file': isString,
-            'selectionOffset': isInt,
-            'selectionLength': isInt
+          'file': isString,
+          'selectionOffset': isInt,
+          'selectionLength': isInt
         }, optionalFields: {
-            'selectionOnly': isBool,
-            'lineLength': isInt,
-            'tabSize': isTabSize,
-            'insertSpaces': isBool,
-            'codeStyle': isCodeStyle
+          'selectionOnly': isBool,
+          'lineLength': isInt,
+          'tabSize': isTabSize,
+          'insertSpaces': isBool,
+          'codeStyle': isCodeStyle
         }));
 
 /// edit.format result
@@ -170,12 +172,12 @@ final Matcher isEditFormatParams =
 ///   "selectionOffset": int
 ///   "selectionLength": int
 /// }
-final Matcher isEditFormatResult = LazyMatcher(() => MatchesJsonObject(
-        'edit.format result', {
-        'edits': isListOf(isSourceEdit),
-        'selectionOffset': isInt,
-        'selectionLength': isInt
-    }));
+final Matcher isEditFormatResult =
+    LazyMatcher(() => MatchesJsonObject('edit.format result', {
+          'edits': isListOf(isSourceEdit),
+          'selectionOffset': isInt,
+          'selectionLength': isInt
+        }));
 
 /// server.connected params
 ///
@@ -183,8 +185,8 @@ final Matcher isEditFormatResult = LazyMatcher(() => MatchesJsonObject(
 ///   "version": String
 ///   "pid": int
 /// }
-final Matcher isServerConnectedParams = LazyMatcher(() =>
-    MatchesJsonObject('server.connected params', {'version': isString, 'pid': isInt}));
+final Matcher isServerConnectedParams = LazyMatcher(() => MatchesJsonObject(
+    'server.connected params', {'version': isString, 'pid': isInt}));
 
 /// server.error params
 ///
@@ -221,13 +223,13 @@ final Matcher isServerShutdownResult = isNull;
 /// }
 final Matcher isServerUpdateContentParams =
     LazyMatcher(() => MatchesJsonObject('server.updateContent params', {
-            'files': isMapOf(
-                isFilePath,
-                isOneOf([
-                    isAddContentOverlay,
-                    isChangeContentOverlay,
-                    isRemoveContentOverlay
-                ]))
+          'files': isMapOf(
+              isFilePath,
+              isOneOf([
+                isAddContentOverlay,
+                isChangeContentOverlay,
+                isRemoveContentOverlay
+              ]))
         }));
 
 /// server.updateContent result
