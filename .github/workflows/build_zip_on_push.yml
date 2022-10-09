@@ -11,6 +11,15 @@ on:
 
   # Allows you to run this workflow manually from the Actions tab (for testing)
   workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to build (defaults to default branch)'
+        required: false
+        default: ''
+      polisher_branch:
+        description: 'Dart Polisher branch to use when building (defaults to default branch)'
+        required: false
+        default: ''
 
 # run action will be from this dir
 defaults:
@@ -44,6 +53,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           path: formatter_server
+          ref: ${{ inputs.branch }}
 
       - name: "Checkout Local Dart Polisher package"
         uses: actions/checkout@v3
@@ -51,7 +61,7 @@ jobs:
           repository: xnfo-dart/dart_polisher
           path: dart_polisher
           token: ${{ secrets.GH_PAT }} # TODO: delete this line when going open source.
-      #   ref: master
+          ref: ${{ inputs.polisher_branch }}
 
       # Uses https://github.com/dart-lang/setup-dart to get dart
       - name: "Dowload dart-sdk"
