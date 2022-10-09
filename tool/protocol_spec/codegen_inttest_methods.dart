@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 /// Code generation for the file "integration_test_methods.dart".
-import './analyzer_utilities_pkg/tools.dart';
+import './analyzer_utilities_tools_hook.dart';
 import 'package:path/path.dart' as path;
 
 import 'api.dart';

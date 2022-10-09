@@ -6,7 +6,7 @@
 
 import 'dart:io';
 
-import './analyzer_utilities_pkg/tools.dart';
+import './analyzer_utilities_tools_hook.dart';
 import 'package:path/path.dart';
 
 import 'codegen_inttest_methods.dart' as codegen_inttest_methods;

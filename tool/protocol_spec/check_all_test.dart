@@ -5,7 +5,7 @@
 import 'dart:io';
 
 //! NOTE: Ported from package:analyzer_utilities/tools.dart
-import './analyzer_utilities_pkg/tools.dart';
+import './analyzer_utilities_tools_hook.dart';
 
 import 'package:path/path.dart';
 import 'generate.dart';

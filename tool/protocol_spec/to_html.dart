@@ -8,7 +8,7 @@
 import 'dart:convert';
 
 import 'analyzer_utilities_pkg/html.dart';
-import 'analyzer_utilities_pkg/tools.dart';
+import './analyzer_utilities_tools_hook.dart';
 import 'package:html/dom.dart' as dom;
 
 import 'api.dart';

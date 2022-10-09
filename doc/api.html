@@ -249,7 +249,7 @@ a:focus, a:hover {
     structures beyond the standard JSON primitives. These data structures are
     documented in the section titled <a href="#types">Types</a>.
   </p>
-
+  
 <p><a href="#domain_server">Server</a></p><ul><li><a href="#request_server.getVersion">server.getVersion</a></li>
 <li><a href="#request_server.shutdown">server.shutdown</a></li>
 <li><a href="#request_server.updateContent">server.updateContent</a></li>
@@ -299,11 +299,11 @@ a:focus, a:hover {
       The server domain contains API’s related to the execution of
       the server.
     </p>
-
-
-
-
-
+    
+    
+    
+    
+    
   <h3>Requests</h3><dl><dt class="request"><a name="request_server.getVersion">server.getVersion</a></dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "server.getVersion"
@@ -316,9 +316,9 @@ a:focus, a:hover {
   }
 }</pre></div>
       <p>Return the version number of the formatter server.</p>
-
+      
     <h4>returns:</h4><dl><dt class="field"><b>version: String</b></dt><dd>
-
+          
           <p>The version number of the formatter server</p>
         </dd><dt class="field"><b>protocol: String</b></dt><dd>
           
@@ -360,10 +360,10 @@ a:focus, a:hover {
         if the file path represents the path to a directory on the
         filesystem.
       </p>
-
-
+      
+      
     <h4>parameters:</h4><dl><dt class="field"><b>files: Map&lt;<a href="#type_FilePath">FilePath</a>, <a href="#type_AddContentOverlay">AddContentOverlay</a> | <a href="#type_ChangeContentOverlay">ChangeContentOverlay</a> | <a href="#type_RemoveContentOverlay">RemoveContentOverlay</a>&gt;</b></dt><dd>
-
+          
           <p>
             A table mapping the files whose content has changed to a
             description of the content change.
@@ -385,12 +385,12 @@ a:focus, a:hover {
         It is not possible to subscribe to or unsubscribe from this
         notification.
       </p>
-
+      
     <h4>parameters:</h4><dl><dt class="field"><b>version: String</b></dt><dd>
-
+          
           <p>The version number of the formatter server.</p>
         </dd><dt class="field"><b>pid: int</b></dt><dd>
-
+          
           <p>The process id of the formatter server process.</p>
         </dd></dl></dd><dt class="notification"><a name="notification_server.error">server.error</a></dt><dd><div class="box"><pre>notification: {
   "event": "server.error"
@@ -412,22 +412,22 @@ a:focus, a:hover {
         It is not possible to subscribe to or unsubscribe from this
         notification.
       </p>
-
+      
     <h4>parameters:</h4><dl><dt class="field"><b>isFatal: bool</b></dt><dd>
-
+          
           <p>
             True if the error is a fatal error, meaning that the
             server will shutdown automatically after sending this
             notification.
           </p>
         </dd><dt class="field"><b>message: String</b></dt><dd>
-
+          
           <p>
             The error message indicating what kind of error was
             encountered.
           </p>
         </dd><dt class="field"><b>stackTrace: String</b></dt><dd>
-
+          
           <p>
             The stack trace associated with the generation of the
             error, used for debugging the server.
@@ -438,7 +438,7 @@ a:focus, a:hover {
       The edit domain contains commands related to edits that can be
       applied to the code.
     </p>
-
+    
 
   <h3>Requests</h3><dl><dt class="request"><a name="request_edit.format">edit.format</a></dt><dd><div class="box"><pre>request: {
   "id": String
@@ -472,34 +472,32 @@ a:focus, a:hover {
         selection offset and selection length.
       </p>
       <p>
-        If a request is made for a file which does not exist, or which is not
-        currently subject to analysis (e.g. because it is not associated with
-        any analysis root specified to analysis.setAnalysisRoots), an error of
+        If a request is made for a file which does not exist, an error of
         type <tt>FORMAT_INVALID_FILE</tt> will be generated. If the source
         contains syntax errors, an error of type <tt>FORMAT_WITH_ERRORS</tt>
         will be generated. If the selection range is outside of the file
         character lenght and error off type <tt>FORMAT_RANGE_ERROR</tt>
         will be generated.
       </p>
-
-
+      
+      
     <h4>parameters:</h4><dl><dt class="field"><b>file: String</b></dt><dd>
-
+          
           <p>
             The file containing the code to be formatted.
           </p>
         </dd><dt class="field"><b>selectionOffset: int</b></dt><dd>
-
+          
           <p>
             The offset of the current selection in the file.
           </p>
         </dd><dt class="field"><b>selectionLength: int</b></dt><dd>
-
+          
           <p>
             The length of the current selection in the file.
           </p>
         </dd><dt class="field"><b>selectionOnly: bool<span style="color:#999999"> (optional)</span></b></dt><dd>
-
+          
           <p>
             True if the code to be formatted should be limited to the selected
             text (or the smallest portion of text that encloses the selected
@@ -507,26 +505,26 @@ a:focus, a:hover {
             defaults to false if not set.
           </p>
         </dd><dt class="field"><b>lineLength: int<span style="color:#999999"> (optional)</span></b></dt><dd>
-
+          
           <p>
             The line length to be used by the formatter.<br>
             defaults to 90 if not set.
           </p>
         </dd><dt class="field"><b>tabSize: <a href="#type_TabSize">TabSize</a><span style="color:#999999"> (optional)</span></b></dt><dd>
-
+          
           <p>
             The tab size in spaces to be used by the formatter.<br>
             defaults all indents to 4 if not set.
           </p>
         </dd><dt class="field"><b>insertSpaces: bool<span style="color:#999999"> (optional)</span></b></dt><dd>
-
+          
           <p>
             True if the code to be formatted should use spaces for indentations,<br>
             false to use tab stops. ignores [tabSize] if false.<br>
             defaults to true if not set.
           </p>
         </dd><dt class="field"><b>codeStyle: <a href="#type_CodeStyle">CodeStyle</a><span style="color:#999999"> (optional)</span></b></dt><dd>
-
+          
           <p>
             Set of common code styles.
             default to 0 = dart_style with unlocked indent sizes.
@@ -534,39 +532,39 @@ a:focus, a:hover {
             defaults to 0 if not set.
           </p>
         </dd></dl><h4>returns:</h4><dl><dt class="field"><b>edits: List&lt;<a href="#type_SourceEdit">SourceEdit</a>&gt;</b></dt><dd>
-
+          
           <p>
             The edit(s) to be applied in order to format the code. The list
             will be empty if the code was already formatted (there are no
             changes).
           </p>
         </dd><dt class="field"><b>selectionOffset: int</b></dt><dd>
-
+          
           <p>
             The offset of the selection after formatting the code.
           </p>
         </dd><dt class="field"><b>selectionLength: int</b></dt><dd>
-
+          
           <p>
             The length of the selection after formatting the code.
           </p>
         </dd></dl></dd></dl>
-
+  
     <h2 class="domain"><a name="types">Types</a></h2>
     <p>
       This section contains descriptions of the data types referenced
       in the API’s of the various domains.
     </p>
 
+    
+
+      
+
+      
 
 
-
-
-
-
-
-
-
+    
+    
   <dl><dt class="typeDefinition"><a name="type_AddContentOverlay">AddContentOverlay: object</a></dt><dd>
       <p>
         A directive to begin overlaying the contents of a file. The supplied
@@ -577,11 +575,11 @@ a:focus, a:hover {
         If this directive is used on a file that already has a file content
         overlay, the old overlay is discarded and replaced with the new one.
       </p>
-
+      
     <dl><dt class="field"><b>type = "add"</b></dt><dd>
-
+          
         </dd><dt class="field"><b>content: String</b></dt><dd>
-
+          
           <p>
             The new content of the file.
           </p>
@@ -605,11 +603,11 @@ a:focus, a:hover {
         If any of the edits cannot be applied due to its offset or length being
         out of range, an <tt>INVALID_OVERLAY_CHANGE</tt> error will be reported.
       </p>
-
+      
     <dl><dt class="field"><b>type = "change"</b></dt><dd>
-
+          
         </dd><dt class="field"><b>edits: List&lt;<a href="#type_SourceEdit">SourceEdit</a>&gt;</b></dt><dd>
-
+          
           <p>
             The edits to be applied to the file.
           </p>
@@ -617,9 +615,9 @@ a:focus, a:hover {
         <p>
           Set of common code styles.
         </p>
-
+        
       <dl><dt class="field"><b>code: int</b></dt><dd>
-
+            
             <p>
               0 = dart_style, original style with unlocked indents<br>
               1 = dart_expanded, based on dart_style with outer braces on blocks that are not collection literals.<br>
@@ -627,7 +625,7 @@ a:focus, a:hover {
               3 = [not available yet]<br>
             </p>
           </dd></dl></dd><dt class="typeDefinition"><a name="type_FilePath">FilePath: String</a></dt><dd>
-
+      
       <p>
         The absolute, normalized path of a file.
       </p>
@@ -640,14 +638,14 @@ a:focus, a:hover {
       <p>
         A position within a file.
       </p>
-
+      
     <dl><dt class="field"><b>file: <a href="#type_FilePath">FilePath</a></b></dt><dd>
-
+          
           <p>
             The file containing the position.
           </p>
         </dd><dt class="field"><b>offset: int</b></dt><dd>
-
+          
           <p>
             The offset of the position.
           </p>
@@ -661,27 +659,27 @@ a:focus, a:hover {
         If this directive is used on a file that doesn't currently have a content
         overlay, it has no effect.
       </p>
-
+      
     <dl><dt class="field"><b>type = "remove"</b></dt><dd>
-
+          
         </dd></dl></dd><dt class="typeDefinition"><a name="type_RequestError">RequestError: object</a></dt><dd>
       <p>
         An indication of a problem with the execution of the server,
         typically in response to a request.
       </p>
-
+      
     <dl><dt class="field"><b>code: <a href="#type_RequestErrorCode">RequestErrorCode</a></b></dt><dd>
-
+          
           <p>
             A code that uniquely identifies the error that occurred.
           </p>
         </dd><dt class="field"><b>message: String</b></dt><dd>
-
+          
           <p>
             A short description of the error.
           </p>
         </dd><dt class="field"><b>stackTrace: String<span style="color:#999999"> (optional)</span></b></dt><dd>
-
+          
           <p>
             The stack trace associated with processing the request,
             used for debugging the server.
@@ -691,32 +689,32 @@ a:focus, a:hover {
         An enumeration of the types of errors that can occur in the
         execution of the server.
       </p>
-
+      
     <dl><dt class="value">FORMAT_INVALID_FILE</dt><dd>
-
+          
           <p>
             An "edit.format" request specified a FilePath
             which does not match a Dart file in an analysis root.
           </p>
         </dd><dt class="value">FORMAT_WITH_ERRORS</dt><dd>
-
+          
           <p>
             An "edit.format" request specified a file that contains syntax
             errors.
           </p>
         </dd><dt class="value">FORMAT_RANGE_ERROR</dt><dd>
-
+          
           <p>
             An "edit.format" request specified an invalid selection range.
           </p>
         </dd><dt class="value">INVALID_FILE_PATH_FORMAT</dt><dd>
-
+          
           <p>
             The format of the given file path is invalid, e.g. is not
             absolute and normalized.
           </p>
         </dd><dt class="value">INVALID_OVERLAY_CHANGE</dt><dd>
-
+          
           <p>
             An "server.updateContent" request contained a
             ChangeContentOverlay object which can't be applied, due
@@ -725,7 +723,7 @@ a:focus, a:hover {
             subsecuent changes.
           </p>
         </dd><dt class="value">INVALID_OVERLAY_RANGE</dt><dd>
-
+          
           <p>
             An "server.updateContent" request contained a
             ChangeContentOverlay object which can't be applied, due
@@ -733,17 +731,17 @@ a:focus, a:hover {
             range.
           </p>
         </dd><dt class="value">INVALID_PARAMETER</dt><dd>
-
+          
           <p>
             One of the method parameters was invalid.
           </p>
         </dd><dt class="value">INVALID_REQUEST</dt><dd>
-
+          
           <p>
             A malformed request was received.
           </p>
         </dd><dt class="value">SERVER_ALREADY_STARTED</dt><dd>
-
+          
           <p>
             The formatter server has already been started (and hence
             won't accept new connections).
@@ -754,20 +752,20 @@ a:focus, a:hover {
             time so this error will never occur.
           </p>
         </dd><dt class="value">SERVER_ERROR</dt><dd>
-
+          
           <p>
             An internal error occurred in the formatter server.
             Also see the server.error notification.
           </p>
         </dd><dt class="value">UNKNOWN_REQUEST</dt><dd>
-
+          
           <p>
             A request was received which the formatter server does
             not recognize, or cannot handle in its current
             configuration.
           </p>
         </dd><dt class="value">UNSUPPORTED_FEATURE</dt><dd>
-
+          
           <p>
             The formatter server was requested to perform an action
             which is not supported.
@@ -780,24 +778,24 @@ a:focus, a:hover {
       <p>
         A description of a single change to a single file.
       </p>
-
+      
     <dl><dt class="field"><b>offset: int</b></dt><dd>
-
+          
           <p>
             The offset of the region to be modified.
           </p>
         </dd><dt class="field"><b>length: int</b></dt><dd>
-
+          
           <p>
             The length of the region to be modified.
           </p>
         </dd><dt class="field"><b>replacement: String</b></dt><dd>
-
+          
           <p>
             The code that is to replace the specified region in the original code.
           </p>
         </dd><dt class="field"><b>id: String<span style="color:#999999"> (optional)</span></b></dt><dd>
-
+          
           <p>
             An identifier that uniquely identifies this source edit from other
             edits in the same response. This field is omitted unless a containing
@@ -813,14 +811,14 @@ a:focus, a:hover {
       <p>
         A description of a set of changes to a single file.
       </p>
-
+      
     <dl><dt class="field"><b>file: <a href="#type_FilePath">FilePath</a></b></dt><dd>
-
+          
           <p>
             The file containing the code to be modified.
           </p>
         </dd><dt class="field"><b><span class="deprecated">fileStamp</span>: long</b></dt><dd>
-
+          
           <p>
             The modification stamp of the file at the moment when the change was
             created, in milliseconds since the "Unix epoch". Will be -1 if the
@@ -829,7 +827,7 @@ a:focus, a:hover {
             safe to apply the change.
           </p>
         </dd><dt class="field"><b>edits: List&lt;<a href="#type_SourceEdit">SourceEdit</a>&gt;</b></dt><dd>
-
+          
           <p>
             A list of the edits used to effect the change.
           </p>
@@ -837,18 +835,18 @@ a:focus, a:hover {
         <p>
           Set of space indentations for different code expressions.
         </p>
-
+        
       <dl><dt class="field"><b>block: int</b></dt><dd>
-
+            
             <p>The number of spaces in a block or collection body.</p>
           </dd><dt class="field"><b>cascade: int</b></dt><dd>
-
+            
             <p>How much wrapped cascade sections indent.</p>
           </dd><dt class="field"><b>expression: int</b></dt><dd>
-
+            
             <p>The number of spaces in a single level of expression nesting.</p>
           </dd><dt class="field"><b>constructorInitializer: int</b></dt><dd>
-
+            
             <p>The ":" on a wrapped constructor initialization list.</p>
           </dd></dl></dd></dl>
   <h2>Errors</h2>

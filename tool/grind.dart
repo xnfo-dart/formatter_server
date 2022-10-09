@@ -2,13 +2,9 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'dart:io';
-
 import 'package:grinder/grinder.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart' as yaml;
-import 'package:package_config/package_config.dart';
-import 'package:path/path.dart' as p;
 
 /// Matches the version line in formatter_server's pubspec.
 final _versionPattern = RegExp(r'^version: .*$', multiLine: true);
@@ -25,6 +21,7 @@ Future<void> validate() async
     // Make sure it's warning clean.
     Analyzer.analyze('bin/listen.dart', fatalWarnings: true);
 
+    // TODO(tekert): format once polisher exposes path format.
     // Format it.
     // Dart.run('bin/format.dart',
     // arguments: ['format', './benchmark/after.dart.txt', '-o', 'none']);
@@ -39,9 +36,9 @@ Future<void> validate() async
 
 // Generate all files
 @Task("Generate all protocol, integration tests matchers/methods, and API html doc.")
-Future<void> generate() async {
-
-    Dart.run('tool/generate.dart');
+Future<void> generate() async
+{
+    Dart.run('tool/protocol_spec/generate.dart');
 }
 
 /// Gets ready to publish a new version of the package.
@@ -68,7 +65,7 @@ Future<void> generate() async {
 ///         git push origin <version>
 ///
 @Task("Bumps from dev to release version")
-@Depends(validate, generate)
+@Depends(generate, validate)
 Future<void> bump() async
 {
     // Read the version from the pubspec.
@@ -110,41 +107,4 @@ String updateVersionConstant(String source, String constant, Version v)
 {
     return source.replaceAll(RegExp("""const String $constant = "[^"]+";"""),
         """const String $constant = "$v";""");
-}
-
-Future<Version?> getDependancyVersion(String packageName) async
-{
-    var packageConfig = await findPackageConfig(Directory(""),
-        recurse: false,
-        onError: (error) => print("Could not find package config file: $error"));
-
-    if (packageConfig == null) return null;
-
-    Package package;
-    try
-    {
-        package =
-            packageConfig.packages.firstWhere((element) => element.name == packageName);
-    }
-    catch (e)
-    {
-        print("Package not found: $packageName");
-        return null;
-    }
-
-    // Get the dependency package pubspec file.
-    Version version;
-    try
-    {
-        final pubspecFile = getFile(p.join(p.fromUri(package.root), 'pubspec.yaml'));
-        final pubspec = pubspecFile.readAsStringSync();
-        version = Version.parse((yaml.loadYaml(pubspec) as Map)['version'] as String);
-    }
-    catch (e)
-    {
-        print("Package $packageName pubspec.yaml: $e");
-        return null;
-    }
-
-    return version;
 }
