@@ -174,9 +174,9 @@ class ContextResolutionTest with ResourceProviderMixin
         required List<String> excluded,
     }) async
     {
-        var includedConverted = included.map(convertPath).toList();
+        /*var includedConverted = included.map(convertPath).toList();
         var excludedConverted = excluded.map(convertPath).toList();
-        /*await handleSuccessfulRequest(
+        await handleSuccessfulRequest(
             AnalysisSetAnalysisRootsParams(
                 includedConverted,
                 excludedConverted,

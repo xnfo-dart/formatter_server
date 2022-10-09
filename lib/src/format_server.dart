@@ -228,7 +228,7 @@ class FormatServer
     }
 
     /// Sends a `server.error` notification.
-    // Ported from lsp implemetation of analisys server socket errors.
+    // Ported from lsp implemetation of analysis server socket errors.
     // listen onError parameter, used from FormatServer.error()
     void sendServerErrorNotification(
         String message,
@@ -252,7 +252,7 @@ class FormatServer
 
         // send the notification
         channel.sendNotification(
-            ServerErrorParams(fatal, fullMessage, '$stackTrace').toNotification());
+            ServerErrorParams(fatal, fullError, '$stackTrace').toNotification());
 /*
         // remember the last few exceptions
         //TODO (tekert): This was for the diagnostics page of the analysis_server, remove.

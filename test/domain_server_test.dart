@@ -5,6 +5,7 @@
 import 'package:formatter_server/protocol/protocol.dart';
 import 'package:formatter_server/protocol/protocol_constants.dart';
 import 'package:formatter_server/protocol/protocol_generated.dart';
+import 'package:formatter_server/src/constants.dart';
 import 'package:test/test.dart';
 import 'package:test_reflective_loader/test_reflective_loader.dart';
 
@@ -31,7 +32,7 @@ class ServerDomainTest extends PubPackageAnalysisServerTest
             response.toJson(),
             equals({
                 Response.ID: '0',
-                Response.RESULT: {VERSION: PROTOCOL_VERSION}
+                Response.RESULT: {VERSION: SERVER_VERSION, VERSION_PROTOCOL: PROTOCOL_VERSION}
             }));
     }
 

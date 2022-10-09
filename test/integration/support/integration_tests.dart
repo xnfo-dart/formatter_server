@@ -110,7 +110,7 @@ abstract class AbstractFormatterServerIntegrationTest extends IntegrationTestMix
 
     /// True if we are currently subscribed to [SERVER_NOTIFICATION_STATUS]
     /// updates.
-    bool _subscribedToServerStatus = false;
+    //bool _subscribedToServerStatus = false;
 
     String dartSdkPath = path.dirname(path.dirname(Platform.resolvedExecutable));
 

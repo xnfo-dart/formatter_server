@@ -25,3 +25,4 @@ const String SUBSCRIPTIONS = 'subscriptions';
 const String TYPE = 'type';
 const String URL = 'url';
 const String VERSION = 'version';
+const String VERSION_PROTOCOL = 'protocol';
