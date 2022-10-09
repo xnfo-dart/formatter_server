@@ -16,7 +16,7 @@ final _versionPattern = RegExp(r'^version: .*$', multiLine: true);
 void main(List<String> args) => grind(args);
 
 @DefaultTask()
-@Task()
+@Task("Run tests and analysis")
 Future<void> validate() async
 {
     // Test it.
@@ -35,6 +35,13 @@ Future<void> validate() async
         throw "Cant parse all dependencys versions";
     }
 */
+}
+
+// Generate all files
+@Task("Generate all protocol, integration tests matchers/methods, and API html doc.")
+Future<void> generate() async {
+
+    Dart.run('tool/generate.dart');
 }
 
 /// Gets ready to publish a new version of the package.
@@ -60,8 +67,8 @@ Future<void> validate() async
 ///         git tag -a "<version>" -m "<version>"
 ///         git push origin <version>
 ///
-@Task()
-@Depends(validate)
+@Task("Bumps from dev to release version")
+@Depends(validate, generate)
 Future<void> bump() async
 {
     // Read the version from the pubspec.
