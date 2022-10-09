@@ -787,14 +787,18 @@ class ServerGetVersionParams implements RequestParams {
 ///
 /// {
 ///   "version": String
+///   "protocol": String
 /// }
 ///
 /// Clients may not extend, implement or mix-in this class.
 class ServerGetVersionResult implements ResponseResult {
-  /// The version number of the formatter server.
+  /// The version number of the formatter server
   String version;
 
-  ServerGetVersionResult(this.version);
+  /// The version number of the API Protocol used in the formatter server
+  String protocol;
+
+  ServerGetVersionResult(this.version, this.protocol);
 
   factory ServerGetVersionResult.fromJson(
       JsonDecoder jsonDecoder, String jsonPath, Object? json) {
@@ -807,7 +811,14 @@ class ServerGetVersionResult implements ResponseResult {
       } else {
         throw jsonDecoder.mismatch(jsonPath, 'version');
       }
-      return ServerGetVersionResult(version);
+      String protocol;
+      if (json.containsKey('protocol')) {
+        protocol =
+            jsonDecoder.decodeString(jsonPath + '.protocol', json['protocol']);
+      } else {
+        throw jsonDecoder.mismatch(jsonPath, 'protocol');
+      }
+      return ServerGetVersionResult(version, protocol);
     } else {
       throw jsonDecoder.mismatch(jsonPath, 'server.getVersion result', json);
     }
@@ -824,6 +835,7 @@ class ServerGetVersionResult implements ResponseResult {
   Map<String, Object> toJson() {
     var result = <String, Object>{};
     result['version'] = version;
+    result['protocol'] = protocol;
     return result;
   }
 
@@ -838,13 +850,16 @@ class ServerGetVersionResult implements ResponseResult {
   @override
   bool operator ==(other) {
     if (other is ServerGetVersionResult) {
-      return version == other.version;
+      return version == other.version && protocol == other.protocol;
     }
     return false;
   }
 
   @override
-  int get hashCode => version.hashCode;
+  int get hashCode => Object.hash(
+        version,
+        protocol,
+      );
 }
 
 /// server.shutdown params

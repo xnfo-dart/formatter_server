@@ -206,9 +206,10 @@ final Matcher isServerGetVersionParams = isNull;
 ///
 /// {
 ///   "version": String
+///   "protocol": String
 /// }
-final Matcher isServerGetVersionResult = LazyMatcher(
-    () => MatchesJsonObject('server.getVersion result', {'version': isString}));
+final Matcher isServerGetVersionResult = LazyMatcher(() => MatchesJsonObject(
+    'server.getVersion result', {'version': isString, 'protocol': isString}));
 
 /// server.shutdown params
 final Matcher isServerShutdownParams = isNull;

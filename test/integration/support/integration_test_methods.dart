@@ -26,8 +26,11 @@ abstract class IntegrationTestMixin {
   ///
   /// version: String
   ///
-  ///   The version number of the formatter server and API in the format
-  ///   Server: #SERVER | API: #API.
+  ///   The version number of the formatter server
+  ///
+  /// protocol: String
+  ///
+  ///   The version number of the API Protocol used in the formatter server
   Future<ServerGetVersionResult> sendServerGetVersion() async {
     var result = await server.send('server.getVersion', null);
     var decoder = ResponseDecoder(null);
