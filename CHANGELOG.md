@@ -30,7 +30,7 @@ Stdio server for handling requests from IDEs using the Dart Polisher formatter.
 
 - Some refactoring
 
-[Unreleased]: https://github.com/xnfo-dart/formatter_server/compare/v0.9.0...HEAD
+[Unreleased]: https://github.com/xnfo-dart/formatter_server/compare/v0.9.1...HEAD
 [0.9.1]: https://github.com/xnfo-dart/formatter_server/releases/tag/v0.9.1
 [0.9.0]: https://github.com/xnfo-dart/formatter_server/releases/tag/v0.9.0
 [0.8.8]: https://github.com/xnfo-dart/formatter_server/releases/tag/v0.8.8
