@@ -697,16 +697,16 @@ class Server
 
         // Test are un on temp dir, we need to get the path to the project dir.
         // Platform.script is useless for integration test.
-        // https://github.com/dart-lang/test/issues/110
+        //! https://github.com/dart-lang/test/issues/110
         final thisClassFilePathUri =
             path.dirname((reflectClass(Server).owner as LibraryMirror).uri.path);
 
         var rootDir = findRoot(thisClassFilePathUri);
 
-        if (useSnapshot) //TODO(tekert): make snapshot
+        if (useSnapshot) //TODO(tekert): delete this or refactor.
         {
-            serverPath = path.normalize(path.join(/*dartSdkPath*/ rootDir, 'bin',
-                'snapshots', 'listen.dart.snapshot'));
+            serverPath = path.normalize(path.join(
+                /*dartSdkPath*/ rootDir, 'bin', 'snapshots', 'listen.dart.snapshot'));
         }
         else
         {

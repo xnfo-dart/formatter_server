@@ -61,7 +61,6 @@ class SocketServer
         formatServer = FormatServer(
             serverChannel,
             resourceProvider,
-            /*sdkManager,*/
             instrumentationService,
         );
     }
@@ -80,7 +79,7 @@ String? _getStandardStateLocation()
         return env['FORMAT_STATE_LOCATION_OVERRIDE'];
     }
 
-    const String formatDir = ".dartCFormatServer";
+    const String formatDir = ".dartXnfoFormatServer";
 
     final home = io.Platform.isWindows ? env['LOCALAPPDATA'] : env['HOME'];
     return home != null && io.FileSystemEntity.isDirectorySync(home)

@@ -29,14 +29,13 @@ class CLIRunner<T> extends CommandRunner<T>
 void main(List<String> args) async
 {
     var runner =
-        CLIRunner<int>("dartcfmtd", "Formatting Server using Dart Xnfo formatter")
+        CLIRunner<void>("dartcfmtd", "Formatting Server using Dart Xnfo formatter")
             ..argParser.addFlag(
                 'version',
                 negatable: false,
                 help: 'Show Dart Formatter server versions.',
             )
             ..addCommand(ListenCommand());
-
     try
     {
         await runner.run(args);

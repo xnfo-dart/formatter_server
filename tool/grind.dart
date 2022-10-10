@@ -87,7 +87,7 @@ Future<void> bump() async
     pubspecFile.writeAsStringSync(pubspec);
 
     // Update the version constants in formatter_constants.dart.
-    var versionFile = getFile('lib/src/server_constants.dart');
+    var versionFile = getFile('lib/src/constants.dart');
     var versionSource = versionFile.readAsStringSync();
     var versionReplaced = updateVersionConstant(versionSource, "SERVER_VERSION", bumped);
     versionFile.writeAsStringSync(versionReplaced);

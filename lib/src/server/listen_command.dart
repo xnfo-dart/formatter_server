@@ -1,11 +1,9 @@
-import 'dart:io';
-
 import 'package:args/command_runner.dart';
 import 'package:formatter_server/src/constants.dart';
 import 'package:formatter_server/starter.dart';
 import 'package:formatter_server/src/server/driver.dart';
 
-class ListenCommand extends Command<int>
+class ListenCommand extends Command<void>
 {
     @override
     String get name => 'listen';
@@ -54,16 +52,11 @@ class ListenCommand extends Command<int>
     }
 
     @override
-    Future<int> run() async
+    Future<void> run() async
     {
         var argResults = this.argResults!;
 
         var starter = ServerStarter();
         starter.start(argResults);
-
-        //TODO (tekert): start() already exits(0) when shutdown
-        // Return the exitCode explicitly for tools which embed dart_formatter
-        // and set their own exitCode.
-        return exitCode;
     }
 }

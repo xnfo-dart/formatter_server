@@ -23,6 +23,7 @@ class FormatTest extends AbstractFormatterServerIntegrationTest
 {
     Future<String> formatTestSetup({bool withErrors = false}) async
     {
+        //debugStdio();
         var pathname = sourcePath('test.dart');
 
         if (withErrors)

@@ -95,9 +95,6 @@ class FormatServer
     /// used as a cache key.
     int overlayModificationStamp = DateTime.now().millisecondsSinceEpoch;
 
-    /// The object used to manage the SDK's known to this server.
-    /*final DartSdkManager sdkManager;*/
-
     /// Handle requests on [channel] using a [baseResourceProvider]
     /// for overlaying files access with a [OverlayResourceProvider]
     /// [instrumentationService] is used for logging exceptions.
@@ -133,14 +130,15 @@ class FormatServer
     void error(Object exception, StackTrace? stackTrace)
     {
         // Don't send to instrumentation service; not an internal error.
+        //TODO(tekert): why? in the lsp implementation intrumentation is used.
         sendServerErrorNotification('Socket error', exception, stackTrace);
     }
 
     /// Handle a [request] that was read from the communication channel.
     void handleRequest(Request request)
     {
-        // runZonedGuarded (onError) handles sync and async errors.
-        // runZoned (ZoneSpecification handleUncaughtError) handles only async (microtask async too).
+        // NOTE: runZonedGuarded (onError) handles sync and async errors.
+        // NOTE: runZoned (ZoneSpecification handleUncaughtError) now handles sync and async errors.
 
         // Because we don't `await` the execution of the handlers, we wrap the
         // execution in order to have one central place to handle exceptions.
@@ -154,7 +152,7 @@ class FormatServer
             if (generator != null)
             {
                 var handler = generator(this, request);
-                handler.handle(); // async,
+                handler.handle(); // async
             }
             else
             {
@@ -162,7 +160,8 @@ class FormatServer
             }
         }, (exception, stackTrace)
         {
-            // In case an async handler doesnt catch it, send response.
+            // In case an async handler doesnt catch RequestFailure (protocol parse errors),
+            // send response but don't log it.
             if (exception is RequestFailure)
             {
                 sendResponse(exception.response);
@@ -229,7 +228,7 @@ class FormatServer
 
     /// Sends a `server.error` notification.
     // Ported from lsp implemetation of analysis server socket errors.
-    // listen onError parameter, used from FormatServer.error()
+    // Stream<Request>.listen onError: parameter
     void sendServerErrorNotification(
         String message,
         Object exception,

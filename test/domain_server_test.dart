@@ -32,7 +32,10 @@ class ServerDomainTest extends PubPackageAnalysisServerTest
             response.toJson(),
             equals({
                 Response.ID: '0',
-                Response.RESULT: {VERSION: SERVER_VERSION, VERSION_PROTOCOL: PROTOCOL_VERSION}
+                Response.RESULT: {
+                    VERSION: SERVER_VERSION,
+                    VERSION_PROTOCOL: PROTOCOL_VERSION
+                }
             }));
     }
 
