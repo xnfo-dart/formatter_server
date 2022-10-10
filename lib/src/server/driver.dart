@@ -104,8 +104,13 @@ class Driver implements ServerStarter
             Future serveResult;
             var stdioServer = StdioFormatServer(socketServer);
 
-            // Creates a channel, then instances a [FormatServer] that listen to requests.
-            // Each request is handled in another nested Error Zone for handlers.
+            // Creates a channel, then instances a [FormatServer] that listen to requests in that channel.
+            //! Important note:
+            // this error zone is handled _captureExceptions (more notes there)
+            // listen onError is handled by FormatServer.error() wich sends an [Notification] Error to client.
+            // Each request is handled in another nested Error Zone for handlers wich logs any exeption error,
+            //   Any unhandled (in Handler from a Request) [RequestFailure] Exeption is
+            //   sent as a [Response] with Error [RequestError] (please handle them inside each handler).
             serveResult = stdioServer.serveStdio();
 
             // When stdioServer is closed then..
@@ -119,13 +124,12 @@ class Driver implements ServerStarter
                 socketServer.formatServer!.shutdown();
                 io.exit(0);
             });
-        }
-            /*
+        });
+/*
         , print: results[INTERNAL_PRINT_TO_CONSOLE] as bool
             ? null
             : httpServer!.recordPrint);
-        */
-            );
+*/
     }
 
     /// Perform log files rolling.
@@ -161,6 +165,7 @@ class Driver implements ServerStarter
             StackTrace stackTrace) async
         {
             service.logException(exception, stackTrace);
+            await service.shutdown(); // flush before throwing.
             throw exception;
         }
 
@@ -172,30 +177,12 @@ class Driver implements ServerStarter
                     // reserved for communication to the client.
                     print(line);
                 };
-        //! Note: doc is in Zone.handleUncaughtError: (they have to copy it to the ZoneSpecification interface)
-        // ZoneSpecification handleUncaughtError Handles uncaught asynchronous errors only,
-        // and future microtask gets caught but exception logs dont have time to flush.
-        // if we dont throw microtasks or syncs errors then everything will be fine.
+        // Care errors gets caught but exception logs don't have time to flush (service.logException).
         var zoneSpecification =
             ZoneSpecification(handleUncaughtError: errorFunction, print: printFunction);
 
         return runZoned(callback, zoneSpecification: zoneSpecification);
     }
-
-    //! TODO (tekert): is this necessary?  it will not get the correct path with this code.
-    // Return the path to the runtime Dart SDK.
-    /*String getSdkPath() => path.dirname(path.dirname(io.Platform.resolvedExecutable));
-
-    String _getSdkPath()
-    {
-        String sdkPath = getSdkPath();
-
-        var pathContext = PhysicalResourceProvider.INSTANCE.pathContext;
-        return pathContext.normalize
-        (
-            pathContext.absolute(sdkPath),
-        );
-    }*/
 
     /// Read the UUID from disk, generating and storing a new one if necessary.
     String _readUuid(InstrumentationService service)

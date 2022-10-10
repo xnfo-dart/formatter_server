@@ -6,7 +6,7 @@
 // To regenerate the file, use the script
 // "tool/protocol_spec/generate.dart".
 
-const String PROTOCOL_VERSION = '0.6.1';
+const String PROTOCOL_VERSION = '0.6.2';
 
 const String EDIT_REQUEST_FORMAT = 'edit.format';
 const String EDIT_REQUEST_FORMAT_CODE_STYLE = 'codeStyle';
@@ -31,4 +31,5 @@ const String SERVER_REQUEST_GET_VERSION = 'server.getVersion';
 const String SERVER_REQUEST_SHUTDOWN = 'server.shutdown';
 const String SERVER_REQUEST_UPDATE_CONTENT = 'server.updateContent';
 const String SERVER_REQUEST_UPDATE_CONTENT_FILES = 'files';
+const String SERVER_RESPONSE_GET_VERSION_PROTOCOL = 'protocol';
 const String SERVER_RESPONSE_GET_VERSION_VERSION = 'version';

@@ -3,9 +3,9 @@ name: Build binaries on tag
 on:
   push:
     tags:
-      - v*.*.*
+      - v[0-9]+.[0-9]+.[0-9]+
 
-  # Allows you to run this workflow manually from the Actions tab
+  # Allows you to run this workflow manually from the Actions tab (for testing)
   workflow_dispatch:
 
 # run action will be from this dir

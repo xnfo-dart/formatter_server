@@ -1,7 +1,7 @@
 # Stdio server and protocol 
 > Extracted from Dart SDK pkg [Analysis server](https://github.com/dart-lang/sdk/tree/main/pkg/analysis_server/)
 
-The interesting part is only in [./src/handler/format_handler.dart]
+The interesting part is only in [./src/handler/edit_format.dart]
 
     Only a subset of functionality was taken from analysis_server, wich is the base API protocol using JSON as RPC over stdio.
 
@@ -15,12 +15,14 @@ The interesting part is only in [./src/handler/format_handler.dart]
 ***
 ## Analyzer notes
 
-The analizer has a very handly classes totally abstracted from the analysis side, for handling `File overlays` (it would make a handly library if expanded)
+The analyzer has handly classes totally abstracted from the analysis side, for handling `File overlays` (it would make a nice library if expanded)
 
 >It was already done, tested, so no need to reinvent anything. Saves time.
 
 This had to be done because the analysis_plugin doesn't hook in edit.format requests, so forking the stdio server seemed like a balanced aproach.
 the analysis_server now uses [Language Server Provider](https://microsoft.github.io/language-server-protocol/).
+
+Using the LSP only for formatting was not feasible, if this server gets more functionality we may change to use the LSP protocol (its already done in the analysis_server, only importing, refactoring and testing is requiered).
 ***
 ## API and tool/protocol_spec
 
@@ -28,6 +30,4 @@ the analysis_server now uses [Language Server Provider](https://microsoft.github
 
 >API was generated using the analysis_server spec tools.
 
-The tool is similar to a protocol_buffer using html as input (very nice) and outputs dart code to handle messages that carry json and come with parsing and errors for each RPC method, its mostly unused as the have moved to using LSP
-
-We only use server output, as the client is in typescript normally and the protocol is small enough to just manually translate it) plus nice html api doc, it would make a really good library, wonder why they dont do it.
+The tool is similar to a protocol_buffer using html as input (very nice) and outputs dart code to handle messages that carry json, generates parsing and errors for each RPC method, its mostly unused as they have now using LSP mostly.

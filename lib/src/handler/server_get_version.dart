@@ -8,6 +8,7 @@ import 'dart:async';
 
 import 'package:formatter_server/protocol/protocol.dart';
 import 'package:formatter_server/protocol/protocol_constants.dart';
+import 'package:formatter_server/src/constants.dart';
 import 'package:formatter_server/src/format_server.dart';
 
 import '../../protocol/protocol_generated.dart';
@@ -24,8 +25,6 @@ class ServerGetVersionHandler extends Handler
     @override
     Future<void> handle() async
     {
-        sendResult(ServerGetVersionResult(
-            PROTOCOL_VERSION,
-        ));
+        sendResult(ServerGetVersionResult(SERVER_VERSION, PROTOCOL_VERSION));
     }
 }

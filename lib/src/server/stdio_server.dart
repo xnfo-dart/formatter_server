@@ -6,7 +6,7 @@
 
 import 'dart:io';
 
-import 'package:formatter_server/src/channel/channel.dart';
+import 'package:formatter_server/src/channel/byte_stream_channel.dart';
 import 'package:formatter_server/src/socket_server.dart';
 
 /// Instances of the class [StdioServer] implement a simple server operating
@@ -30,6 +30,7 @@ class StdioFormatServer
         var serverChannel = ByteStreamServerChannel(
             stdin,
             stdout.nonBlocking,
+            socketServer.instrumentationService,
         );
         socketServer.createFormatServer(serverChannel);
         return serverChannel.closed;

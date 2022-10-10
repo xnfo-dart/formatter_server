@@ -2,13 +2,9 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import 'dart:io';
-
 import 'package:grinder/grinder.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart' as yaml;
-import 'package:package_config/package_config.dart';
-import 'package:path/path.dart' as p;
 
 /// Matches the version line in formatter_server's pubspec.
 final _versionPattern = RegExp(r'^version: .*$', multiLine: true);
@@ -16,18 +12,19 @@ final _versionPattern = RegExp(r'^version: .*$', multiLine: true);
 void main(List<String> args) => grind(args);
 
 @DefaultTask()
-@Task()
+@Task("Run tests and analysis")
 Future<void> validate() async
 {
     // Test it.
-    //await TestRunner().testAsync();
+    await TestRunner().testAsync();
 
     // Make sure it's warning clean.
     Analyzer.analyze('bin/listen.dart', fatalWarnings: true);
 
+    // TODO(tekert): format once polisher exposes path format.
     // Format it.
-   // Dart.run('bin/format.dart',
-       // arguments: ['format', './benchmark/after.dart.txt', '-o', 'none']);
+    // Dart.run('bin/format.dart',
+    // arguments: ['format', './benchmark/after.dart.txt', '-o', 'none']);
 
     // Check if we can get parse all dependencys versions used as constants.
 /*  if (await getDependancyVersion("dart_style") == null)
@@ -35,6 +32,13 @@ Future<void> validate() async
         throw "Cant parse all dependencys versions";
     }
 */
+}
+
+// Generate all files
+@Task("Generate all protocol, integration tests matchers/methods, and API html doc.")
+Future<void> generate() async
+{
+    Dart.run('tool/protocol_spec/generate.dart');
 }
 
 /// Gets ready to publish a new version of the package.
@@ -45,30 +49,23 @@ Future<void> validate() async
 ///      already be the case since you've already landed patches that change
 ///      the formatter and bumped to that as a consequence.
 ///
-///   2. Run this task:
+///   2. Commit the change to develop and Tag it for candidate to release: vX.X.X-betaY.
 ///
-///         dart run grinder bump
+///   3. Merge to master
 ///
-///   3. Commit the change to a branch.
+///      git merge --no-commit <BETA_TAG>
+///      dart run grinder bump
+///      git commit -a
+///         Version $THE_VERSION_BEING_BUMPED
+///         Merge commit '#DEV_HASH_TO_BASE_RELEASE_OFF' into master
 ///
-///   4. Send it out for review:
-///
-///         git cl upload
-///
-///   5. After the review is complete, land it:
-///
-///         git cl land
-///
-///   6. Tag the commit:
+///   4. Tag the commit:
 ///
 ///         git tag -a "<version>" -m "<version>"
 ///         git push origin <version>
 ///
-///   7. Publish the package:
-///
-///         pub lish
-@Task()
-@Depends(validate)
+@Task("Bumps from dev to release version")
+@Depends(generate, validate)
 Future<void> bump() async
 {
     // Read the version from the pubspec.
@@ -90,13 +87,13 @@ Future<void> bump() async
     pubspecFile.writeAsStringSync(pubspec);
 
     // Update the version constants in formatter_constants.dart.
-    var versionFile = getFile('lib/src/server_constants.dart');
+    var versionFile = getFile('lib/src/constants.dart');
     var versionSource = versionFile.readAsStringSync();
-    var versionReplaced =
-        updateVersionConstant(versionSource, "FORMATTER_SERVER_VERSION", bumped);
+    var versionReplaced = updateVersionConstant(versionSource, "SERVER_VERSION", bumped);
     versionFile.writeAsStringSync(versionReplaced);
 
     // Update the version in the CHANGELOG.
+    // TODO(tekert): create bump header and move Unreleased header
     var changelogFile = getFile('CHANGELOG.md');
     var changelog = changelogFile
         .readAsStringSync()
@@ -110,41 +107,4 @@ String updateVersionConstant(String source, String constant, Version v)
 {
     return source.replaceAll(RegExp("""const String $constant = "[^"]+";"""),
         """const String $constant = "$v";""");
-}
-
-Future<Version?> getDependancyVersion(String packageName) async
-{
-    var packageConfig = await findPackageConfig(Directory(""),
-        recurse: false,
-        onError: (error) => print("Could not find package config file: $error"));
-
-    if (packageConfig == null) return null;
-
-    Package package;
-    try
-    {
-        package =
-            packageConfig.packages.firstWhere((element) => element.name == packageName);
-    }
-    catch (e)
-    {
-        print("Package not found: $packageName");
-        return null;
-    }
-
-    // Get the dependency package pubspec file.
-    Version version;
-    try
-    {
-        final pubspecFile = getFile(p.join(p.fromUri(package.root), 'pubspec.yaml'));
-        final pubspec = pubspecFile.readAsStringSync();
-        version = Version.parse((yaml.loadYaml(pubspec) as Map)['version'] as String);
-    }
-    catch (e)
-    {
-        print("Package $packageName pubspec.yaml: $e");
-        return null;
-    }
-
-    return version;
 }

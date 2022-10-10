@@ -110,7 +110,7 @@ a:focus, a:hover {
 <body>
   <h1>Formatter Server API Specification</h1>
   <h1 style="color:#999999">Version
-    0.6.1
+    0.6.2
   </h1>
   <p>
     This document contains a specification of the API provided by the
@@ -312,13 +312,17 @@ a:focus, a:hover {
   "error": <span style="color:#999999">optional</span> <a href="#type_RequestError">RequestError</a>
   "result": {
     "<b>version</b>": String
+    "<b>protocol</b>": String
   }
 }</pre></div>
       <p>Return the version number of the formatter server.</p>
       
     <h4>returns:</h4><dl><dt class="field"><b>version: String</b></dt><dd>
           
-          <p>The version number of the formatter server.</p>
+          <p>The version number of the formatter server</p>
+        </dd><dt class="field"><b>protocol: String</b></dt><dd>
+          
+          <p>The version number of the API Protocol used in the formatter server</p>
         </dd></dl></dd><dt class="request"><a name="request_server.shutdown">server.shutdown</a></dt><dd><div class="box"><pre>request: {
   "id": String
   "method": "server.shutdown"
@@ -468,9 +472,7 @@ a:focus, a:hover {
         selection offset and selection length.
       </p>
       <p>
-        If a request is made for a file which does not exist, or which is not
-        currently subject to analysis (e.g. because it is not associated with
-        any analysis root specified to analysis.setAnalysisRoots), an error of
+        If a request is made for a file which does not exist, an error of
         type <tt>FORMAT_INVALID_FILE</tt> will be generated. If the source
         contains syntax errors, an error of type <tt>FORMAT_WITH_ERRORS</tt>
         will be generated. If the selection range is outside of the file
@@ -772,45 +774,6 @@ a:focus, a:hover {
             This is a legacy error; it will be removed before the
             API reaches version 1.0.
           </p>
-        </dd></dl></dd><dt class="typeDefinition"><a name="type_SourceChange">SourceChange: object</a></dt><dd>
-      <p>
-        A description of a set of edits that implement a single conceptual change.
-      </p>
-      
-    <dl><dt class="field"><b>message: String</b></dt><dd>
-          
-          <p>
-            A human-readable description of the change to be applied.
-          </p>
-        </dd><dt class="field"><b>edits: List&lt;<a href="#type_SourceFileEdit">SourceFileEdit</a>&gt;</b></dt><dd>
-          
-          <p>
-            A list of the edits used to effect the change, grouped by file.
-          </p>
-        </dd><dt class="field"><b>linkedEditGroups: List&lt;LinkedEditGroup&gt;</b></dt><dd>
-          
-          <p>
-            A list of the linked editing groups used to customize the changes that
-            were made.
-          </p>
-        </dd><dt class="field"><b>selection: <a href="#type_Position">Position</a><span style="color:#999999"> (optional)</span></b></dt><dd>
-          
-          <p>
-            The position that should be selected after the edits have been
-            applied.
-          </p>
-        </dd><dt class="field"><b>selectionLength: int<span style="color:#999999"> (optional)</span></b></dt><dd>
-          
-          <p>
-            The length of the selection (starting at Position) that should be selected after
-            the edits have been applied.
-          </p>
-        </dd><dt class="field"><b>id: String<span style="color:#999999"> (optional)</span></b></dt><dd>
-          
-          <p>
-            The optional identifier of the change kind. The identifier remains
-            stable even if the message changes, or is parameterized.
-          </p>
         </dd></dl></dd><dt class="typeDefinition"><a name="type_SourceEdit">SourceEdit: object</a></dt><dd>
       <p>
         A description of a single change to a single file.
@@ -895,7 +858,7 @@ a:focus, a:hover {
     TODO: TBD
   </p>
   <h2 class="domain"><a name="index">Index</a></h2>
-  <h3>Domains</h3><h4>server (<a href="#domain_server">↑</a>)</h4><div class="subindex"><h5>Requests</h5><ul><li><a href="#request_server.getVersion">getVersion</a></li><li><a href="#request_server.shutdown">shutdown</a></li><li><a href="#request_server.updateContent">updateContent</a></li></ul><h5>Notifications</h5><div class="subindex"><ul><li><a href="#notification_server.connected">connected</a></li><li><a href="#notification_server.error">error</a></li></ul></div></div><h4>edit (<a href="#domain_edit">↑</a>)</h4><div class="subindex"><h5>Requests</h5><ul><li><a href="#request_edit.format">format</a></li></ul></div><h3>Types (<a href="#types">↑</a>)</h3><div class="subindex"><ul><li><a href="#type_AddContentOverlay">AddContentOverlay</a></li><li><a href="#type_ChangeContentOverlay">ChangeContentOverlay</a></li><li><a href="#type_CodeStyle">CodeStyle</a></li><li><a href="#type_FilePath">FilePath</a></li><li><a href="#type_Position">Position</a></li><li><a href="#type_RemoveContentOverlay">RemoveContentOverlay</a></li><li><a href="#type_RequestError">RequestError</a></li><li><a href="#type_RequestErrorCode">RequestErrorCode</a></li><li><a href="#type_SourceChange">SourceChange</a></li><li><a href="#type_SourceEdit">SourceEdit</a></li><li><a href="#type_SourceFileEdit">SourceFileEdit</a></li><li><a href="#type_TabSize">TabSize</a></li></ul></div><h3>Refactorings (<a href="#refactorings">↑</a>)</h3><div class="subindex"><ul></ul></div>
+  <h3>Domains</h3><h4>server (<a href="#domain_server">↑</a>)</h4><div class="subindex"><h5>Requests</h5><ul><li><a href="#request_server.getVersion">getVersion</a></li><li><a href="#request_server.shutdown">shutdown</a></li><li><a href="#request_server.updateContent">updateContent</a></li></ul><h5>Notifications</h5><div class="subindex"><ul><li><a href="#notification_server.connected">connected</a></li><li><a href="#notification_server.error">error</a></li></ul></div></div><h4>edit (<a href="#domain_edit">↑</a>)</h4><div class="subindex"><h5>Requests</h5><ul><li><a href="#request_edit.format">format</a></li></ul></div><h3>Types (<a href="#types">↑</a>)</h3><div class="subindex"><ul><li><a href="#type_AddContentOverlay">AddContentOverlay</a></li><li><a href="#type_ChangeContentOverlay">ChangeContentOverlay</a></li><li><a href="#type_CodeStyle">CodeStyle</a></li><li><a href="#type_FilePath">FilePath</a></li><li><a href="#type_Position">Position</a></li><li><a href="#type_RemoveContentOverlay">RemoveContentOverlay</a></li><li><a href="#type_RequestError">RequestError</a></li><li><a href="#type_RequestErrorCode">RequestErrorCode</a></li><li><a href="#type_SourceEdit">SourceEdit</a></li><li><a href="#type_SourceFileEdit">SourceFileEdit</a></li><li><a href="#type_TabSize">TabSize</a></li></ul></div><h3>Refactorings (<a href="#refactorings">↑</a>)</h3><div class="subindex"><ul></ul></div>
 
 
 

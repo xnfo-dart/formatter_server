@@ -3,7 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 /// Code for enumerating the set of types implied by the API.
-import 'analyzer_utilities_pkg/tools.dart';
+import './analyzer_utilities_tools_hook.dart';
 
 import 'api.dart';
 

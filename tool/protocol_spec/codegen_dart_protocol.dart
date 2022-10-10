@@ -6,7 +6,7 @@
 
 import 'dart:convert';
 
-import 'analyzer_utilities_pkg/tools.dart';
+import './analyzer_utilities_tools_hook.dart';
 import 'package:html/dom.dart' as dom;
 import 'package:path/path.dart' as path;
 
@@ -40,8 +40,7 @@ GeneratedFile clientTarget(bool responseRequiresRequestTime)
 
 GeneratedFile serverTarget(bool responseRequiresRequestTime)
 {
-    return GeneratedFile('lib/protocol/protocol_generated.dart',
-        (String pkgPath) async
+    return GeneratedFile('lib/protocol/protocol_generated.dart', (String pkgPath) async
     {
         var visitor = CodegenProtocolVisitor(
             path.basename(pkgPath), responseRequiresRequestTime, true, readApi(pkgPath));
@@ -459,8 +458,7 @@ class CodegenProtocolVisitor extends DartCodegenVisitor with CodeGenerator
         if (isServer)
         {
             writeln("import 'package:$packageName/protocol/protocol.dart';");
-            writeln(
-                "import 'package:$packageName/src/protocol/protocol_internal.dart';");
+            writeln("import 'package:$packageName/src/protocol/protocol_internal.dart';");
             writeln("import 'package:analyzer_plugin/protocol/protocol.dart' show Enum;");
 
             for (var uri in api.types.importUris)
@@ -472,12 +470,9 @@ class CodegenProtocolVisitor extends DartCodegenVisitor with CodeGenerator
         }
         else
         {
-            writeln(
-                "import 'package:$packageName/protocol/protocol_base.dart';");
-            writeln(
-                "import 'package:$packageName/protocol/protocol_common.dart';");
-            writeln(
-                "import 'package:$packageName/protocol/protocol_internal.dart';");
+            writeln("import 'package:$packageName/protocol/protocol_base.dart';");
+            writeln("import 'package:$packageName/protocol/protocol_common.dart';");
+            writeln("import 'package:$packageName/protocol/protocol_internal.dart';");
         }
     }
 

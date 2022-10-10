@@ -4,7 +4,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
-import './analyzer_utilities_pkg/tools.dart';
+import './analyzer_utilities_tools_hook.dart';
 
 import 'api.dart';
 import 'codegen_dart.dart';
@@ -17,8 +17,8 @@ final GeneratedFile clientTarget = GeneratedFile(
     return visitor.collectCode(visitor.visitApi);
 });
 
-final GeneratedFile serverTarget = GeneratedFile(
-    'lib/protocol/protocol_constants.dart', (String pkgPath) async
+final GeneratedFile serverTarget =
+    GeneratedFile('lib/protocol/protocol_constants.dart', (String pkgPath) async
 {
     var visitor = CodegenVisitor(readApi(pkgPath));
     return visitor.collectCode(visitor.visitApi);

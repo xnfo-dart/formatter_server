@@ -16,18 +16,6 @@ import 'package:analyzer_plugin/src/protocol/protocol_internal.dart' show Respon
 
 import 'package:formatter_server/protocol/protocol_generated.dart';
 
-/// An object that can handle requests and produce responses for them.
-///
-/// Clients may not extend, implement or mix-in this class.
-abstract class RequestHandler
-{
-    /// Attempt to handle the given [request]. If the request is not recognized by
-    /// this handler, return `null` so that other handlers will be given a chance
-    /// to handle it. Otherwise, return the response that should be passed back to
-    /// the client.
-    Response? handleRequest(Request request);
-}
-
 /// A request that was received from the client.
 ///
 /// Clients may not extend, implement or mix-in this class.

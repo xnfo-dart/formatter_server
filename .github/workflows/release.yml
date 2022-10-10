@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       versionName:
-        description: 'Name of version  (ie 5.5.0)'
+        description: 'Name of version  (ie v5.5.0) same as tag name'
         required: true
       isDraft:
         description: 'Should we create a draft release?'
@@ -55,12 +55,13 @@ jobs:
       #    version: ${{ github.event.inputs.versionName }} # Required
 
       # https://github.com/softprops/action-gh-release
+      # Requires content write permission
       - name: Release
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          name: Formatter Server v${{ github.event.inputs.versionName }}
-          tag_name: v${{ github.event.inputs.versionName }}
+          name: Formatter Server ${{ github.event.inputs.versionName }}
+          tag_name: ${{ github.event.inputs.versionName }}
           draft: ${{ github.event.inputs.isDraft }}
           prerelease: false
           body: ${{ steps.extract-release-notes.outputs.release_notes }}

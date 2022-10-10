@@ -16,12 +16,17 @@ import 'package:analyzer_plugin/protocol/protocol_common.dart'; // for ContentOv
 /*import 'package:analyzer/src/generated/sdk.dart';*/
 
 import 'package:formatter_server/src/channel/channel.dart';
-import 'package:formatter_server/src/edit_domain.dart';
-import 'package:formatter_server/src/domain_server.dart';
 import 'package:formatter_server/src/server/error_notifier.dart';
 import 'package:formatter_server/protocol/protocol.dart';
 import 'package:formatter_server/protocol/protocol_constants.dart';
 import 'package:formatter_server/protocol/protocol_generated.dart';
+
+// Handlers
+import 'package:formatter_server/src/handler/abstract_handler.dart';
+import 'package:formatter_server/src/handler/edit_format.dart';
+import 'package:formatter_server/src/handler/server_get_version.dart';
+import 'package:formatter_server/src/handler/server_shutdown.dart';
+import 'package:formatter_server/src/handler/server_update_content.dart';
 
 /// Various IDE options.
 class FormatServerOptions
@@ -30,15 +35,23 @@ class FormatServerOptions
     String? clientVersion;
 }
 
+/// A function that can be executed to create a handler for a request.
+typedef HandlerGenerator = Handler Function(FormatServer, Request);
+
 class FormatServer
 {
+    /// A map from the name of a request to a function used to create a request
+    /// handler.
+    static final Map<String, HandlerGenerator> handlerGenerators = {
+        EDIT_REQUEST_FORMAT: EditFormatHandler.new,
+        SERVER_REQUEST_GET_VERSION: ServerGetVersionHandler.new,
+        SERVER_REQUEST_SHUTDOWN: ServerShutdownHandler.new,
+        SERVER_REQUEST_UPDATE_CONTENT: ServerUpdateContentHandler.new,
+    };
+
     /// The channel from which requests are received and to which responses should
     /// be sent.
     final ServerCommunicationChannel channel;
-
-    /// A list of the request handlers used to handle the requests sent to this
-    /// server.
-    late List<RequestHandler> handlers;
 
     /// The instrumentation service that is to be used by this format server.
     InstrumentationService instrumentationService;
@@ -82,9 +95,9 @@ class FormatServer
     /// used as a cache key.
     int overlayModificationStamp = DateTime.now().millisecondsSinceEpoch;
 
-    /// The object used to manage the SDK's known to this server.
-    /*final DartSdkManager sdkManager;*/
-
+    /// Handle requests on [channel] using a [baseResourceProvider]
+    /// for overlaying files access with a [OverlayResourceProvider]
+    /// [instrumentationService] is used for logging exceptions.
     FormatServer(this.channel, ResourceProvider baseResourceProvider,
         /*this.sdkManager,*/ this.instrumentationService)
         : resourceProvider = OverlayResourceProvider(baseResourceProvider)
@@ -98,11 +111,15 @@ class FormatServer
 
         channel.requests.listen(handleRequest, onDone: done, onError: error);
         //debounceRequests(channel, discardedRequests).listen(handleRequest, onDone: done, onError: error);
+    }
 
-        handlers = <RequestHandler>[
-            EditDomainHandler(this),
-            ServerDomainHandler(this),
-        ];
+    /// For tests only
+    Future<void> dispose() async
+    {
+        for (var timer in _pendingFilesToRemoveOverlay.values)
+        {
+            timer.cancel();
+        }
     }
 
     /// The socket from which requests are being read has been closed.
@@ -110,59 +127,48 @@ class FormatServer
 
     /// There was an error related to the socket from which requests are being
     /// read.
-    void error(argument) {}
+    void error(Object exception, StackTrace? stackTrace)
+    {
+        // Don't send to instrumentation service; not an internal error.
+        //TODO(tekert): why? in the lsp implementation intrumentation is used.
+        sendServerErrorNotification('Socket error', exception, stackTrace);
+    }
 
     /// Handle a [request] that was read from the communication channel.
     void handleRequest(Request request)
     {
-        // runZonedGuarded (onError) handles sync and async errors.
-        // runZoned (ZoneSpecification handleUncaughtError) hnadles only async (microtask async too).
+        // NOTE: runZonedGuarded (onError) handles sync and async errors.
+        // NOTE: runZoned (ZoneSpecification handleUncaughtError) now handles sync and async errors.
+
+        // Because we don't `await` the execution of the handlers, we wrap the
+        // execution in order to have one central place to handle exceptions.
         runZonedGuarded(()
         {
-            var count = handlers.length;
-            for (var i = 0; i < count; i++)
+            //analyticsManager.startedRequest(request: request, startTime: DateTime.now());
+            //performance.logRequestTiming(request.clientRequestTime);
+
+            // Find request name and get the request handler constructor.
+            var generator = handlerGenerators[request.method];
+            if (generator != null)
             {
-                try
-                {
-                    // Ask each registered handler if it can handle it.
-                    var response = handlers[i].handleRequest(request);
-                    if (response == Response.DELAYED_RESPONSE)
-                    {
-                        // Means the request is being handled asyncrhonously,
-                        // the handler will be responsible for sending [Response] when ready.
-                        return;
-                    }
-                    if (response != null)
-                    {
-                        sendResponse(response);
-                        return;
-                    }
-                }
-                on RequestFailure catch (exception)
-                {
-                    sendResponse(exception.response);
-                    return;
-                }
-                catch (exception, stackTrace)
-                {
-                    var error =
-                        RequestError(RequestErrorCode.SERVER_ERROR, exception.toString());
-                    error.stackTrace = stackTrace.toString();
-                    var response = Response(request.id, error: error);
-                    sendResponse(response);
-                    return;
-                }
+                var handler = generator(this, request);
+                handler.handle(); // async
             }
-            sendResponse(Response.unknownRequest(request));
+            else
+            {
+                sendResponse(Response.unknownRequest(request));
+            }
         }, (exception, stackTrace)
         {
-            // In case an async handler doesnt catch it, send response but log it.
+            // In case an async handler doesnt catch RequestFailure (protocol parse errors),
+            // send response but don't log it.
             if (exception is RequestFailure)
             {
                 sendResponse(exception.response);
-                //return; // TODO: test if log is actually logged.
+                return;
             }
 
+            // Log the exception.
             instrumentationService.logException(
                 FatalException(
                     'Failed to handle request: ${request.method}',
@@ -170,7 +176,13 @@ class FormatServer
                     stackTrace,
                 ),
                 null,
+                //crashReportingAttachmentsBuilder.forException(exception),
             );
+            // Then return an error response to the client.
+            var error = RequestError(RequestErrorCode.SERVER_ERROR, exception.toString());
+            error.stackTrace = stackTrace.toString();
+            var response = Response(request.id, error: error);
+            sendResponse(response);
         });
     }
 
@@ -215,38 +227,51 @@ class FormatServer
     }
 
     /// Sends a `server.error` notification.
-    //TODO (tekert): check for what it was used.
+    // Ported from lsp implemetation of analysis server socket errors.
+    // Stream<Request>.listen onError: parameter
     void sendServerErrorNotification(
         String message,
-        dynamic exception,
-        /*StackTrace*/ stackTrace, {
+        Object exception,
+        StackTrace? stackTrace, {
         bool fatal = false,
     })
     {
-        var msg = exception == null ? message : '$message: $exception';
-        if (stackTrace != null && exception is! CaughtException)
-        {
-            stackTrace = StackTrace.current;
-        }
-
-        // send the notification
-        channel.sendNotification(
-            ServerErrorParams(fatal, msg, '$stackTrace').toNotification());
-
-        // remember the last few exceptions
+        var fullMessage = message;
         if (exception is CaughtException)
         {
             stackTrace ??= exception.stackTrace;
+            fullMessage = '$fullMessage: ${exception.exception}';
         }
+        else
+        {
+            fullMessage = '$fullMessage: $exception';
+        }
+        final fullError = stackTrace == null ? fullMessage : '$fullMessage\n$stackTrace';
+        stackTrace ??= StackTrace.current;
+
+        // send the notification
+        channel.sendNotification(
+            ServerErrorParams(fatal, fullError, '$stackTrace').toNotification());
 /*
-        TODO (tekert): This was for the diagnostics page of the analysis_server, remove.
+        // remember the last few exceptions
+        //TODO (tekert): This was for the diagnostics page of the analysis_server, remove.
+        // no use here.
         exceptions.add(ServerException(
             message,
             exception,
-            stackTrace is StackTrace ? stackTrace : StackTrace.current,
-            fatal,
+            stackTrace,
+            false,
         ));
 */
+        instrumentationService.logException(
+            FatalException(
+                message,
+                exception,
+                stackTrace,
+            ),
+            null,
+            //crashReportingAttachmentsBuilder.forException(exception),
+        );
     }
 
     Future<void> shutdown()
