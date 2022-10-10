@@ -17,7 +17,7 @@ For IDE integration.
 ```./tool/protocol_spec/spec-input.html```
 
 2. Update protocol files and doc using spec-input.html<br>
-```dart run ./tool/protocol_spec/generate.dart```
+```dart run grinder generate```
 
 3. (when releasing tag) Bump version (protocol, app, and dependencies)<br>
 ```dart run grinder bump```
@@ -34,7 +34,7 @@ Server *forked* from [analysis_server](https://github.com/dart-lang/sdk/tree/mai
 ## License
 BSD-3-Clause license
 
-Most of the code is originaly from Dart Authors.
+Most of the code is originaly from the Dart Authors.
 
 [API]: https://htmlpreview.github.io/?https://github.com/xnfo-dart/formatter_server/blob/master/doc/api.html
 

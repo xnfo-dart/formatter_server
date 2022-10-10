@@ -30,4 +30,4 @@ Using the LSP only for formatting was not feasible, if this server gets more fun
 
 >API was generated using the analysis_server spec tools.
 
-The tool is similar to a protocol_buffer using html as input (very nice) and outputs dart code to handle messages that carry json, generates parsing and errors for each RPC method, its mostly unused as they have now using LSP mostly.
+The tool is similar to a protocol_buffer using html as input (very nice) and outputs dart code to handle messages that carry json, generates parsing and errors for each RPC method, its mostly unused as they have now moved to LSP mostly.
