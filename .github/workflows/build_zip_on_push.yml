@@ -3,11 +3,11 @@ name: Build on Push
 # Controls when the workflow will run
 on:
   # Triggers the workflow only if these files change
-  push:
-    branches: [ "master" ]
-    paths:
-      - '**.dart'
-      - '**.yaml'
+#  push:
+#    branches: [ "master" ]
+#    paths:
+#      - '**.dart'
+#      - '**.yaml'
 
   # Allows you to run this workflow manually from the Actions tab (for testing)
   workflow_dispatch:
