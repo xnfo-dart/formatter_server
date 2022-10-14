@@ -1,4 +1,4 @@
-name: Build on Push
+name: Build on Push (delete this)
 
 # Controls when the workflow will run
 on:
@@ -12,14 +12,13 @@ on:
   # Allows you to run this workflow manually from the Actions tab (for testing)
   workflow_dispatch:
     inputs:
+        #default: is only for the visual text box
       branch:
         description: 'Branch to build (defaults to default branch)'
         required: false
-        default: ''
       polisher_branch:
         description: 'Dart Polisher branch to use when building (defaults to default branch)'
         required: false
-        default: ''
 
 # run action will be from this dir
 defaults:
@@ -55,6 +54,7 @@ jobs:
           path: formatter_server
           ref: ${{ inputs.branch }}
 
+      # TODO: delete this when going open source and pubspec has this repo as a git dependency.
       - name: "Checkout Local Dart Polisher package"
         uses: actions/checkout@v3
         with:

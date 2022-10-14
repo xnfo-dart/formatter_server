@@ -27,6 +27,7 @@ jobs:
 
       - run: mkdir releases
 
+      # TODO: delete this and include this workflow as a dependency.
       # Download artifacts from the last run of build_on_tag
       - name: Download artifact Linux
         uses: dawidd6/action-download-artifact@v2
@@ -70,3 +71,10 @@ jobs:
             releases/**
 
       # steps.create_release.outputs.upload_url   has the URL
+      - name: Generate release data using Markdown
+        run: |
+          echo "### :rocket: Release data:" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Release url: {{ steps.create_release.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Release ID: {{ steps.create_release.outputs.id }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Upload url: {{ steps.create_release.outputs.upload_url }}" >> $GITHUB_STEP_SUMMARY

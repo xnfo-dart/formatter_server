@@ -41,6 +41,7 @@ jobs:
         with:
           path: formatter_server
 
+      # TODO: delete this when going open source and pubspec has this repo as a git dependency.
       - name: "Checkout Local Dart Polisher package"
         uses: actions/checkout@v3
         with:
@@ -56,7 +57,7 @@ jobs:
       - name: Install pub dependencies
         run: dart pub get
 
-      # Build (TODO: create dart grinder task for this particular build method)
+      # TODO: create dart grinder task for this particular build method
       - name: "Create build dir"
         run: |
           mkdir build
@@ -70,3 +71,5 @@ jobs:
         with:
           name: dartpolishd-${{ matrix.osname }}
           path: formatter_server/build/${{ matrix.osname }}
+
+# TODO: release draft (uses: job)
