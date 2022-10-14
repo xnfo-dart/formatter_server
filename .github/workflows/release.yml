@@ -1,6 +1,28 @@
-name: Create a Release
+name: Make GH Release
+
+###
+#  Makes a github release when 'Release on TAG' finishes (draft) or manually triggered (draft optional).
+#  Uses CHANGELOG notes between 2nd Header and 3rd Header for release automatically. (optional version to pick specific version notes)
+#  Picks artifacts from the last successful build if manually triggered (only for especial use)
+#    When 'Release on Tag' finishes it uses the caller run_number artifacts.
+#  Finally outputs release notes.
+#
+
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run
+# https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#workflow_run
+run-name: "Release: ('${{ github.event.workflow.name }}' -> '${{ github.workflow }}') [on ${{ github.event.workflow_run.event }}: ${{ inputs.versionName }}${{ github.event.workflow_run.head_branch }}]"
 
 on:
+
+  #! NOTE: This event will only trigger a workflow run if the workflow file is on the default branch.
+  workflow_run:
+    workflows: [Release on TAG]
+    branches:
+      # Only run when parent workflow was run on push tags
+      - v[0-9]+.[0-9]+.[0-9]+
+    types:
+      - completed
+
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
@@ -16,25 +38,56 @@ permissions:
   contents: write
 
 jobs:
+
   release:
+    # Run if this was fired from a success worflow_run or workflow_dispatch (in wich case workflow_run.conclusion would be empty)
+    if: ${{ contains(fromJson('["success", ""]'), github.event.workflow_run.conclusion) || (github.event_name == 'workflow_dispatch') }}
+
     runs-on:  ubuntu-latest
-    # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
 
     steps:
+
+      # workflow_run | workflow_dispatch : ${{github.event_name}}
+      - name: "Setup variables"
+        shell: bash
+        run: |
+          # Parent workflow is on an push tag event, so this head_branch will be a version.
+          if [[ "${{github.event_name}}" == "workflow_run" ]]; then
+              CHECKOUT_TAG=${{ github.event.workflow_run.head_branch }}
+              RELEASE_IS_DRAFT=true
+          fi
+          if [[ "${{github.event_name}}" == "workflow_dispatch" ]]; then
+              CHECKOUT_TAG=${{ inputs.versionName }}
+              RELEASE_IS_DRAFT=${{ inputs.isDraft }}
+          fi
+          if [[ "$CHECKOUT_TAG" == "" ]]; then
+              echo "CHECKOUT_TAG is null, something when wront when selecting a version"
+              exit 1
+          fi
+          echo "CHECKOUT_TAG=$CHECKOUT_TAG" >> $GITHUB_ENV
+          echo "Using $CHECKOUT_TAG as tag to checkout formatter_server"
+          echo "RELEASE_IS_DRAFT=$RELEASE_IS_DRAFT" >> $GITHUB_ENV
+          echo "Releasing draft? '$RELEASE_IS_DRAFT'"
+
       # To have access to CHANGELOG.md
       - name: "Checkout local repository"
         uses: actions/checkout@v3
+        with:
+          ref: ${{ env.CHECKOUT_TAG }}
 
       - run: mkdir releases
 
-      # TODO: delete this and include this workflow as a dependency.
-      # Download artifacts from the last run of build_on_tag
+      # Alternative on https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run
+      # Download artifacts from the last run of build_on_tag (cleaner method that works on workflow_dispatch (no run_id))
+      # Do not specify pr, commit, branch, run_id together or workflow_conclusion and run_id together. Pick just one of each or none.
       - name: Download artifact Linux
         uses: dawidd6/action-download-artifact@v2
         with:
           workflow: build_on_tag.yml
-          branch: master
-          github_token: ${{secrets.GH_PAT}}
+          workflow_conclusion: success # for when this is a workflow_dispatch
+          github_token: ${{secrets.GH_PAT}} #TODO: remove when going open source.
+          #run_id: ${{ github.event.workflow_run.id }} # workflow_conclusion is already defined.
+          run_number: ${{ github.event.workflow_run.run_number }} # if null, default is to take the last successful run
           path: releases
           skip_unpack: true
 
@@ -42,7 +95,7 @@ jobs:
         run: ls -R
         working-directory: releases
 
-      # Extracts between 2nd H2 - 3rd H2
+      # Extracts text between 2nd H2 - 3rd H2
       - name: Extract release notes
         id: extract-release-notes
         uses: ffurrer2/extract-release-notes@v1
@@ -53,7 +106,7 @@ jobs:
       #  id: extract-release-notes
       #  with:
       #    changelog_path: ./CHANGELOG.md # Optional
-      #    version: ${{ github.event.inputs.versionName }} # Required
+      #    version: ${{ env.CHECKOUT_TAG }} # Required
 
       # https://github.com/softprops/action-gh-release
       # Requires content write permission
@@ -61,12 +114,12 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          name: Formatter Server ${{ github.event.inputs.versionName }}
-          tag_name: ${{ github.event.inputs.versionName }}
-          draft: ${{ github.event.inputs.isDraft }}
+          name: Formatter Server ${{ env.CHECKOUT_TAG }}
+          tag_name: ${{ env.CHECKOUT_TAG }}
+          draft: ${{ env.RELEASE_IS_DRAFT }}
           prerelease: false
           body: ${{ steps.extract-release-notes.outputs.release_notes }}
-          token: ${{ secrets.GH_PAT }}
+          token: ${{ secrets.GH_PAT }} # TODO: comment-test-remove when going open source.
           files: |
             releases/**
 
@@ -75,6 +128,8 @@ jobs:
         run: |
           echo "### :rocket: Release data:" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Release url: {{ steps.create_release.outputs.url }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Release ID: {{ steps.create_release.outputs.id }}" >> $GITHUB_STEP_SUMMARY
-          echo "- Upload url: {{ steps.create_release.outputs.upload_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Release url: ${{ steps.create_release.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Release ID: ${{ steps.create_release.outputs.id }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Upload url: ${{ steps.create_release.outputs.upload_url }}" >> $GITHUB_STEP_SUMMARY
+
+# TODO: send to discord

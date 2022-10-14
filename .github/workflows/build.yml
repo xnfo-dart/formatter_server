@@ -1,0 +1,152 @@
+name: Build
+
+###
+#  Builds native executables for [linux,windows,mac] when called or manually triggered.
+#    input 'target' can be set to '--last-release' when called, it builds the last release tag.
+#    (master branch releases are done in semantic tags ej: "v1.2.3")
+#  Uploads all output files as 'dartpolishd-${{ matrix.output-name }}'
+#  This output format is ready for use by the vscode polisher extension.
+
+
+# https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_call
+# NOTE: Payload is the same as the caller.
+# run-name is not used when on a workflow_call
+run-name: "Build ${{ github.repository }} ('${{ github.event.workflow.name }}' -> '${{ github.workflow }}') [target: @${{ inputs.branch }}${{ github.event.inputs.target }}]"
+
+# Controls when the workflow will run
+on:
+  # {{ github }} context is inherited from caller.
+  workflow_call:
+    inputs:
+      target:
+        description: "'--last-release' | 'commit/branch/tag'"
+        required: false
+        type: string
+        default: "${{ github.ref_name }}"
+
+  # Allows you to run this workflow manually from the Actions tab (for testing)
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch/Tag/Commit to build (defaults to default branch when fired manually)'
+        required: false
+      polisher_branch:
+        description: 'Dart Polisher branch to use when building (defaults to stable branch)'
+        required: false
+        default: 'stable'
+
+# run action will be from this dir
+defaults:
+  run:
+    working-directory: formatter_server
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on:  ${{ matrix.os }}
+
+    # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        include:
+          - os: ubuntu-latest
+            output-name: dartpolishd-linux
+          - os: macOS-latest
+            output-name: dartpolishd-mac
+          - os: windows-latest
+            output-name: dartpolishd-windows.exe
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+
+      # https://github.com/actions/checkout
+      - name: "Clone formatter_server repository"
+        uses: actions/checkout@v3
+        with:
+          repository: xnfo-dart/formatter_server
+          path: formatter_server
+          token: ${{ secrets.GH_PAT }} # TODO: delete this line when going open source.
+          ref: master # checkouts the github.ref_name (on push 'tag' in this case) if this is empty.
+                      # we use master to select with tag/branch/commit on a central place below.
+        env:
+          GITHUB_JSON: ${{ toJSON(github) }}
+
+      # workflow_run | workflow_dispatch : ${{github.event_name}}
+      - name: "Setup variables"
+        shell: bash
+        run: |
+          # Setup build modes from event type
+          echo "Getting tags..."
+          git fetch --tags -f
+
+          echo "Getting repo name..."
+          REPO_NAME=${GITHUB_REPOSITORY#*/}
+          echo "Parsing $REPO_NAME build ref..."
+          BUILD_REF="master"
+          DART_POLISHER_BRANCH="stable"
+          # if this is a workflow_call then
+          if [[ "${{ inputs.target }}" != "" ]]; then
+              if [[ "${{ inputs.target }}" == "--last-release" ]]; then
+                  BUILD_REF=$(git tag --sort=-creatordate | awk 'match($0, /^v[0-9]+\.[0-9]+\.[0-9]+$/)' | head -n 1)
+              else
+                  BUILD_REF=${{ inputs.target }}
+              fi
+          fi
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+              echo "workflow_dispatch ref: ${{ inputs.branch }}"
+              BUILD_REF="${{ inputs.branch }}"
+              DART_POLISHER_BRANCH=${{ inputs.polisher_branch }}
+          fi
+          echo "BUILD_REF=$BUILD_REF" >> $GITHUB_ENV
+          echo "Using $REPO_NAME@$BUILD_REF for checkout"
+          # TODO: delete DART_POLISHER_BRANCH when going open source, control wich branch from pubspec/grinder.
+          echo "DART_POLISHER_BRANCH=$DART_POLISHER_BRANCH" >> $GITHUB_ENV
+          echo "Using $DART_POLISHER_BRANCH brach for dart_polisher"
+
+          # turn the detached message off
+          git config --global advice.detachedHead false
+          echo "Checking out $REPO_NAME@$BUILD_REF..."
+          git checkout $BUILD_REF
+
+      - name: "Formatter Server status"
+        run: git status
+        working-directory: formatter_server
+
+      # TODO: delete this when going open source and pubspec has this repo as a git dependency.
+      - name: "Clone Local Dart Polisher package"
+        uses: actions/checkout@v3
+        with:
+          repository: xnfo-dart/dart_polisher
+          path: dart_polisher
+          token: ${{ secrets.GH_PAT }} # TODO: delete this line when going open source.
+          ref: ${{ env.DART_POLISHER_BRANCH }}
+
+      - name: "Dart Polish status"
+        run: git status
+        working-directory: dart_polisher
+
+      # Uses https://github.com/dart-lang/setup-dart to get dart
+      - name: "Dowload dart-sdk"
+        uses: dart-lang/setup-dart@v1.3
+
+      - name: Install pub dependencies
+        run: dart pub get
+
+      # Build
+      # TODO: make grinder run tests before building production releases.
+      # TODO: create dart grinder task for this particular build method
+      - name: "Create build dir"
+        run: mkdir build
+      - name : "Compile"
+        run: dart compile exe bin/listen.dart -v -o build/${{ matrix.output-name }}
+
+      # https://github.com/actions/upload-artifact#zipped-artifact-downloads
+      - name: "Upload all artifacts"
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: native-executables
+          path: formatter_server/build
+          retention-days: 5
