@@ -2,7 +2,7 @@
 Stdio server for handling requests from IDEs using the Dart Polisher formatter.
 
 ## [Unreleased]
-
+- Grinder build task and pubspec version tool.
 
 ## [0.9.1] - 10/10/2022
 - Refactor The way Handlers are called from Requests, cleaner execution and error handling.

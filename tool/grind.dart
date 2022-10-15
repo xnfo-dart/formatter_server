@@ -5,6 +5,7 @@
 import 'package:grinder/grinder.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart' as yaml;
+import 'package:path/path.dart' as p;
 
 /// Matches the version line in formatter_server's pubspec.
 final _versionPattern = RegExp(r'^version: .*$', multiLine: true);
@@ -34,11 +35,80 @@ Future<void> validate() async
 */
 }
 
+@Task("Validation for use in continuous integration")
+Future<void> validateCI() async
+{
+    // Test it.
+    await TestRunner().testAsync();
+
+    // Make sure it's warning clean.
+    Analyzer.analyze('bin/listen.dart', fatalWarnings: true);
+
+    // Style is applied when bumping.
+}
+
 // Generate all files
-@Task("Generate all protocol, integration tests matchers/methods, and API html doc.")
+@Task("Generate all protocols, integration tests (matchers/methods), and API doc.")
 Future<void> generate() async
 {
     Dart.run('tool/protocol_spec/generate.dart');
+}
+
+// TODO: check the constant version too, return error if they mismatch.
+@Task("Print the pubspec[version] attribute")
+Future<void> version() async
+{
+    // Get pubspec executable targets names
+    var pubspecFile = getFile('pubspec.yaml');
+    var pubspec = pubspecFile.readAsStringSync();
+    var pubspecMap = yaml.loadYaml(pubspec) as yaml.YamlMap;
+    var version = Version.parse(pubspecMap["version"] as String);
+
+    print(version);
+}
+
+@Task('Compile to native, --output=<filename> (all paths are relative to ./build directory)')
+@Depends(validateCI)
+Future<void> build() async
+{
+    TaskArgs args = context.invocation.arguments;
+    var outName = args.getOption("output");
+    var verbose = !args.getFlag("quiet");
+
+    // Get base normalized output Dir and File name from input.
+    var outPath = FilePath(outName);
+    if (outPath.parent != null) outName = outPath.name;
+    var basePath = outPath.parent?.path ?? "";
+    var outDirPath = p.normalize(joinDir(buildDir, [basePath]).path);
+    var outDir = getDir(outDirPath);
+
+    // Get pubspec executable targets names
+    var pubspecFile = getFile('pubspec.yaml');
+    var pubspec = pubspecFile.readAsStringSync();
+    var pubspecMap = yaml.loadYaml(pubspec) as yaml.YamlMap;
+    var pubspecExecutables = pubspecMap["executables"] as yaml.YamlMap;
+    var defaultOutName = pubspecExecutables.keys
+        .firstWhere((k) => pubspecExecutables[k] == 'listen', orElse: () => null);
+    // Use default name from pubspec if not given
+    outName ??= defaultOutName as String?;
+
+    // Setup file output to compile
+    FilePath(outDir).createDirectory(recursive: true);
+    var outFile = joinFile(outDir, [outName!]);
+    var binFile = joinFile(binDir, ["listen.dart"]);
+
+    // There should be a Dart Compile method but there is not, so we run it manually.
+    // (dart compile "-v" flag is not in help messages)
+    run(dartVM.path,
+        arguments: [
+            "compile",
+            "exe",
+            binFile.path,
+            "-o",
+            outFile.path,
+            verbose ? "-v" : "--verbosity=error"
+        ],
+        quiet: !verbose);
 }
 
 /// Gets ready to publish a new version of the package.
