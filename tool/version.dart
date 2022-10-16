@@ -1,3 +1,5 @@
+import 'dart:io' as io;
+
 import 'package:grinder/grinder.dart';
 import 'package:pub_semver/pub_semver.dart';
 import 'package:yaml/yaml.dart' as yaml;
@@ -11,5 +13,5 @@ void main()
     var pubspecMap = yaml.loadYaml(pubspec) as yaml.YamlMap;
     var version = Version.parse(pubspecMap["version"] as String);
 
-    print(version);
+    io.stdout.write(version);
 }

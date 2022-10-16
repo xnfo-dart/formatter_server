@@ -68,7 +68,7 @@ Future<void> version() async
 }
 
 @Task('Compile to native, --output=<filename> (all paths are relative to ./build directory)')
-@Depends(validateCI)
+//@Depends(validateCI)
 Future<void> build() async
 {
     TaskArgs args = context.invocation.arguments;

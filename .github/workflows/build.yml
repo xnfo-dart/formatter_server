@@ -1,34 +1,34 @@
 name: Build
 
+#  Call this using @master branch version.
+
 ###
 #  Builds native executables for [linux,windows,mac] when called or manually triggered.
-#    input 'target' can be set to '--last-release' when called, it builds the last release tag.
-#    (master branch releases are done in semantic tags ej: "v1.2.3")
-#  Uploads all output files as 'dartpolishd-${{ matrix.output-name }}'
-#  This output format is ready for use by the vscode polisher extension.
-
+#    input 'target' can be set to '--last-release' when called, it builds the last released tag.
+#    (Releases are done using semantic version tags example: "v1.2.3" on master branch)
+#  Uploads all output files in one artifact as 'native-artifacts' with 'dartpolishd-${{ matrix.output-name }}' executables.
+#    This output format is ready for use by the vscode polisher extension.
 
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_call
 # NOTE: Payload is the same as the caller.
 # run-name is not used when on a workflow_call
-run-name: "Build ${{ github.repository }} ('${{ github.event.workflow.name }}' -> '${{ github.workflow }}') [target: @${{ inputs.branch }}${{ github.event.inputs.target }}]"
+run-name: "${{ github.workflow }} ${{ github.event.repository.name }}: ('${{ github.job || github.event_name }}' -> '${{ github.workflow }}') [target: ${{ inputs.branch || github.event.inputs.target }}] [ref: ${{ github.ref_name }}]"
 
-# Controls when the workflow will run
 on:
-  # {{ github }} context is inherited from caller.
+  #{{ github }} {{ inputs }} context is inherited from caller (except github.job).
+  # (inputs from this workflow gets added to caller inputs in case of a caller workflow_dispatch)
   workflow_call:
     inputs:
       target:
-        description: "'--last-release' | 'commit/branch/tag'"
+        description: "'--last-release' (use the last release) | '<ref>' (commit/tag/branch) | '' or null (use caller <ref>)"
         required: false
         type: string
-        default: "${{ github.ref_name }}"
 
-  # Allows you to run this workflow manually from the Actions tab (for testing)
+  # Allows you to run this workflow manually from the Actions tab (for manual builds)
   workflow_dispatch:
     inputs:
       branch:
-        description: 'Branch/Tag/Commit to build (defaults to default branch when fired manually)'
+        description: 'Branch/Tag/Commit to build (defaults to selected ref when fired manually)'
         required: false
       polisher_branch:
         description: 'Dart Polisher branch to use when building (defaults to stable branch)'
@@ -40,11 +40,10 @@ defaults:
   run:
     working-directory: formatter_server
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
+
   build:
-    # The type of runner that the job will run on
+
     runs-on:  ${{ matrix.os }}
 
     # https://docs.github.com/en/actions/using-jobs/using-a-matrix-for-your-jobs
@@ -68,14 +67,12 @@ jobs:
         with:
           repository: xnfo-dart/formatter_server
           path: formatter_server
-          token: ${{ secrets.GH_PAT }} # TODO: delete this line when going open source.
-          ref: master # checkouts the github.ref_name (on push 'tag' in this case) if this is empty.
-                      # we use master to select with tag/branch/commit on a central place below.
-        env:
-          GITHUB_JSON: ${{ toJSON(github) }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: master # If empty it uses the github.ref_name (note: it uses the caller ref if called externally).
+                      # We use master to select a tag/branch/commit on a central place below.
 
-      # TODO: check if its a tag, that the tag version == pubspec version
-      # workflow_run | workflow_dispatch : ${{github.event_name}}
+      # workflow_run | workflow_dispatch : ${{github.event_name}}; workflow_call : ${{(PARENT)github.event_name}};
+      # Means github.event_name on a workflow_call its not an individual event, its the caller event, (its better to just check if the inputs are not null).
       - name: "Setup variables"
         shell: bash
         run: |
@@ -83,20 +80,25 @@ jobs:
           echo "Getting tags..."
           git fetch --tags -f
 
+          echo "Github event: ${{ github.event_name }}"
           echo "Getting repo name..."
           REPO_NAME=${GITHUB_REPOSITORY#*/}
           echo "Parsing $REPO_NAME build ref..."
-          BUILD_REF="master"
+
+          BUILD_REF=${{ github.ref_name }}
           DART_POLISHER_BRANCH="stable"
           # if this is a workflow_call then
           if [[ "${{ inputs.target }}" != "" ]]; then
               if [[ "${{ inputs.target }}" == "--last-release" ]]; then
+                  # Gets the last tag release name.
                   BUILD_REF=$(git tag --sort=-creatordate | awk 'match($0, /^v[0-9]+\.[0-9]+\.[0-9]+$/)' | head -n 1)
               else
                   BUILD_REF=${{ inputs.target }}
               fi
           fi
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          # workflow_dispatch (github.event_name) can be from the caller or the called
+          # To check in wich event we are, just check if the local input exists.
+          if [[ "${{ inputs.branch }}" != "" ]]; then
               echo "workflow_dispatch ref: ${{ inputs.branch }}"
               BUILD_REF="${{ inputs.branch }}"
               DART_POLISHER_BRANCH=${{ inputs.polisher_branch }}
@@ -136,13 +138,30 @@ jobs:
       - name: Install pub dependencies
         run: dart pub get
 
-      # Build
-      # TODO: make grinder run tests before building production releases.
-      # TODO: create dart grinder task for this particular build method
-      - name: "Create build dir"
-        run: mkdir build
+      # TODO: check if its a tag, that the tag version == pubspec version
+      - name : "Test"
+        run: dart test
+
+      # Build (output is relative to ./build)
       - name : "Compile"
-        run: dart compile exe bin/listen.dart -v -o build/${{ matrix.output-name }}
+        run: dart run grinder build --output=${{ matrix.output-name }}
+
+      - name : "Get built version in a env variable"
+        run: |
+          # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
+          echo 'COMPILED_VERSION<<EOF' >> $GITHUB_ENV
+          ./build/${{ matrix.output-name }} --version >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
+
+          PACKAGE_VERSION=$(dart run tool/version.dart)
+          echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV
+
+          echo "Built version:"
+          ./build/${{ matrix.output-name }} --version
+
+          echo "Package version:"
+          dart run tool/version.dart
+        shell: bash
 
       # https://github.com/actions/upload-artifact#zipped-artifact-downloads
       - name: "Upload all artifacts"
@@ -150,4 +169,38 @@ jobs:
         with:
           name: native-executables
           path: formatter_server/build
+          retention-days: 5
+
+      # This is in a matrix, so only output this info from one OS
+      - name: Generate release data using Markdown
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          echo '### Build' >> $GITHUB_STEP_SUMMARY
+          echo 'Compiled from git ref: `${{ env.BUILD_REF }}`' >> $GITHUB_STEP_SUMMARY
+          printf 'Compiled version:\n```\n${{ env.COMPILED_VERSION }}\n```\n' >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo '### Workflow' >> $GITHUB_STEP_SUMMARY
+          echo 'Event name: `${{ github.event_name }}`' >> $GITHUB_STEP_SUMMARY
+          echo 'Workflow: `build.yml`' >> $GITHUB_STEP_SUMMARY
+          echo 'Workflow files ref: `${{ github.ref_type }} : ${{ github.ref }}`' >> $GITHUB_STEP_SUMMARY
+          echo 'Called from workflow: `${{ github.workflow }}`' >> $GITHUB_STEP_SUMMARY
+          echo '' >> $GITHUB_STEP_SUMMARY
+          echo '### Inputs' >> $GITHUB_STEP_SUMMARY
+          printf 'Inputs:\n```json\n${{ toJSON(inputs) }}\n```\n' >> $GITHUB_STEP_SUMMARY
+          printf 'Inputs: (Caller)\n```json\n${{ toJSON(github.event.inputs) }}\n```\n' >> $GITHUB_STEP_SUMMARY
+        shell: bash
+
+      - name: Upload build data
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          mkdir -p ./build-data
+          echo '${{ env.BUILD_REF }}' >> ./build-data/ref
+          echo '${{ env.COMPILED_VERSION }}' >> ./build-data/version
+          echo '${{ env.DART_POLISHER_BRANCH }}' >> ./build-data/dpbranch
+          echo '${{ env.PACKAGE_VERSION }} >> ./build-data/package_version
+      - uses: actions/upload-artifact@v3.1.0
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          name: build-data
+          path:  formatter_server/build-data/
           retention-days: 5

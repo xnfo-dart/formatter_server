@@ -1,35 +1,40 @@
-name: Release on TAG
+name: onRelTAG
 
 ###
 #  Builds native executables for [linux,windows,mac] when a semantic release tag is pushed.
-#  Renames the output files separately based on OS and uploads ready for release.
+#  Renames the output files based on OS and uploads each one separately rdy for release.
 #  Finally deletes temporary artifacts
 #    release.yml is automatically called when this finishes.
 
 
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#push
 # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
-run-name: "Build: [on ${{ github.ref_type }}: ${{ github.ref_name }}]"
+run-name: "${{ github.workflow }}: [on ${{ inputs.buildref == '' && github.ref_type || 'worflow_dispatch' }}] [target: ${{ inputs.buildref || github.ref_name }}] [ref: ${{ github.ref_name }}]"
+
+# TODO: Try to prevent pushes of old tags firing this. Use workflow_dispath for old build or releases.
 
 on:
   push:
     tags:
       - v[0-9]+.[0-9]+.[0-9]+
-  # Allows you to run this workflow manually from the Actions tab (for testing)
-#  workflow_dispatch:
-#    inputs:
-#      versionName:
-#        description: 'Name of version  (ie v1.2.3) same as tag name'
-#        required: false
+
+  # For testing purposes (manually fire a tag event, target sets a ref to build)
+  workflow_dispatch:
+    inputs:
+      buildref:
+        description: "'--last-release' (build the last release)  |  '<ref>' (commit/tag/branch)  |  '' (use selected ref)"
+        required: false
+        type: string
 
 jobs:
 
   build:
+    # If you use the second syntax option (without {owner}/{repo} and @{ref}) the called workflow is from the same commit as the caller workflow.
     name: "Compile native executables"
     uses: ./.github/workflows/build.yml
-# If null, will use ref_name from this event, wich is a tag name.
-#    with:
-#      target: --last-release
+    # If empty, will use ref_name from this event (on push <ref> | workdlow_dispatch <ref>).
+    with:
+      target: ${{ inputs.buildref }}
     secrets: inherit
 
 
@@ -63,12 +68,6 @@ jobs:
         run: ls -R
 
       # https://github.com/actions/upload-artifact#zipped-artifact-downloads
-      # - name: "Upload OS Artifacts"
-      #   uses: actions/upload-artifact@v3.1.0
-      #   with:
-      #     name: dartpolishd-executables
-      #     path: bin
-
       # Make a diferent artifact for each native executable.
       - name: "Upload OS Artifacts"
         uses: actions/upload-artifact@v3.1.0
@@ -94,50 +93,6 @@ jobs:
       - uses: geekyeggo/delete-artifact@v2
         with:
           name: |
-            dartpolishd-executables
             native-executables
 
 # NOTE: ./release.yml is run after this finishes successfully.
-
-# Uneccesarily slow.
-#
-#   make-artifacts:
-
-#     needs: [rename-files]
-#     if: needs.rename-files.result == 'success'
-
-#     runs-on: ubuntu-latest
-#     strategy:
-#       matrix:
-#         osname: [linux, windows, mac]
-
-#     steps:
-#       # Download artifact
-#       - name: "Download build artifacts"
-#         uses: actions/download-artifact@v3
-#         with:
-#           name: dartpolishd-executables
-
-#       - name: Display structure of downloaded files.
-#         run: ls -R
-
-#       # Make a diferent artifact for each native executable.
-#       - name: "Upload OS Artifacts"
-#         uses: actions/upload-artifact@v3.1.0
-#         with:
-#           name: dartpolishd-${{ matrix.osname }}
-#           path: ${{ matrix.osname }}
-
-
-#   delete-temp-artifacts:
-#     needs: [make-artifacts]
-
-#     runs-on: ubuntu-latest
-
-#     steps:
-#       # delete temporary artifacts
-#       - uses: geekyeggo/delete-artifact@v2
-#         with:
-#           name: |
-#             dartpolishd-executables
-#             native-executables
