@@ -80,6 +80,7 @@ jobs:
         with:
           name: dartpolishd-linux
           path: bin/linux
+          retention-days: 5
 
       # Make a diferent artifact for each native executable.
       - name: "Upload OS Artifacts"
@@ -87,6 +88,7 @@ jobs:
         with:
           name: dartpolishd-windows
           path: bin/windows
+          retention-days: 5
 
       # Make a diferent artifact for each native executable.
       - name: "Upload OS Artifacts"
@@ -94,6 +96,7 @@ jobs:
         with:
           name: dartpolishd-mac
           path: bin/mac
+          retention-days: 5
 
       # delete temporary artifacts
       - uses: geekyeggo/delete-artifact@v2

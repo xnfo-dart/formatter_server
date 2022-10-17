@@ -139,7 +139,9 @@ jobs:
         run: dart pub get
 
       # TODO: check if its a tag, that the tag version == pubspec version
+      # No need to test on every os.
       - name : "Test"
+        if: matrix.os == 'ubuntu-latest'
         run: dart test
 
       # Build (output is relative to ./build)
