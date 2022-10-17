@@ -83,8 +83,8 @@ jobs:
           echo "Github event: ${{ github.event_name }}"
           echo "Getting repo name..."
           REPO_NAME=${GITHUB_REPOSITORY#*/}
-          echo "Parsing $REPO_NAME build ref..."
 
+          echo "Parsing $REPO_NAME build ref..."
           BUILD_REF=${{ github.ref_name }}
           DART_POLISHER_BRANCH="stable"
           # if this is a workflow_call then
@@ -111,7 +111,6 @@ jobs:
 
           # turn the detached message off
           git config --global advice.detachedHead false
-          echo "Checking out $REPO_NAME@$BUILD_REF..."
           git checkout $BUILD_REF
 
       - name: "Formatter Server status"
@@ -146,7 +145,17 @@ jobs:
 
       # Build (output is relative to ./build)
       - name : "Compile"
+        id: compile
         run: dart run grinder build --output=${{ matrix.output-name }}
+        continue-on-error: true
+
+      # For older versions.
+      - name : "Compile Old"
+        if: always() && steps.compile.outcome == 'failure'
+        id: compileold
+        run: |
+          mkdir build
+          dart compile exe bin/listen.dart -v -o build/${{ matrix.output-name }}
 
       - name : "Get built version in a env variable"
         run: |
@@ -155,14 +164,18 @@ jobs:
           ./build/${{ matrix.output-name }} --version >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
-          BUILD_PACKAGE_VERSION=$(dart run tool/version.dart)
-          echo "BUILD_PACKAGE_VERSION=$BUILD_PACKAGE_VERSION" >> $GITHUB_ENV
+          VERSION_FILE="./tool/version.dart"
+          if [ -f "$VERSION_FILE" ]; then
+              BUILD_PACKAGE_VERSION=$(dart run tool/version.dart)
+              echo "BUILD_PACKAGE_VERSION=$BUILD_PACKAGE_VERSION" >> $GITHUB_ENV
+          else
+              echo "BUILD_PACKAGE_VERSION=VERSION_NOT_FOUND" >> $GITHUB_ENV
+          fi
 
           echo "Built version:"
           ./build/${{ matrix.output-name }} --version
 
-          echo "Package version:"
-          dart run tool/version.dart
+          echo "ackage version: $BUILD_PACKAGE_VERSION"
         shell: bash
 
       # https://github.com/actions/upload-artifact#zipped-artifact-downloads
@@ -189,13 +202,20 @@ jobs:
           echo '### Build' >> $GITHUB_STEP_SUMMARY
           echo 'Compiled from git ref: `${{ env.BUILD_REF }}`' >> $GITHUB_STEP_SUMMARY
           printf 'Compiled version:\n```\n${{ env.BUILD_COMPILED_VERSION }}\n```\n' >> $GITHUB_STEP_SUMMARY
+
           echo '' >> $GITHUB_STEP_SUMMARY
+
           echo '### Workflow' >> $GITHUB_STEP_SUMMARY
           echo 'Event name: `${{ github.event_name }}`' >> $GITHUB_STEP_SUMMARY
-          echo 'Workflow: `build.yml`' >> $GITHUB_STEP_SUMMARY
+          echo 'Workflow file: `build.yml`' >> $GITHUB_STEP_SUMMARY
+          echo 'From repository: `xnfo-dart/formatter_server`' >> $GITHUB_STEP_SUMMARY
           echo 'Workflow files ref: `${{ github.ref_type }} : ${{ github.ref }}`' >> $GITHUB_STEP_SUMMARY
           echo 'Called from workflow: `${{ github.workflow }}`' >> $GITHUB_STEP_SUMMARY
+          echo 'Called from workflow file: `${{ github.event.workflow }}`' >> $GITHUB_STEP_SUMMARY
+          echo 'Called from repository: `${{ github.repository }}`' >> $GITHUB_STEP_SUMMARY
+          
           echo '' >> $GITHUB_STEP_SUMMARY
+
           echo '### Inputs' >> $GITHUB_STEP_SUMMARY
           printf 'Inputs:\n```json\n${{ toJSON(inputs) }}\n```\n' >> $GITHUB_STEP_SUMMARY
           printf 'Inputs: (Caller)\n```json\n${{ toJSON(github.event.inputs) }}\n```\n' >> $GITHUB_STEP_SUMMARY

@@ -1,6 +1,9 @@
 name: onRelTAG
 
 ###
+#
+# FLOW: ( [onRelTAG] -> [Build] ) -> [Release]
+#
 #  Builds native executables for [linux,windows,mac] when a semantic release tag is pushed.
 #  Renames the output files based on OS and uploads each one separately rdy for release.
 #  Finally deletes temporary artifacts
