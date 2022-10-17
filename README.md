@@ -11,22 +11,24 @@ For IDE integration.
 
 
 ## Build
-> Until i finish the v1.0.0 release and update the grinder for better quality of life building, i do every step separately fow now.
 
-1. (optional) Protocol spec and version is defined in<br>
+Compile to native executable<br>
+```dart run grinder build --output=<filename>```
+
+
+## Build notes
+
+>(optional) Protocol spec and version is defined in<br>
 ```./tool/protocol_spec/spec-input.html```
 
-2. Update protocol files and doc using spec-input.html<br>
-```dart run grinder generate```
+>(optional) Update protocol files and doc using spec-input.html<br>
+```dart run grinder generate```  
 
-3. (when releasing tag) Bump version (protocol, app, and dependencies)<br>
+>(for release) Bump version (protocol, app, and dependencies)<br>
 ```dart run grinder bump```
 
-4. Compile<br>
-```dart compile exe ./bin/listen.dart```
 
-
-the resulting executable is usually used as a daemon for IDE extensions, for example the [VScode Extension] loads this daemon from `/bin`.
+The resulting executable is usually used as a daemon for IDE extensions, for example the [VScode Extension] loads this daemon from `/bin`.
 
 ### Forked from
 Server *forked* from [analysis_server](https://github.com/dart-lang/sdk/tree/main/pkg/analysis_server) (base stdio server and protocol only)  
