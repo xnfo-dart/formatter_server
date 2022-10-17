@@ -73,19 +73,19 @@ jobs:
           unzip ./releases/build-data.zip -d ./build-data
           rm ./releases/build-data.zip
           BUILD_REF=$(cat ./build-data/ref)
-          COMPILED_VERSION=$(cat ./build-data/version)
+          BUILD_COMPILED_VERSION=$(cat ./build-data/version)
           DART_POLISHER_BRANCH=$(cat ./build-data/dpbranch)
+          BUILD_PACKAGE_VERSION=$(cat ./build-data/package_version)
 
           # Note: Multiline strings are handled differently.
           # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
-          echo 'COMPILED_VERSION<<EOF' >> $GITHUB_ENV
-          echo $COMPILED_VERSION >> $GITHUB_ENV
+          echo 'BUILD_COMPILED_VERSION<<EOF' >> $GITHUB_ENV
+          echo $BUILD_COMPILED_VERSION >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
           echo "BUILD_REF=$BUILD_REF" >> $GITHUB_ENV
           echo "DART_POLISHER_BRANCH=$DART_POLISHER_BRANCH" >> $GITHUB_ENV
-
-          ls -R
+          echo "BUILD_PACKAGE_VERSION=$BUILD_PACKAGE_VERSION" >> $GITHUB_ENV
 
       # workflow_run | workflow_dispatch : ${{github.event_name}}
       - name: "Setup variables"
@@ -142,7 +142,7 @@ jobs:
         id: create_release
         uses: softprops/action-gh-release@v1
         with:
-          name: Formatter Server ${{ env.BUILD_REF }}
+          name: Formatter Server v${{ env.BUILD_PACKAGE_VERSION }}
           tag_name: ${{ env.CHECKOUT_TAG }}
           draft: ${{ env.RELEASE_IS_DRAFT }}
           prerelease: false
@@ -159,6 +159,6 @@ jobs:
           echo "- Release url: ${{ steps.create_release.outputs.url }}" >> $GITHUB_STEP_SUMMARY
           echo "- Release ID: ${{ steps.create_release.outputs.id }}" >> $GITHUB_STEP_SUMMARY
           echo "- Upload url: ${{ steps.create_release.outputs.upload_url }}" >> $GITHUB_STEP_SUMMARY
-# TODO: COMPILED_VERSION ?
+# TODO: BUILD_COMPILED_VERSION ?
 
 # TODO: send to discord

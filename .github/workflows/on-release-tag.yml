@@ -57,12 +57,18 @@ jobs:
 
       - name: Rename and move files
         run: |
-          mkdir -p ./bin/linux
-          mv dartpolishd-linux bin/linux/dartpolishd
-          mkdir -p ./bin/windows
-          mv dartpolishd-windows.exe bin/windows/dartpolishd.exe
-          mkdir -p ./bin/mac
-          mv dartpolishd-mac bin/mac/dartpolishd
+          BIN_NAME="dartpolishd"
+          OS_ARRAY="linux windows mac"
+          for OS in $OS_ARRAY
+          do
+              mkdir -p ./bin/$OS
+              if [[ "$OS" == "windows" ]]; then
+                  mv $BIN_NAME-$OS.exe bin/$OS/$BIN_NAME.exe
+              else
+                  mv $BIN_NAME-$OS bin/$OS/$BIN_NAME
+              fi
+              cp LICENSE bin/$OS/
+          done
 
       - name: Display structure of moved files.
         run: ls -R

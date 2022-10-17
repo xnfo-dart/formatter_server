@@ -149,12 +149,12 @@ jobs:
       - name : "Get built version in a env variable"
         run: |
           # https://docs.github.com/en/actions/using-workflows/workflow-commands-for-github-actions#multiline-strings
-          echo 'COMPILED_VERSION<<EOF' >> $GITHUB_ENV
+          echo 'BUILD_COMPILED_VERSION<<EOF' >> $GITHUB_ENV
           ./build/${{ matrix.output-name }} --version >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
-          PACKAGE_VERSION=$(dart run tool/version.dart)
-          echo "PACKAGE_VERSION=$PACKAGE_VERSION" >> $GITHUB_ENV
+          BUILD_PACKAGE_VERSION=$(dart run tool/version.dart)
+          echo "BUILD_PACKAGE_VERSION=$BUILD_PACKAGE_VERSION" >> $GITHUB_ENV
 
           echo "Built version:"
           ./build/${{ matrix.output-name }} --version
@@ -171,13 +171,22 @@ jobs:
           path: formatter_server/build
           retention-days: 5
 
+      # Put LICENSE file in the artifact zip from one matrix job only.
+      - name: Upload LICENSE
+        uses: actions/upload-artifact@v3.1.0
+        if: matrix.os == 'ubuntu-latest'
+        with:
+          name: native-executables
+          path:  formatter_server/LICENSE
+          retention-days: 5
+
       # This is in a matrix, so only output this info from one OS
       - name: Generate release data using Markdown
         if: matrix.os == 'ubuntu-latest'
         run: |
           echo '### Build' >> $GITHUB_STEP_SUMMARY
           echo 'Compiled from git ref: `${{ env.BUILD_REF }}`' >> $GITHUB_STEP_SUMMARY
-          printf 'Compiled version:\n```\n${{ env.COMPILED_VERSION }}\n```\n' >> $GITHUB_STEP_SUMMARY
+          printf 'Compiled version:\n```\n${{ env.BUILD_COMPILED_VERSION }}\n```\n' >> $GITHUB_STEP_SUMMARY
           echo '' >> $GITHUB_STEP_SUMMARY
           echo '### Workflow' >> $GITHUB_STEP_SUMMARY
           echo 'Event name: `${{ github.event_name }}`' >> $GITHUB_STEP_SUMMARY
@@ -195,9 +204,9 @@ jobs:
         run: |
           mkdir -p ./build-data
           echo '${{ env.BUILD_REF }}' >> ./build-data/ref
-          echo '${{ env.COMPILED_VERSION }}' >> ./build-data/version
+          echo '${{ env.BUILD_COMPILED_VERSION }}' >> ./build-data/version
           echo '${{ env.DART_POLISHER_BRANCH }}' >> ./build-data/dpbranch
-          echo '${{ env.PACKAGE_VERSION }} >> ./build-data/package_version
+          echo '${{ env.BUILD_PACKAGE_VERSION }}' >> ./build-data/package_version
       - uses: actions/upload-artifact@v3.1.0
         if: matrix.os == 'ubuntu-latest'
         with:
