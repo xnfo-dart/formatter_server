@@ -1,23 +1,23 @@
 name: Release
 
 ###
-#  Makes a github draft release when 'On Release Tag' finishes.
-#    Or if manually triggered there is input for draft mode and build ref from caller.
+#  Makes a github draft release when 'onRelTAG' finishes.
+#    Or if manually triggered there is input for draft mode and build ref from caller).
 #  Uses CHANGELOG notes between 2nd Header and 3rd Header for release. (dev: there is an optional code to pick specific version notes)
 #  Gets artifacts from caller workflow run_number.
-#    If manually triggered there is a 'buildBranch' input to get the (successful) <ref> run from on-release-tag.yml and download it's artifacts.
+#    If manually triggered there is a 'buildRef' input to get the (successful) <ref> run from on-release-tag.yml and download it's artifacts.
 #  Finally outputs a release with changelog notes.
 #
 
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run
 # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#workflow_run
-run-name: "${{ github.workflow }}: [event: ${{ github.event_name }}] [from: ${{ github.event.workflow.name || 'manual' }}] [on: '${{ github.event.workflow_run.event || 'input' }}': ${{ github.event.workflow_run.head_branch || inputs.buildBranch }}] [ref: ${{ github.ref_name }}]"
+run-name: "${{ github.workflow }}: [event: ${{ github.event_name }}] [from: ${{ github.event.workflow.name || 'manual' }}] [on: '${{ github.event.workflow_run.event || 'input' }}': ${{ github.event.workflow_run.head_branch || inputs.buildRef }}] [ref: ${{ github.ref_name }}]"
 
 on:
 
   #! NOTE: This event will only trigger a workflow run if the workflow file is on the default branch.
   workflow_run:
-    workflows: [On Release Tag]
+    workflows: [onRelTAG]
     branches:
       # Only run when parent workflow was run on push tags
       - v[0-9]+.[0-9]+.[0-9]+
@@ -27,11 +27,11 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
-      buildBranch:
-        description: 'Git tag/branch (tag ie: v5.5.0 for releases, "master" for dev builds) from a successful workflow run of "Build on Tag"'
+      buildRef:
+        description: 'Git branch/tag (preferably a tag ie: v5.5.0) from a successful workflow run of "onRelTAG"'
         required: true
       workflowRun:
-        description: 'Workflow number of a succeful run of release_on_tag.yml", can be ommited if run <ref> was done on a tag/branch'
+        description: 'Workflow number of a succeful run of release_on_tag.yml", can be ommited if run was done on a tag'
         required: false
         type: string
       isDraft:
@@ -53,20 +53,23 @@ jobs:
 
     steps:
 
-      # If workflow run cannot be located by tag/branch name, input run_number of the workflow where release artifacts are.
+      # Worflow runs are run on master HEAD, and sometimes with master TAG, so when we want to get a workflow_run with only a TAG we have a problem.
+      # There is no info on the workflow run itseld about what was built, but the annotations or summary can be scanned one by one to selecet the correct run.
+      # Another way is to ask for a tag and a run number and just try wich one gets the artifact (currently using this method).
 
       # Alternative on https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#workflow_run
       # Download artifacts from the succeful <ref> of on-release-tag (cleaner method)
       # Do not specify pr, commit, branch, run_id together or workflow_conclusion and run_id together. Pick just one of each or none.
-      - name: Download artifact
+      - name: Download artifact Linux
         id: download-artifacts
         uses: dawidd6/action-download-artifact@v2
         with:
           workflow: on-release-tag.yml
           workflow_conclusion: success
+          #github_token: ${{secrets.GH_PAT}} # TODO: remove when going open source.
           #run_id: ${{ github.event.workflow_run.id }} # workflow_conclusion is already defined.
           run_number: ${{ github.event.workflow_run.run_number }} # (caller run number) if null, default is to take the last successful run
-          branch: ${{ github.event.workflow_run.head_branch || inputs.buildBranch }}
+          branch: ${{ github.event.workflow_run.head_branch || inputs.buildRef }}
           path: releases
           skip_unpack: true
           if_no_artifact_found: warn
@@ -77,7 +80,9 @@ jobs:
         with:
           workflow: on-release-tag.yml
           workflow_conclusion: success
-          run_number: ${{ inputs.workflowRun || 'INPUT_NOT_FOUND' }} # (caller run number) if null, default is to take the last successful run
+          #github_token: ${{secrets.GH_PAT}} # TODO: remove when going open source.
+          #run_id: ${{ inputs.workflowID }} # workflow_conclusion is already defined.
+          run_number: ${{ inputs.workflowRun || "INPUT_NOT_FOUND" }} # (caller run number) if null, default is to take the last successful run
           path: releases
           skip_unpack: true
 
@@ -91,6 +96,7 @@ jobs:
           rm ./releases/build-data.zip
           BUILD_REF=$(cat ./build-data/ref)
           BUILD_COMPILED_VERSION=$(cat ./build-data/version)
+          DART_POLISHER_BRANCH=$(cat ./build-data/dpbranch)
           BUILD_PACKAGE_VERSION=$(cat ./build-data/package_version)
 
           # Note: Multiline strings are handled differently.
@@ -100,6 +106,7 @@ jobs:
           echo 'EOF' >> $GITHUB_ENV
 
           echo "BUILD_REF=$BUILD_REF" >> $GITHUB_ENV
+          echo "DART_POLISHER_BRANCH=$DART_POLISHER_BRANCH" >> $GITHUB_ENV
           echo "BUILD_PACKAGE_VERSION=$BUILD_PACKAGE_VERSION" >> $GITHUB_ENV
 
           echo "BUILD_REF=$BUILD_REF"
@@ -109,17 +116,22 @@ jobs:
       - name: "Setup release variables"
         shell: bash
         run: |
-          # Checkout the formatter_server built from ref
-          CHECKOUT_TAG=${{ env.BUILD_REF }}
-          RELEASE_IS_DRAFT=true
+          # Parent workflow is on an push tag event, so this head_branch will be a version.
+          if [[ "${{github.event_name}}" == "workflow_run" ]]; then
+              CHECKOUT_TAG=${{ env.BUILD_REF }}
+              RELEASE_IS_DRAFT=true
+          fi
           if [[ "${{github.event_name}}" == "workflow_dispatch" ]]; then
-              CHECKOUT_TAG=${{ inputs.buildBranch }}
+              CHECKOUT_TAG=${{ inputs.buildRef }}
               RELEASE_IS_DRAFT=${{ inputs.isDraft }}
           fi
+          if [[ "$CHECKOUT_TAG" == "" ]]; then
+              echo "CHECKOUT_TAG is null, something when wront when selecting a git tag from event: ${{github.event_name}}"
+              exit 1
+          fi
           echo "CHECKOUT_TAG=$CHECKOUT_TAG" >> $GITHUB_ENV
-          echo "RELEASE_IS_DRAFT=$RELEASE_IS_DRAFT" >> $GITHUB_ENV
-
           echo "Using $CHECKOUT_TAG as tag to checkout ${GITHUB_REPOSITORY#*/}"
+          echo "RELEASE_IS_DRAFT=$RELEASE_IS_DRAFT" >> $GITHUB_ENV
           echo "Releasing a draft?: '$RELEASE_IS_DRAFT'"
 
       # To have access to CHANGELOG.md
@@ -146,7 +158,7 @@ jobs:
       #  uses: yashanand1910/standard-release-notes@v1.2.1
       #  id: extract-release-notes
       #  with:
-      #    changelog_path: ./repo/CHANGELOG.md # Optional
+      #    changelog_path: ./CHANGELOG.md # Optional
       #    version: ${{ env.CHECKOUT_TAG }} # Required
 
       # https://github.com/softprops/action-gh-release

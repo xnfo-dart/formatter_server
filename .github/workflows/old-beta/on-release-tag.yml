@@ -1,6 +1,7 @@
-name: On Release Tag
+name: onRelTAG
 
 ###
+#
 # FLOW: ( [onRelTAG] -> [Build] ) -> [Release]
 #
 #  Builds native executables for [linux,windows,mac] when a semantic release tag is pushed.
@@ -8,17 +9,25 @@ name: On Release Tag
 #  Finally deletes temporary artifacts
 #    release.yml is automatically called when this finishes.
 
+
 # https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#push
 # https://docs.github.com/en/developers/webhooks-and-events/webhooks/webhook-events-and-payloads#push
-run-name: "${{ github.workflow }}: [on ${{ github.event_name != 'workflow_dispatch' && github.ref_type || 'workflow_dispatch' }}] [ref: ${{ github.ref_name }}]"
+run-name: "${{ github.workflow }}: [on ${{ inputs.buildref == '' && github.ref_type || 'worflow_dispatch' }}] [target: ${{ inputs.buildref || github.ref_name }}] [ref: ${{ github.ref_name }}]"
+
+# TODO: Try to prevent pushes of old tags firing this. Use workflow_dispath for old build or releases.
 
 on:
   push:
     tags:
       - v[0-9]+.[0-9]+.[0-9]+
 
-  # Builds selected ref
+  # For testing purposes (manually fire a tag event, target sets a ref to build)
   workflow_dispatch:
+    inputs:
+      buildref:
+        description: "'--last-release' (build the last release)  |  '<ref>' (commit/tag/branch)  |  '' (use selected ref)"
+        required: false
+        type: string
 
 jobs:
 
@@ -26,7 +35,11 @@ jobs:
     # If you use the second syntax option (without {owner}/{repo} and @{ref}) the called workflow is from the same commit as the caller workflow.
     name: "Compile native executables"
     uses: ./.github/workflows/build.yml
+    # If empty, will use ref_name from this event (on push <ref> | workdlow_dispatch <ref>).
+    with:
+      target: ${{ inputs.buildref }}
     secrets: inherit
+
 
   release-binaries:
     name: "Upload native executables"
