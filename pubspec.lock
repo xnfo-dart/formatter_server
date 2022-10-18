@@ -88,10 +88,12 @@ packages:
   dart_polisher:
     dependency: "direct main"
     description:
-      path: "../dart_polisher"
-      relative: true
-    source: path
-    version: "0.9.3-dev"
+      path: "."
+      ref: stable
+      resolved-ref: "0ce6aeb800aa0be771260f1e81673adf8b11d972"
+      url: "https://github.com/xnfo-dart/dart_polisher.git"
+    source: git
+    version: "0.9.2"
   dart_style:
     dependency: transitive
     description:

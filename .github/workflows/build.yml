@@ -31,7 +31,7 @@ on:
         description: 'Branch/Tag/Commit to build (defaults to selected ref when fired manually)'
         required: false
       polisher_branch:
-        description: 'Dart Polisher branch to use when building (defaults to stable branch)'
+        description: 'Dart Polisher branch to use when building (defaults to stable branch) (not working yet)'
         required: false
         default: 'stable'
 
@@ -105,7 +105,7 @@ jobs:
           fi
           echo "BUILD_REF=$BUILD_REF" >> $GITHUB_ENV
           echo "Using $REPO_NAME@$BUILD_REF for checkout"
-          # TODO: delete DART_POLISHER_BRANCH when going open source, control wich branch from pubspec/grinder.
+           # TODO: control wich branch from pubspec/grinder.
           echo "DART_POLISHER_BRANCH=$DART_POLISHER_BRANCH" >> $GITHUB_ENV
           echo "Using $DART_POLISHER_BRANCH brach for dart_polisher"
 
@@ -123,7 +123,7 @@ jobs:
         with:
           repository: xnfo-dart/dart_polisher
           path: dart_polisher
-          token: ${{ secrets.GH_PAT }} # TODO: delete this line when going open source.
+          #token: ${{ secrets.GH_PAT }} # TODO: delete this line when going open source.
           ref: ${{ env.DART_POLISHER_BRANCH }}
 
       - name: "Dart Polish status"
@@ -175,7 +175,7 @@ jobs:
           echo "Built version:"
           ./build/${{ matrix.output-name }} --version
 
-          echo "ackage version: $BUILD_PACKAGE_VERSION"
+          echo "Package version: $BUILD_PACKAGE_VERSION"
         shell: bash
 
       # https://github.com/actions/upload-artifact#zipped-artifact-downloads
@@ -213,7 +213,7 @@ jobs:
           echo 'Called from workflow: `${{ github.workflow }}`' >> $GITHUB_STEP_SUMMARY
           echo 'Called from workflow file: `${{ github.event.workflow }}`' >> $GITHUB_STEP_SUMMARY
           echo 'Called from repository: `${{ github.repository }}`' >> $GITHUB_STEP_SUMMARY
-          
+
           echo '' >> $GITHUB_STEP_SUMMARY
 
           echo '### Inputs' >> $GITHUB_STEP_SUMMARY

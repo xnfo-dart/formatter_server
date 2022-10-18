@@ -14,7 +14,13 @@ dependencies:
   analyzer: '>=4.4.0 <6.0.0'
   _fe_analyzer_shared: any #analyzer will decide wich one to use.
   dart_polisher:
-    path: ../dart_polisher #change to git when uploaded
+    git:
+      url: https://github.com/xnfo-dart/dart_polisher.git
+      ref: stable
+
+#dependency_overrides:
+#  dart_polisher:
+#    path: ../dart_polisher #change to git when uploaded
 
 dev_dependencies:
   grinder: ^0.9.2
