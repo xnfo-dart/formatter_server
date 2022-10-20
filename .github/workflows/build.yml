@@ -66,7 +66,7 @@ jobs:
         with:
           repository: xnfo-dart/formatter_server
           path: formatter_server
-          ref: master # If empty it uses the github.ref_name (note: it uses the caller ref if called externally and it would not be valid here).
+          ref: master # If empty it uses the github.ref_name (note: it uses the caller ref, if called externally and it would not be valid here).
                       # Thats why we use master, to select the final ref below.
 
       # workflow_run | workflow_dispatch : ${{github.event_name}}; workflow_call : ${{(PARENT)github.event_name}};
@@ -171,22 +171,23 @@ jobs:
 
           echo '' >> $GITHUB_STEP_SUMMARY
 
-          echo '### Workflow' >> $GITHUB_STEP_SUMMARY
-          echo 'Event name: `${{ github.event_name }}`' >> $GITHUB_STEP_SUMMARY
-          echo 'Workflow file: `build.yml`' >> $GITHUB_STEP_SUMMARY
-          echo 'From repository: `xnfo-dart/formatter_server`' >> $GITHUB_STEP_SUMMARY
-          echo 'Workflow files ref: `${{ github.ref_type }} : ${{ github.ref }}`' >> $GITHUB_STEP_SUMMARY
+          echo '### Workflow (Data)' >> $GITHUB_STEP_SUMMARY
+          echo 'Event: `${{ github.event_name }}`' >> $GITHUB_STEP_SUMMARY
+          echo 'REF: `${{ github.ref_type }} : ${{ github.ref }}`' >> $GITHUB_STEP_SUMMARY
+          echo 'SHA: ${{ env.GITHUB_SHA }}' >> $GITHUB_STEP_SUMMARY
+          echo 'File: `build.yml`' >> $GITHUB_STEP_SUMMARY
+          echo 'Repository: `xnfo-dart/formatter_server`' >> $GITHUB_STEP_SUMMARY
 
           echo '' >> $GITHUB_STEP_SUMMARY
 
-          echo '#### Workflow (Caller)' >> $GITHUB_STEP_SUMMARY
-          echo 'Called from workflow: `${{ github.workflow }}`' >> $GITHUB_STEP_SUMMARY
-          echo 'Called from workflow file: `${{ github.event.workflow }}`' >> $GITHUB_STEP_SUMMARY
-          echo 'Called from repository: `${{ github.repository }}`' >> $GITHUB_STEP_SUMMARY
+          echo '#### Workflow (Called from)' >> $GITHUB_STEP_SUMMARY
+          echo 'Workflow name: `${{ github.workflow }}`' >> $GITHUB_STEP_SUMMARY
+          echo 'Workflow file: `${{ github.event.workflow }}`' >> $GITHUB_STEP_SUMMARY
+          echo 'Repository: `${{ github.repository }}`' >> $GITHUB_STEP_SUMMARY
 
           echo '' >> $GITHUB_STEP_SUMMARY
 
-          echo '### Inputs' >> $GITHUB_STEP_SUMMARY
+          echo '#### Inputs' >> $GITHUB_STEP_SUMMARY
           printf 'Inputs:\n```json\n${{ toJSON(inputs) }}\n```\n' >> $GITHUB_STEP_SUMMARY
           printf 'Inputs: (Caller)\n```json\n${{ toJSON(github.event.inputs) }}\n```\n' >> $GITHUB_STEP_SUMMARY
         shell: bash
