@@ -41,7 +41,12 @@ defaults:
 
 jobs:
 
+  test:
+    uses: ./.github/workflows/test.yml
+
   build:
+    needs: [test]
+    if: needs.test.result == 'success'
 
     runs-on:  ${{ matrix.os }}
 
@@ -103,11 +108,6 @@ jobs:
 
       - name: Install pub dependencies
         run: dart pub get
-
-      # No need to test on every os.
-      - name : "Test"
-        if: matrix.os == 'ubuntu-latest'
-        run: dart test
 
       # Build (output is relative to ./build)
       - name : "Compile"
