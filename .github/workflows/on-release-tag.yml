@@ -66,7 +66,7 @@ jobs:
       # https://github.com/actions/upload-artifact#zipped-artifact-downloads
       # Make a diferent artifact for each native executable.
       - name: "Upload OS Artifacts"
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: dartpolishd-linux
           path: bin/linux
@@ -74,7 +74,7 @@ jobs:
 
       # Make a diferent artifact for each native executable.
       - name: "Upload OS Artifacts"
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: dartpolishd-windows
           path: bin/windows
@@ -82,7 +82,7 @@ jobs:
 
       # Make a diferent artifact for each native executable.
       - name: "Upload OS Artifacts"
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: dartpolishd-mac
           path: bin/mac
