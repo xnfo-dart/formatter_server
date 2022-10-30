@@ -70,4 +70,9 @@ jobs:
 
           # Not to run when issue/PR has one of the label.
           # Default: []
-          #excludeLabels: []
+          excludeLabels:
+            # 'addAssignees: author' uses 'assignees: ["dependabot[bot]"]'
+            # action outputs 'Error: Not Found' if we don't ignore
+            # TODO: check if there is another way to fix it.
+            # https://docs.github.com/es/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file#labels
+            dependencies # dependabot sets this label by default
