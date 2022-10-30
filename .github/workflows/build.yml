@@ -104,7 +104,7 @@ jobs:
 
       # Uses https://github.com/dart-lang/setup-dart to get dart
       - name: "Dowload dart-sdk"
-        uses: dart-lang/setup-dart@v1.3
+        uses: dart-lang/setup-dart@v1
 
       - name: Install pub dependencies
         run: dart pub get
@@ -145,7 +145,7 @@ jobs:
 
       # https://github.com/actions/upload-artifact#zipped-artifact-downloads
       - name: "Upload all artifacts"
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@v3
         with:
           name: native-executables
           path: formatter_server/build
@@ -153,7 +153,7 @@ jobs:
 
       # Put LICENSE file in the artifact zip from one matrix job only.
       - name: Upload LICENSE
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@v3
         if: matrix.os == 'ubuntu-latest'
         with:
           name: native-executables
@@ -201,7 +201,7 @@ jobs:
           echo '${{ env.BUILD_PACKAGE_VERSION }}' >> ./build-data/package_version
 
       - name: Upload build data
-        uses: actions/upload-artifact@v3.1.1
+        uses: actions/upload-artifact@v3
         if: matrix.os == 'ubuntu-latest'
         with:
           name: build-data
