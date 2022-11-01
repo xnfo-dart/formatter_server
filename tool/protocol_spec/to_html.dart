@@ -7,9 +7,10 @@
 /// in generated code.
 import 'dart:convert';
 
-import 'analyzer_utilities_pkg/html.dart';
+import 'package:analyzer_utilities/html_dom.dart' as dom;
+import 'package:analyzer_utilities/html_generator.dart';
+//import 'package:analyzer_utilities/tools.dart';
 import './analyzer_utilities_tools_hook.dart';
-import 'package:html/dom.dart' as dom;
 
 import 'api.dart';
 import 'from_html.dart';
@@ -127,7 +128,6 @@ final GeneratedFile target = GeneratedFile('doc/api.html', (String pkgPath) asyn
 {
     var visitor = ToHtmlVisitor(readApi(pkgPath));
     var document = dom.Document();
-    document.append(dom.DocumentType('html', null, null));
     for (var node in visitor.collectHtml(visitor.visitApi))
     {
         document.append(node);
@@ -147,7 +147,7 @@ class ApiMappings extends HierarchicalApiVisitor
 {
     Map<dom.Element, Domain> domains = <dom.Element, Domain>{};
 
-    ApiMappings(Api api) : super(api);
+    ApiMappings(super.api);
 
     @override
     void visitDomain(Domain domain)
@@ -176,7 +176,7 @@ mixin HtmlMixin
     void dl(void Function() callback) => element('dl', {}, callback);
     void dt(String cls, void Function() callback) =>
         element('dt', {'class': cls}, callback);
-    void element(String name, Map<Object, String> attributes, [void Function() callback]);
+    void element(String name, Map<String, String> attributes, [void Function() callback]);
     void gray(void Function() callback) =>
         element('span', {'style': 'color:#999999'}, callback);
     void h1(void Function() callback) => element('h1', {}, callback);
@@ -194,7 +194,7 @@ mixin HtmlMixin
     void html(void Function() callback) => element('html', {}, callback);
     void i(void Function() callback) => element('i', {}, callback);
     void li(void Function() callback) => element('li', {}, callback);
-    void link(String id, void Function() callback, [Map<Object, String>? attributes])
+    void link(String id, void Function() callback, [Map<String, String>? attributes])
     {
         attributes ??= {};
         attributes['href'] = '#$id';
@@ -219,9 +219,7 @@ class ToHtmlVisitor extends HierarchicalApiVisitor with HtmlMixin, HtmlGenerator
     /// Mappings from HTML elements to API nodes.
     ApiMappings apiMappings;
 
-    ToHtmlVisitor(Api api)
-        : apiMappings = ApiMappings(api),
-          super(api)
+    ToHtmlVisitor(super.api) : apiMappings = ApiMappings(api)
     {
         apiMappings.visitApi();
     }
@@ -489,7 +487,7 @@ class ToHtmlVisitor extends HierarchicalApiVisitor with HtmlMixin, HtmlGenerator
         {
             if (node is dom.Element)
             {
-                var localName = node.localName!;
+                var localName = node.name;
                 if (squashParagraphs && localName == 'p')
                 {
                     translateHtml(node, squashParagraphs: squashParagraphs);
@@ -546,7 +544,7 @@ class ToHtmlVisitor extends HierarchicalApiVisitor with HtmlMixin, HtmlGenerator
             }
             else if (node is dom.Text)
             {
-                var text = node.text;
+                var text = node.textRemoveTags;
                 write(text);
             }
         }
@@ -723,7 +721,7 @@ class ToHtmlVisitor extends HierarchicalApiVisitor with HtmlMixin, HtmlGenerator
         var isDocumented = false;
         for (var node in typeEnumValue.html.nodes)
         {
-            if ((node is dom.Element && node.localName != 'code') ||
+            if ((node is dom.Element && node.name != 'code') ||
                 (node is dom.Text && node.text.trim().isNotEmpty))
             {
                 isDocumented = true;
@@ -846,7 +844,7 @@ class TypeVisitor extends HierarchicalApiVisitor with HtmlMixin, HtmlCodeGenerat
     /// objects are shown as simply "object", and enums are shown as "String".
     final bool short;
 
-    TypeVisitor(Api api, {this.fieldsToBold = const {}, this.short = false}) : super(api);
+    TypeVisitor(super.api, {this.fieldsToBold = const {}, this.short = false});
 
     @override
     void visitTypeEnum(TypeEnum typeEnum)

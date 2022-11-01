@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 /// Code for enumerating the set of types implied by the API.
+//import 'package:analyzer_utilities/tools.dart';
 import './analyzer_utilities_tools_hook.dart';
 
 import 'api.dart';
@@ -40,7 +41,7 @@ class _ImpliedTypesVisitor extends HierarchicalApiVisitor
 {
     Map<String, ImpliedType> impliedTypes = <String, ImpliedType>{};
 
-    _ImpliedTypesVisitor(Api api) : super(api);
+    _ImpliedTypesVisitor(super.api);
 
     void storeType(
         String name, String? nameSuffix, TypeDecl? type, String kind, ApiNode apiNode)

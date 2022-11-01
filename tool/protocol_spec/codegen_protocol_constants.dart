@@ -4,6 +4,7 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+//import 'package:analyzer_utilities/tools.dart';
 import './analyzer_utilities_tools_hook.dart';
 
 import 'api.dart';
@@ -13,14 +14,14 @@ import 'from_html.dart';
 final GeneratedFile clientTarget = GeneratedFile(
     'tool/protocol_spec/generated/client/protocol_constants.dart', (String pkgPath) async
 {
-    var visitor = CodegenVisitor(readApi(pkgPath));
+    var visitor = _CodegenVisitor(readApi(pkgPath));
     return visitor.collectCode(visitor.visitApi);
 });
 
 final GeneratedFile serverTarget =
     GeneratedFile('lib/protocol/protocol_constants.dart', (String pkgPath) async
 {
-    var visitor = CodegenVisitor(readApi(pkgPath));
+    var visitor = _CodegenVisitor(readApi(pkgPath));
     return visitor.collectCode(visitor.visitApi);
 });
 
@@ -59,9 +60,9 @@ Iterable<String> _split(String first)
 
 /// A visitor that produces Dart code defining constants associated with the
 /// API.
-class CodegenVisitor extends DartCodegenVisitor with CodeGenerator
+class _CodegenVisitor extends DartCodegenVisitor with CodeGenerator
 {
-    CodegenVisitor(Api api) : super(api)
+    _CodegenVisitor(super.api)
     {
         codeGeneratorSettings.commentLineLength = 79;
         codeGeneratorSettings.docCommentStartMarker = null;
@@ -71,7 +72,6 @@ class CodegenVisitor extends DartCodegenVisitor with CodeGenerator
     }
 
     /// Generate the given [constant].
-    // ignore: library_private_types_in_public_api
     void generateConstant(_Constant constant)
     {
         write('const String ');
@@ -125,7 +125,7 @@ class _ConstantVisitor extends HierarchicalApiVisitor
     List<_Constant> constants = <_Constant>[];
 
     /// Initialize a newly created visitor to visit the given [api].
-    _ConstantVisitor(Api api) : super(api);
+    _ConstantVisitor(super.api);
 
     @override
     void visitNotification(Notification notification)

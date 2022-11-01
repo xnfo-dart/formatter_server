@@ -3,6 +3,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 /// Code generation for the file "matchers.dart".
+//import 'package:analyzer_utilities/tools.dart';
 import './analyzer_utilities_tools_hook.dart';
 
 import 'api.dart';

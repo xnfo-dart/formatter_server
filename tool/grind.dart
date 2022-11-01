@@ -22,7 +22,7 @@ Future<void> validate() async
     // Make sure it's warning clean.
     Analyzer.analyze('bin/listen.dart', fatalWarnings: true);
 
-    // TODO(tekert): format once polisher exposes path format.
+    // TODO(tekert): format by running dart_polisher bin/format.dart from dependency.
     // Format it.
     // Dart.run('bin/format.dart',
     // arguments: ['format', './benchmark/after.dart.txt', '-o', 'none']);
@@ -67,7 +67,8 @@ Future<void> version() async
     print(version);
 }
 
-@Task('Compile to native, --output=<filename> (all paths are relative to ./build directory)')
+@Task('Compile to native, --output=<filename> '
+    '(all paths are relative to ./build directory)')
 //@Depends(validateCI)
 Future<void> build() async
 {

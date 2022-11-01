@@ -6,12 +6,13 @@
 // To regenerate the file, use the script
 // "tool/protocol_spec/generate.dart".
 
+// ignore_for_file: constant_identifier_names
+
 //TODO: use json from the standard library (C code) instead of analyzer_plugin and measure performnace or ask why is was used.
 import 'dart:convert' hide JsonDecoder;
 
 import 'package:formatter_server/protocol/protocol.dart';
 import 'package:formatter_server/src/protocol/protocol_internal.dart';
-import 'package:analyzer_plugin/protocol/protocol.dart' show Enum;
 import 'package:analyzer_plugin/protocol/protocol_common.dart';
 
 /// CodeStyle
@@ -40,7 +41,7 @@ class CodeStyle implements HasToJson
             int code;
             if (json.containsKey('code'))
             {
-                code = jsonDecoder.decodeInt(jsonPath + '.code', json['code']);
+                code = jsonDecoder.decodeInt('$jsonPath.code', json['code']);
             }
             else
             {
@@ -144,7 +145,7 @@ class EditFormatParams implements RequestParams
             String file;
             if (json.containsKey('file'))
             {
-                file = jsonDecoder.decodeString(jsonPath + '.file', json['file']);
+                file = jsonDecoder.decodeString('$jsonPath.file', json['file']);
             }
             else
             {
@@ -154,7 +155,7 @@ class EditFormatParams implements RequestParams
             if (json.containsKey('selectionOffset'))
             {
                 selectionOffset = jsonDecoder.decodeInt(
-                    jsonPath + '.selectionOffset', json['selectionOffset']);
+                    '$jsonPath.selectionOffset', json['selectionOffset']);
             }
             else
             {
@@ -164,7 +165,7 @@ class EditFormatParams implements RequestParams
             if (json.containsKey('selectionLength'))
             {
                 selectionLength = jsonDecoder.decodeInt(
-                    jsonPath + '.selectionLength', json['selectionLength']);
+                    '$jsonPath.selectionLength', json['selectionLength']);
             }
             else
             {
@@ -174,31 +175,31 @@ class EditFormatParams implements RequestParams
             if (json.containsKey('selectionOnly'))
             {
                 selectionOnly = jsonDecoder.decodeBool(
-                    jsonPath + '.selectionOnly', json['selectionOnly']);
+                    '$jsonPath.selectionOnly', json['selectionOnly']);
             }
             int? lineLength;
             if (json.containsKey('lineLength'))
             {
                 lineLength =
-                    jsonDecoder.decodeInt(jsonPath + '.lineLength', json['lineLength']);
+                    jsonDecoder.decodeInt('$jsonPath.lineLength', json['lineLength']);
             }
             TabSize? tabSize;
             if (json.containsKey('tabSize'))
             {
                 tabSize =
-                    TabSize.fromJson(jsonDecoder, jsonPath + '.tabSize', json['tabSize']);
+                    TabSize.fromJson(jsonDecoder, '$jsonPath.tabSize', json['tabSize']);
             }
             bool? insertSpaces;
             if (json.containsKey('insertSpaces'))
             {
                 insertSpaces = jsonDecoder.decodeBool(
-                    jsonPath + '.insertSpaces', json['insertSpaces']);
+                    '$jsonPath.insertSpaces', json['insertSpaces']);
             }
             CodeStyle? codeStyle;
             if (json.containsKey('codeStyle'))
             {
                 codeStyle = CodeStyle.fromJson(
-                    jsonDecoder, jsonPath + '.codeStyle', json['codeStyle']);
+                    jsonDecoder, '$jsonPath.codeStyle', json['codeStyle']);
             }
             return EditFormatParams(file, selectionOffset, selectionLength,
                 selectionOnly: selectionOnly,
@@ -326,7 +327,7 @@ class EditFormatResult implements ResponseResult
             if (json.containsKey('edits'))
             {
                 edits = jsonDecoder.decodeList(
-                    jsonPath + '.edits',
+                    '$jsonPath.edits',
                     json['edits'],
                     (String jsonPath, Object? json) =>
                         SourceEdit.fromJson(jsonDecoder, jsonPath, json));
@@ -339,7 +340,7 @@ class EditFormatResult implements ResponseResult
             if (json.containsKey('selectionOffset'))
             {
                 selectionOffset = jsonDecoder.decodeInt(
-                    jsonPath + '.selectionOffset', json['selectionOffset']);
+                    '$jsonPath.selectionOffset', json['selectionOffset']);
             }
             else
             {
@@ -349,7 +350,7 @@ class EditFormatResult implements ResponseResult
             if (json.containsKey('selectionLength'))
             {
                 selectionLength = jsonDecoder.decodeInt(
-                    jsonPath + '.selectionLength', json['selectionLength']);
+                    '$jsonPath.selectionLength', json['selectionLength']);
             }
             else
             {
@@ -405,7 +406,7 @@ class EditFormatResult implements ResponseResult
 
     @override
     int get hashCode => Object.hash(
-            edits,
+            Object.hashAll(edits),
             selectionOffset,
             selectionLength,
         );
@@ -443,7 +444,7 @@ class RequestError implements HasToJson
             if (json.containsKey('code'))
             {
                 code = RequestErrorCode.fromJson(
-                    jsonDecoder, jsonPath + '.code', json['code']);
+                    jsonDecoder, '$jsonPath.code', json['code']);
             }
             else
             {
@@ -452,8 +453,7 @@ class RequestError implements HasToJson
             String message;
             if (json.containsKey('message'))
             {
-                message =
-                    jsonDecoder.decodeString(jsonPath + '.message', json['message']);
+                message = jsonDecoder.decodeString('$jsonPath.message', json['message']);
             }
             else
             {
@@ -462,8 +462,8 @@ class RequestError implements HasToJson
             String? stackTrace;
             if (json.containsKey('stackTrace'))
             {
-                stackTrace = jsonDecoder.decodeString(
-                    jsonPath + '.stackTrace', json['stackTrace']);
+                stackTrace =
+                    jsonDecoder.decodeString('$jsonPath.stackTrace', json['stackTrace']);
             }
             return RequestError(code, message, stackTrace: stackTrace);
         }
@@ -696,8 +696,7 @@ class ServerConnectedParams implements HasToJson
             String version;
             if (json.containsKey('version'))
             {
-                version =
-                    jsonDecoder.decodeString(jsonPath + '.version', json['version']);
+                version = jsonDecoder.decodeString('$jsonPath.version', json['version']);
             }
             else
             {
@@ -706,7 +705,7 @@ class ServerConnectedParams implements HasToJson
             int pid;
             if (json.containsKey('pid'))
             {
-                pid = jsonDecoder.decodeInt(jsonPath + '.pid', json['pid']);
+                pid = jsonDecoder.decodeInt('$jsonPath.pid', json['pid']);
             }
             else
             {
@@ -793,7 +792,7 @@ class ServerErrorParams implements HasToJson
             bool isFatal;
             if (json.containsKey('isFatal'))
             {
-                isFatal = jsonDecoder.decodeBool(jsonPath + '.isFatal', json['isFatal']);
+                isFatal = jsonDecoder.decodeBool('$jsonPath.isFatal', json['isFatal']);
             }
             else
             {
@@ -802,8 +801,7 @@ class ServerErrorParams implements HasToJson
             String message;
             if (json.containsKey('message'))
             {
-                message =
-                    jsonDecoder.decodeString(jsonPath + '.message', json['message']);
+                message = jsonDecoder.decodeString('$jsonPath.message', json['message']);
             }
             else
             {
@@ -812,8 +810,8 @@ class ServerErrorParams implements HasToJson
             String stackTrace;
             if (json.containsKey('stackTrace'))
             {
-                stackTrace = jsonDecoder.decodeString(
-                    jsonPath + '.stackTrace', json['stackTrace']);
+                stackTrace =
+                    jsonDecoder.decodeString('$jsonPath.stackTrace', json['stackTrace']);
             }
             else
             {
@@ -877,7 +875,7 @@ class ServerErrorParams implements HasToJson
 class ServerGetVersionParams implements RequestParams
 {
     @override
-    Map<String, Object> toJson() => <String, Object>{};
+    Map<String, Object> toJson() => {};
 
     @override
     Request toRequest(String id)
@@ -886,14 +884,7 @@ class ServerGetVersionParams implements RequestParams
     }
 
     @override
-    bool operator ==(other)
-    {
-        if (other is ServerGetVersionParams)
-        {
-            return true;
-        }
-        return false;
-    }
+    bool operator ==(other) => other is ServerGetVersionParams;
 
     @override
     int get hashCode => 55877452;
@@ -926,8 +917,7 @@ class ServerGetVersionResult implements ResponseResult
             String version;
             if (json.containsKey('version'))
             {
-                version =
-                    jsonDecoder.decodeString(jsonPath + '.version', json['version']);
+                version = jsonDecoder.decodeString('$jsonPath.version', json['version']);
             }
             else
             {
@@ -937,7 +927,7 @@ class ServerGetVersionResult implements ResponseResult
             if (json.containsKey('protocol'))
             {
                 protocol =
-                    jsonDecoder.decodeString(jsonPath + '.protocol', json['protocol']);
+                    jsonDecoder.decodeString('$jsonPath.protocol', json['protocol']);
             }
             else
             {
@@ -1000,7 +990,7 @@ class ServerGetVersionResult implements ResponseResult
 class ServerShutdownParams implements RequestParams
 {
     @override
-    Map<String, Object> toJson() => <String, Object>{};
+    Map<String, Object> toJson() => {};
 
     @override
     Request toRequest(String id)
@@ -1009,14 +999,7 @@ class ServerShutdownParams implements RequestParams
     }
 
     @override
-    bool operator ==(other)
-    {
-        if (other is ServerShutdownParams)
-        {
-            return true;
-        }
-        return false;
-    }
+    bool operator ==(other) => other is ServerShutdownParams;
 
     @override
     int get hashCode => 366630911;
@@ -1028,7 +1011,7 @@ class ServerShutdownParams implements RequestParams
 class ServerShutdownResult implements ResponseResult
 {
     @override
-    Map<String, Object> toJson() => <String, Object>{};
+    Map<String, Object> toJson() => {};
 
     @override
     Response toResponse(String id)
@@ -1037,14 +1020,7 @@ class ServerShutdownResult implements ResponseResult
     }
 
     @override
-    bool operator ==(other)
-    {
-        if (other is ServerShutdownResult)
-        {
-            return true;
-        }
-        return false;
-    }
+    bool operator ==(other) => other is ServerShutdownResult;
 
     @override
     int get hashCode => 193626532;
@@ -1074,7 +1050,7 @@ class ServerUpdateContentParams implements RequestParams
             Map<String, Object> files;
             if (json.containsKey('files'))
             {
-                files = jsonDecoder.decodeMap(jsonPath + '.files', json['files'],
+                files = jsonDecoder.decodeMap('$jsonPath.files', json['files'],
                     valueDecoder: (String jsonPath, Object? json) =>
                         jsonDecoder.decodeUnion(jsonPath, json, 'type', {
                             'add': (String jsonPath, Object? json) =>
@@ -1133,7 +1109,7 @@ class ServerUpdateContentParams implements RequestParams
     }
 
     @override
-    int get hashCode => files.hashCode;
+    int get hashCode => Object.hashAll([...files.keys, ...files.values]);
 }
 
 /// server.updateContent result
@@ -1232,7 +1208,7 @@ class TabSize implements HasToJson
             int block;
             if (json.containsKey('block'))
             {
-                block = jsonDecoder.decodeInt(jsonPath + '.block', json['block']);
+                block = jsonDecoder.decodeInt('$jsonPath.block', json['block']);
             }
             else
             {
@@ -1241,7 +1217,7 @@ class TabSize implements HasToJson
             int cascade;
             if (json.containsKey('cascade'))
             {
-                cascade = jsonDecoder.decodeInt(jsonPath + '.cascade', json['cascade']);
+                cascade = jsonDecoder.decodeInt('$jsonPath.cascade', json['cascade']);
             }
             else
             {
@@ -1251,7 +1227,7 @@ class TabSize implements HasToJson
             if (json.containsKey('expression'))
             {
                 expression =
-                    jsonDecoder.decodeInt(jsonPath + '.expression', json['expression']);
+                    jsonDecoder.decodeInt('$jsonPath.expression', json['expression']);
             }
             else
             {
@@ -1261,7 +1237,7 @@ class TabSize implements HasToJson
             if (json.containsKey('constructorInitializer'))
             {
                 constructorInitializer = jsonDecoder.decodeInt(
-                    jsonPath + '.constructorInitializer', json['constructorInitializer']);
+                    '$jsonPath.constructorInitializer', json['constructorInitializer']);
             }
             else
             {

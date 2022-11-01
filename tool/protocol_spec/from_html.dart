@@ -5,9 +5,8 @@
 /// Code for reading an HTML API description.
 import 'dart:io';
 
-import 'analyzer_utilities_pkg/html.dart';
-import 'package:html/dom.dart' as dom;
-import 'package:html/parser.dart' as parser;
+import 'package:analyzer_utilities/html_dom.dart' as dom;
+import 'package:analyzer_utilities/html_generator.dart';
 import 'package:path/path.dart';
 
 import 'api.dart';
@@ -21,8 +20,6 @@ Api readApi(String pkgPath)
 }
 
 typedef ElementProcessor = void Function(dom.Element element);
-
-typedef TextProcessor = void Function(dom.Text text);
 
 class ApiReader
 {
@@ -120,14 +117,10 @@ class ApiReader
         var attributesFound = <String>{};
         element.attributes.forEach((name, value)
         {
-            if (name is! String)
-            {
-                throw Exception('$context: Only string attribute names expected: $name');
-            }
             if (!requiredAttributes.contains(name) && !optionalAttributes.contains(name))
             {
                 throw Exception(
-                    '$context: Unexpected attribute in ${element.localName}: $name');
+                    '$context: Unexpected attribute in ${element.name}: $name');
             }
             attributesFound.add(name);
         });
@@ -136,7 +129,7 @@ class ApiReader
             if (!attributesFound.contains(expectedAttribute))
             {
                 throw Exception(
-                    '$context: ${element.localName} must contain attribute $expectedAttribute');
+                    '$context: ${element.name} must contain attribute $expectedAttribute');
             }
         }
     }
@@ -144,11 +137,10 @@ class ApiReader
     /// Check that the given [element] has the given [expectedName].
     void checkName(dom.Element element, String expectedName, [String? context])
     {
-        if (element.localName != expectedName)
+        if (element.name != expectedName)
         {
-            context ??= element.localName;
-            throw Exception(
-                '$context: Expected $expectedName, found ${element.localName}');
+            context ??= element.name;
+            throw Exception('$context: Expected $expectedName, found ${element.name}');
         }
     }
 
@@ -192,13 +184,13 @@ class ApiReader
         var ancestor = html.parent;
         while (ancestor != null)
         {
-            if (ancestor.localName == name)
+            if (ancestor.name == name)
             {
                 return ancestor;
             }
             ancestor = ancestor.parent;
         }
-        throw Exception('$context: <${html.localName}> must be nested within <$name>');
+        throw Exception('$context: <${html.name}> must be nested within <$name>');
     }
 
     /// Create a [Notification] object from an HTML representation such as:
@@ -358,10 +350,11 @@ class ApiReader
     /// Read the API description from file with the given [filePath].
     Api readApi()
     {
-        var htmlContents = File(filePath).readAsStringSync();
-        var document = parser.parse(htmlContents);
+        var file = File(filePath);
+        var htmlContents = file.readAsStringSync();
+        var document = dom.parse(htmlContents, file.uri);
         var htmlElement = document.children
-            .singleWhere((element) => element.localName!.toLowerCase() == 'html');
+            .singleWhere((element) => element.name.toLowerCase() == 'html');
         return apiFromHtml(htmlElement);
     }
 
@@ -379,14 +372,14 @@ class ApiReader
         {
             if (node is dom.Element)
             {
-                var processor = elementProcessors[node.localName];
+                var processor = elementProcessors[node.name];
                 if (processor != null)
                 {
                     processor(node);
                 }
-                else if (specialElements.contains(node.localName))
+                else if (specialElements.contains(node.name))
                 {
-                    throw Exception('$context: Unexpected use of <${node.localName}>');
+                    throw Exception('$context: Unexpected use of <${node.name}>');
                 }
                 else
                 {

@@ -3,18 +3,16 @@
  
 For IDE integration.
 
-
 ## Download
 - From [Releases](https://github.com/xnfo-dart/formatter_server/releases)
+
  ## IDE Extensions
 - [VScode Extension]
-
 
 ## Build
 
 Compile to native executable<br>
 ```dart run grinder build --output=<filename>```
-
 
 ## Build notes
 
@@ -26,7 +24,6 @@ Compile to native executable<br>
 
 >(for release) Bump version (protocol, app, and dependencies)<br>
 ```dart run grinder bump```
-
 
 The resulting executable is usually used as a daemon for IDE extensions, for example the [VScode Extension] loads this daemon from `/bin`.
 

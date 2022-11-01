@@ -1,7 +1,7 @@
 import 'package:dart_polisher/dart_polisher.dart';
 
-import 'analyzer_utilities_pkg/tools.dart' as autools;
-export 'analyzer_utilities_pkg/tools.dart' hide GeneratedFile;
+import 'package:analyzer_utilities/tools.dart' as autools;
+export 'package:analyzer_utilities/tools.dart' hide GeneratedFile;
 
 /// Class representing a single output file (either generated code or generated
 /// HTML).

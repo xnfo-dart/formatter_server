@@ -6,8 +6,9 @@
 
 import 'dart:convert';
 
+import 'package:analyzer_utilities/html_dom.dart' as dom;
+//import 'package:analyzer_utilities/tools.dart';
 import './analyzer_utilities_tools_hook.dart';
-import 'package:html/dom.dart' as dom;
 import 'package:path/path.dart' as path;
 
 import 'api.dart';
@@ -29,7 +30,8 @@ const Map<String, String> specialElementFlags = {
 
 GeneratedFile clientTarget(bool responseRequiresRequestTime)
 {
-    return GeneratedFile('tool/protocol_spec/generated/client/protocol_generated.dart',
+    return GeneratedFile(
+        '../analysis_server_client/lib/src/protocol/protocol_generated.dart',
         (String pkgPath) async
     {
         var visitor = CodegenProtocolVisitor('analysis_server_client',
@@ -300,7 +302,7 @@ class CodegenProtocolVisitor extends DartCodegenVisitor with CodeGenerator
     void emitEmptyToJsonMember()
     {
         writeln('@override');
-        writeln('Map<String, Object> toJson() => <String, Object>{};');
+        writeln('Map<String, Object> toJson() => {};');
     }
 
     /// Emit a class to encapsulate an enum.
@@ -459,8 +461,6 @@ class CodegenProtocolVisitor extends DartCodegenVisitor with CodeGenerator
         {
             writeln("import 'package:$packageName/protocol/protocol.dart';");
             writeln("import 'package:$packageName/src/protocol/protocol_internal.dart';");
-            writeln("import 'package:analyzer_plugin/protocol/protocol.dart' show Enum;");
-
             for (var uri in api.types.importUris)
             {
                 write("import '");
@@ -470,9 +470,9 @@ class CodegenProtocolVisitor extends DartCodegenVisitor with CodeGenerator
         }
         else
         {
-            writeln("import 'package:$packageName/protocol/protocol_base.dart';");
-            writeln("import 'package:$packageName/protocol/protocol_common.dart';");
-            writeln("import 'package:$packageName/protocol/protocol_internal.dart';");
+            writeln("import 'package:$packageName/src/protocol/protocol_base.dart';");
+            writeln("import 'package:$packageName/src/protocol/protocol_common.dart';");
+            writeln("import 'package:$packageName/src/protocol/protocol_internal.dart';");
         }
     }
 
@@ -625,39 +625,38 @@ class CodegenProtocolVisitor extends DartCodegenVisitor with CodeGenerator
             args.add('{${optionalArgs.join(', ')}}');
         }
         write('$className(${args.join(', ')})');
-        if (initializers.isEmpty)
-        {
-            writeln(';');
-        }
-        else
+        if (initializers.isNotEmpty)
         {
             writeln(' : ${initializers.join(', ')}');
-            writeln(';');
         }
+        writeln(';');
     }
 
     /// Emit the operator== code for an object class.
     void emitObjectEqualsMember(TypeObject? type, String className)
     {
         writeln('@override');
-        writeln('bool operator ==(other) {');
+        write('bool operator ==(other) ');
+        if (type == null)
+        {
+            writeln('=> other is $className;');
+            return;
+        }
+        writeln('{');
         indent(()
         {
             writeln('if (other is $className) {');
             indent(()
             {
                 var comparisons = <String>[];
-                if (type != null)
+                for (var field in type.fields)
                 {
-                    for (var field in type.fields)
+                    if (field.value != null)
                     {
-                        if (field.value != null)
-                        {
-                            continue;
-                        }
-                        comparisons.add(compareEqualsCode(
-                            field.type, field.name, 'other.${field.name}'));
+                        continue;
                     }
+                    comparisons.add(
+                        compareEqualsCode(field.type, field.name, 'other.${field.name}'));
                 }
                 if (comparisons.isEmpty)
                 {
@@ -718,7 +717,7 @@ class CodegenProtocolVisitor extends DartCodegenVisitor with CodeGenerator
                 {
                     var fieldNameString = literalString(field.name);
                     var fieldAccessor = 'json[$fieldNameString]';
-                    var jsonPath = 'jsonPath + ${literalString('.${field.name}')}';
+                    var jsonPath = literalString('\$jsonPath.${field.name}');
                     var fieldValue = field.value;
                     if (fieldValue is String)
                     {
@@ -785,6 +784,36 @@ class CodegenProtocolVisitor extends DartCodegenVisitor with CodeGenerator
     {
         writeln('@override');
         writeln('int get hashCode => ');
+
+        String hashAll(String value) => 'Object.hashAll($value)';
+
+        String fieldValue(TypeObjectField field, {required bool single})
+        {
+            if (field.value != null)
+            {
+                return field.value.hashCode.toString();
+            }
+            else
+            {
+                var name = field.name;
+                var type = field.type;
+                if (type is TypeList)
+                {
+                    var nullableString = field.optional ? ' ?? []' : '';
+                    return hashAll(name + nullableString);
+                }
+                else if (type is TypeMap)
+                {
+                    var nullable = field.optional ? '?' : '';
+                    return hashAll(
+                        '[...$nullable$name$nullable.keys,'
+                        ' ...$nullable$name$nullable.values]',
+                    );
+                }
+                return single ? '$name.hashCode' : name;
+            }
+        }
+
         indent(()
         {
             if (type == null)
@@ -793,33 +822,23 @@ class CodegenProtocolVisitor extends DartCodegenVisitor with CodeGenerator
             }
             else
             {
-                final items = type.fields.map((field)
-                {
-                    if (field.value != null)
-                    {
-                        return field.value.hashCode.toString();
-                    }
-                    else
-                    {
-                        return field.name;
-                    }
-                }).toList();
-
-                if (items.isEmpty)
+                final fields = type.fields;
+                if (fields.isEmpty)
                 {
                     writeln('0');
                 }
-                else if (items.length == 1)
+                else if (fields.length == 1)
                 {
-                    write(items.single);
-                    write('.hashCode');
+                    var field = fields.single;
+                    write(fieldValue(field, single: true));
                 }
                 else
                 {
                     writeln('Object.hash(');
-                    for (var field in items)
+                    for (var field in fields)
                     {
-                        writeln('$field,');
+                        write(fieldValue(field, single: false));
+                        writeln(',');
                     }
                     writeln(')');
                 }

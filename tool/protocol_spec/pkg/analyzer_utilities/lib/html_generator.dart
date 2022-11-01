@@ -4,11 +4,8 @@
 
 /// Tools for manipulating HTML during code generation of analyzer and analysis
 /// server.
-import 'package:html/dom.dart' as dom;
 
-/// Make a deep copy of the given HTML nodes.
-List<dom.Node> cloneHtmlNodes(List<dom.Node> nodes) =>
-    nodes.map((dom.Node node) => node.clone(true)).toList();
+import 'html_dom.dart' as dom;
 
 /// Return true if the given iterable contains only whitespace text nodes.
 bool containsOnlyWhitespace(Iterable<dom.Node> nodes)
@@ -33,7 +30,7 @@ String innerText(dom.Element parent)
         {
             if (child is dom.Text)
             {
-                buffer.write(child.text);
+                buffer.write(child.textRemoveTags);
             }
             else if (child is dom.Element)
             {
@@ -64,7 +61,7 @@ bool isWhitespaceNode(dom.Node node)
 
 /// Create an HTML element with the given name, attributes, and child nodes.
 dom.Element makeElement(
-    String name, Map<Object, String> attributes, List<dom.Node> children)
+    String name, Map<String, String> attributes, List<dom.Node> children)
 {
     var result = dom.Element.tag(name);
     result.attributes.addAll(attributes);
@@ -118,7 +115,7 @@ mixin HtmlGenerator
 
     /// Execute [callback], wrapping its output in an element with the given
     /// [name] and [attributes].
-    void element(String name, Map<Object, String> attributes, [void Function()? callback])
+    void element(String name, Map<String, String> attributes, [void Function()? callback])
     {
         add(makeElement(name, attributes, collectHtml(callback)));
     }

@@ -1,20 +1,20 @@
 //* Taken from analysis_server, the analyzer_plugin implementation was missing some methods.
-// Original code: https://github.com/dart-lang/sdk/blob/main/pkg/analysis_server/lib/protocol/protocol.dart
-
+// Original code: https://github.com/dart-lang/sdk/blob/master/pkg/analysis_server/lib/protocol/protocol.dart
+//
 // Copyright (c) 2014, the Dart project authors. Please see the AUTHORS file
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
-
-// ignore_for_file: constant_identifier_names, non_constant_identifier_names
 
 /// Support for client code that needs to interact with the requests, responses
 /// and notifications that are part of the analysis server's wire protocol.
 import 'dart:convert' hide JsonDecoder;
 
-// ignore: implementation_imports
-import 'package:analyzer_plugin/src/protocol/protocol_internal.dart' show ResponseDecoder;
-
 import 'package:formatter_server/protocol/protocol_generated.dart';
+//import 'package:analyzer_plugin/src/protocol/protocol_internal.dart' show ResponseDecoder;
+import 'package:formatter_server/src/protocol/protocol_internal.dart'
+    show ResponseDecoder;
+
+export 'package:analyzer_plugin/protocol/protocol.dart' show Enum;
 
 /// A request that was received from the client.
 ///
@@ -179,7 +179,7 @@ class Request
     ///     'id': String,
     ///     'method': methodName,
     ///     'params': {
-    ///       paramter_name: value
+    ///       parameter_name: value
     ///     }
     ///   }
     ///

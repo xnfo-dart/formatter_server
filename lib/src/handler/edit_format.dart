@@ -13,7 +13,7 @@ import 'package:analyzer/error/listener.dart';
 import 'package:analyzer_plugin/protocol/protocol_common.dart' hide Position;
 
 import "package:dart_polisher/dart_polisher.dart" hide CodeStyle;
-import 'package:dart_polisher/dart_polisher.dart' as dartformatter
+import 'package:dart_polisher/dart_polisher.dart' as dartpolisher
     show CodeStyle; // API Protocol uses same name.
 import 'package:formatter_server/src/format_server.dart';
 import 'package:formatter_server/protocol/protocol.dart';
@@ -79,8 +79,8 @@ class EditFormatHandler extends Handler
                 selectionStart: start,
                 selectionLength: length);
 
-            // Translate CodeStyle from API to dart_formatter.CodeStyle.
-            final style = dartformatter.CodeStyle.getEnum(params.codeStyle?.code);
+            // Translate CodeStyle from API to dartpolisher.CodeStyle.
+            final style = dartpolisher.CodeStyle.getEnum(params.codeStyle?.code);
 
             // Translate tab sizes from API to CodeIndent.
             final tabSizes = CodeIndent.opt(

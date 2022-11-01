@@ -356,29 +356,29 @@
           <p>
             True if the code to be formatted should be limited to the selected
             text (or the smallest portion of text that encloses the selected
-            text that can be formatted).<br>
+            text that can be formatted).<br />
             defaults to false if not set.
           </p>
         </field>
         <field name="lineLength" optional="true">
           <ref>int</ref>
           <p>
-            The line length to be used by the formatter.<br>
+            The line length to be used by the formatter.<br />
             defaults to 90 if not set.
           </p>
         </field>
         <field name="tabSize" optional="true">
           <ref>TabSize</ref>
           <p>
-            The tab size in spaces to be used by the formatter.<br>
+            The tab size in spaces to be used by the formatter.<br />
             defaults all indents to 4 if not set.
           </p>
         </field>
         <field name="insertSpaces" optional="true">
           <ref>bool</ref>
           <p>
-            True if the code to be formatted should use spaces for indentations,<br>
-            false to use tab stops. ignores [tabSize] if false.<br>
+            True if the code to be formatted should use spaces for indentations,<br />
+            false to use tab stops. ignores [tabSize] if false.<br />
             defaults to true if not set.
           </p>
         </field>
@@ -387,7 +387,7 @@
           <p>
             Set of common code styles.
             default to 0 = dart_style with unlocked indent sizes.
-            for more info check [CodeStyle] type.<br>
+            for more info check [CodeStyle] type.<br />
             defaults to 0 if not set.
           </p>
         </field>
@@ -429,46 +429,46 @@
     <include path="analyzer_plugin_pkg/tool/spec/common_types_spec.html"
       import="package:analyzer_plugin/protocol/protocol_common.dart"></include>
 
-      <type name="CodeStyle">
-        <p>
-          Set of common code styles.
-        </p>
-        <object>
-          <field name="code">
-            <ref>int</ref>
-            <p>
-              0 = dart_style, original style with unlocked indents<br>
-              1 = dart_expanded, based on dart_style with outer braces on blocks that are not collection literals.<br>
-              2 = [not available yet]<br>
-              3 = [not available yet]<br>
-            </p>
-          </field>
-        </object>
-      </type>
+    <type name="CodeStyle">
+      <p>
+        Set of common code styles.
+      </p>
+      <object>
+        <field name="code">
+          <ref>int</ref>
+          <p>
+            0 = dart_style, original style with unlocked indents<br />
+            1 = dart_expanded, based on dart_style with outer braces on blocks that are not collection literals.<br />
+            2 = [not available yet]<br />
+            3 = [not available yet]<br />
+          </p>
+        </field>
+      </object>
+    </type>
 
-      <type name="TabSize">
-        <p>
-          Set of space indentations for different code expressions.
-        </p>
-        <object>
-          <field name="block">
-            <ref>int</ref>
-            <p>The number of spaces in a block or collection body.</p>
-          </field>
-          <field name="cascade">
-            <ref>int</ref>
-            <p>How much wrapped cascade sections indent.</p>
-          </field>
-          <field name="expression">
-            <ref>int</ref>
-            <p>The number of spaces in a single level of expression nesting.</p>
-          </field>
-          <field name="constructorInitializer">
-            <ref>int</ref>
-            <p>The ":" on a wrapped constructor initialization list.</p>
-          </field>
-        </object>
-      </type>
+    <type name="TabSize">
+      <p>
+        Set of space indentations for different code expressions.
+      </p>
+      <object>
+        <field name="block">
+          <ref>int</ref>
+          <p>The number of spaces in a block or collection body.</p>
+        </field>
+        <field name="cascade">
+          <ref>int</ref>
+          <p>How much wrapped cascade sections indent.</p>
+        </field>
+        <field name="expression">
+          <ref>int</ref>
+          <p>The number of spaces in a single level of expression nesting.</p>
+        </field>
+        <field name="constructorInitializer">
+          <ref>int</ref>
+          <p>The ":" on a wrapped constructor initialization list.</p>
+        </field>
+      </object>
+    </type>
 
 
     <type name="RequestError">

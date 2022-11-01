@@ -28,5 +28,14 @@ String get packageRoot
     {
         return pathos.joinAll(parts.sublist(0, pkgIndex + 1)) + pathos.separator;
     }
+    // Try google3 environment. We expect that all packages that will be
+    // accessed via this root are configured in the BUILD file, and located
+    // inside this single root.
+    final runFiles = Platform.environment['RUNFILES'];
+    final analyzerPackagesRoot = Platform.environment['ANALYZER_PACKAGES_ROOT'];
+    if (runFiles != null && analyzerPackagesRoot != null)
+    {
+        return pathos.join(runFiles, analyzerPackagesRoot);
+    }
     throw StateError('Unable to find sdk/pkg/ in $scriptPath');
 }

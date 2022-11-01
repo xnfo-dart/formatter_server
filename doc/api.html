@@ -1,7 +1,9 @@
-<!DOCTYPE html><html><head>
+<!DOCTYPE html><html>
+
+<head>
   <meta charset="UTF-8">
   <title>Formatter Server API Specification</title>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;700&amp;family=Roboto:ital,wght@0,300;0,400;0,700;1,400&amp;display=swap" type="text/css"><style>body {
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;700&family=Roboto:ital,wght@0,300;0,400;0,700;1,400&display=swap" type="text/css"><style>body {
   font-family: 'Roboto', sans-serif;
   max-width: 800px;
   margin: 0 auto;
@@ -558,9 +560,9 @@ a:focus, a:hover {
 
     
 
-      
+    
 
-      
+    
 
 
     
@@ -612,19 +614,19 @@ a:focus, a:hover {
             The edits to be applied to the file.
           </p>
         </dd></dl></dd><dt class="typeDefinition"><a name="type_CodeStyle">CodeStyle: object</a></dt><dd>
-        <p>
-          Set of common code styles.
-        </p>
-        
-      <dl><dt class="field"><b>code: int</b></dt><dd>
-            
-            <p>
-              0 = dart_style, original style with unlocked indents<br>
-              1 = dart_expanded, based on dart_style with outer braces on blocks that are not collection literals.<br>
-              2 = [not available yet]<br>
-              3 = [not available yet]<br>
-            </p>
-          </dd></dl></dd><dt class="typeDefinition"><a name="type_FilePath">FilePath: String</a></dt><dd>
+      <p>
+        Set of common code styles.
+      </p>
+      
+    <dl><dt class="field"><b>code: int</b></dt><dd>
+          
+          <p>
+            0 = dart_style, original style with unlocked indents<br>
+            1 = dart_expanded, based on dart_style with outer braces on blocks that are not collection literals.<br>
+            2 = [not available yet]<br>
+            3 = [not available yet]<br>
+          </p>
+        </dd></dl></dd><dt class="typeDefinition"><a name="type_FilePath">FilePath: String</a></dt><dd>
       
       <p>
         The absolute, normalized path of a file.
@@ -832,23 +834,23 @@ a:focus, a:hover {
             A list of the edits used to effect the change.
           </p>
         </dd></dl></dd><dt class="typeDefinition"><a name="type_TabSize">TabSize: object</a></dt><dd>
-        <p>
-          Set of space indentations for different code expressions.
-        </p>
-        
-      <dl><dt class="field"><b>block: int</b></dt><dd>
-            
-            <p>The number of spaces in a block or collection body.</p>
-          </dd><dt class="field"><b>cascade: int</b></dt><dd>
-            
-            <p>How much wrapped cascade sections indent.</p>
-          </dd><dt class="field"><b>expression: int</b></dt><dd>
-            
-            <p>The number of spaces in a single level of expression nesting.</p>
-          </dd><dt class="field"><b>constructorInitializer: int</b></dt><dd>
-            
-            <p>The ":" on a wrapped constructor initialization list.</p>
-          </dd></dl></dd></dl>
+      <p>
+        Set of space indentations for different code expressions.
+      </p>
+      
+    <dl><dt class="field"><b>block: int</b></dt><dd>
+          
+          <p>The number of spaces in a block or collection body.</p>
+        </dd><dt class="field"><b>cascade: int</b></dt><dd>
+          
+          <p>How much wrapped cascade sections indent.</p>
+        </dd><dt class="field"><b>expression: int</b></dt><dd>
+          
+          <p>The number of spaces in a single level of expression nesting.</p>
+        </dd><dt class="field"><b>constructorInitializer: int</b></dt><dd>
+          
+          <p>The ":" on a wrapped constructor initialization list.</p>
+        </dd></dl></dd></dl>
   <h2>Errors</h2>
   <p>
     This section contains a list of all of the errors that are
@@ -859,7 +861,6 @@ a:focus, a:hover {
   </p>
   <h2 class="domain"><a name="index">Index</a></h2>
   <h3>Domains</h3><h4>server (<a href="#domain_server">↑</a>)</h4><div class="subindex"><h5>Requests</h5><ul><li><a href="#request_server.getVersion">getVersion</a></li><li><a href="#request_server.shutdown">shutdown</a></li><li><a href="#request_server.updateContent">updateContent</a></li></ul><h5>Notifications</h5><div class="subindex"><ul><li><a href="#notification_server.connected">connected</a></li><li><a href="#notification_server.error">error</a></li></ul></div></div><h4>edit (<a href="#domain_edit">↑</a>)</h4><div class="subindex"><h5>Requests</h5><ul><li><a href="#request_edit.format">format</a></li></ul></div><h3>Types (<a href="#types">↑</a>)</h3><div class="subindex"><ul><li><a href="#type_AddContentOverlay">AddContentOverlay</a></li><li><a href="#type_ChangeContentOverlay">ChangeContentOverlay</a></li><li><a href="#type_CodeStyle">CodeStyle</a></li><li><a href="#type_FilePath">FilePath</a></li><li><a href="#type_Position">Position</a></li><li><a href="#type_RemoveContentOverlay">RemoveContentOverlay</a></li><li><a href="#type_RequestError">RequestError</a></li><li><a href="#type_RequestErrorCode">RequestErrorCode</a></li><li><a href="#type_SourceEdit">SourceEdit</a></li><li><a href="#type_SourceFileEdit">SourceFileEdit</a></li><li><a href="#type_TabSize">TabSize</a></li></ul></div><h3>Refactorings (<a href="#refactorings">↑</a>)</h3><div class="subindex"><ul></ul></div>
+</body>
 
-
-
-</body></html>
+</html>
