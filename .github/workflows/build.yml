@@ -71,7 +71,7 @@ jobs:
         with:
           repository: xnfo-dart/formatter_server
           path: formatter_server
-          ref: master # If empty it uses the github.ref_name (note: it uses the caller ref, if called externally and it would not be valid here).
+          ref: master # If empty it uses the github.ref_name (note: it uses the caller ref, if called externally it would not be valid here).
                       # Thats why we use master, to select the final ref below.
 
       # workflow_run | workflow_dispatch : ${{github.event_name}}; workflow_call : ${{(PARENT)github.event_name}};
