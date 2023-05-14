@@ -695,7 +695,7 @@ class Server
         var useSnapshot = Platform.environment['TEST_SERVER_SNAPSHOT'] == 'true';
         String serverPath;
 
-        // Test are un on temp dir, we need to get the path to the project dir.
+        // Test are on temp dir, we need to get the path to the project dir.
         // Platform.script is useless for integration test.
         //! https://github.com/dart-lang/test/issues/110
         final thisClassFilePathUri =

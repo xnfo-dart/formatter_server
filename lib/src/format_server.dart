@@ -243,17 +243,15 @@ class FormatServer
         );
     }
 
-    Future<void> shutdown()
+    Future<void> shutdown() async
     {
         // Defer closing the channel and shutting down the instrumentation server so
         // that the shutdown response can be sent and logged.
-        Future(()
+        unawaited(Future(()
         {
             instrumentationService.shutdown();
             channel.close();
-        });
-
-        return Future.value();
+        }));
     }
 
     /// Implementation for `server.updateContent`.

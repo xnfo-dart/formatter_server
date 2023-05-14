@@ -1,5 +1,7 @@
 # Stdio server and protocol 
-> Extracted from Dart SDK pkg [Analysis server](https://github.com/dart-lang/sdk/tree/main/pkg/analysis_server/)
+> Extracted from Dart SDK pkg [Analysis server](https://github.com/dart-lang/sdk/tree/main/pkg/analysis_server/) master branch prior to the '8 ago 2022' lsp refactor.
+
+> Post refactor the DAS is named [LegacyAnalysisServer](https://github.com/dart-lang/sdk/tree/main/pkg/analysis_server/lib/src/legacy_analysis_server.dart)
 
 The interesting part is only in [./src/handler/edit_format.dart]
 
@@ -15,9 +17,9 @@ The interesting part is only in [./src/handler/edit_format.dart]
 ***
 ## Analyzer notes
 
-The analyzer has handly classes totally abstracted from the analysis side, for handling `File overlays` (it would make a nice library if expanded)
+The analyzer has some classes totally abstracted from the analysis side, for example the one for handling `File overlays` (it would make a nice library if expanded)
 
->It was already done, tested, so no need to reinvent anything. Saves time.
+>The reason for using analysis_server is that it was already done, tested, so no need to reinvent anything. Saves time.
 
 This had to be done because the analysis_plugin doesn't hook in edit.format requests, so forking the stdio server seemed like a balanced aproach.
 the analysis_server now uses [Language Server Provider](https://microsoft.github.io/language-server-protocol/).
@@ -30,4 +32,4 @@ Using the LSP only for formatting was not feasible, if this server gets more fun
 
 >API was generated using the analysis_server spec tools.
 
-The tool is similar to a protocol_buffer using html as input (very nice) and outputs dart code to handle messages that carry json, generates parsing and errors for each RPC method, its mostly unused as they have now moved to LSP mostly.
+The tool is similar to a protocol_buffer using html as input (very nice) and outputs dart code to handle messages that contain json, generates parsing and errors for each RPC method, its mostly unused as they have now moved to LSP mostly but it's a nice tool for use in this simple server.

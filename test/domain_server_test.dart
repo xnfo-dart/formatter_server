@@ -64,4 +64,6 @@ class ServerDomainTest extends PubPackageAnalysisServerTest
         var request = ServerShutdownParams().toRequest('0');
         await handleSuccessfulRequest(request);
     }
+
+    //TODO(tekert): add overlay tests.
 }

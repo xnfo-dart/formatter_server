@@ -177,7 +177,7 @@ class Driver implements ServerStarter
                     // reserved for communication to the client.
                     print(line);
                 };
-        // Care errors gets caught but exception logs don't have time to flush (service.logException).
+        // Warning, errors gets caught but exception logs don't have time to flush (service.logException).
         var zoneSpecification =
             ZoneSpecification(handleUncaughtError: errorFunction, print: printFunction);
 
