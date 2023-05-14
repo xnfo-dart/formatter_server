@@ -683,7 +683,9 @@ class CodegenProtocolVisitor extends DartCodegenVisitor with CodeGenerator
         if (className == 'RefactoringFeedback')
         {
             writeln('static RefactoringFeedback? fromJson(JsonDecoder jsonDecoder, '
-                'String jsonPath, Object? json, Map responseJson) {');
+          'String jsonPath, '
+          'Object? json, '
+          'Map<Object?, Object?> responseJson) {');
             indent(()
             {
                 writeln('return refactoringFeedbackFromJson(jsonDecoder, jsonPath, '

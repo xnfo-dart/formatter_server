@@ -58,7 +58,7 @@ class SocketServerTest
         });
     }
 
-    static Future createFormatServer_successful()
+    static Future<void> createFormatServer_successful()
     {
         var channel = MockServerChannel();
         _createSocketServer(channel);

@@ -118,10 +118,10 @@ class ByteStreamServerChannelTest
     late Stream<Request> requestStream;
 
     /// Stream of errors received from the channel via [listen()].
-    late Stream errorStream;
+    late Stream<Object?> errorStream;
 
     /// Future which is completed when then [listen()] reports [onDone].
-    late Future doneFuture;
+    late Future<void> doneFuture;
 
     void setUp()
     {

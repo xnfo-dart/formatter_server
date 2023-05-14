@@ -90,16 +90,8 @@ class Request
         return jsonObject;
     }
 
-    bool _equalLists(List? first, List? second)
+    bool _equalLists(List<Object?> first, List<Object?> second)
     {
-        if (first == null)
-        {
-            return second == null;
-        }
-        if (second == null)
-        {
-            return false;
-        }
         var length = first.length;
         if (length != second.length)
         {
@@ -115,16 +107,8 @@ class Request
         return true;
     }
 
-    bool _equalMaps(Map? first, Map? second)
+    bool _equalMaps(Map<Object?, Object?> first, Map<Object?, Object?> second)
     {
-        if (first == null)
-        {
-            return second == null;
-        }
-        if (second == null)
-        {
-            return false;
-        }
         if (first.length != second.length)
         {
             return false;
@@ -439,7 +423,7 @@ class Notification
     Notification(this.event, [this.params]);
 
     /// Initialize a newly created instance based on the given JSON data.
-    factory Notification.fromJson(Map json)
+     factory Notification.fromJson(Map<Object?, Object?> json)
     {
         return Notification(json[Notification.EVENT] as String,
             json[Notification.PARAMS] as Map<String, Object?>?);

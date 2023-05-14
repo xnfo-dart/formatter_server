@@ -12,7 +12,7 @@ import 'package:analyzer/instrumentation/instrumentation.dart';
 /// standard input and standard output) to communicate with clients.
 class ByteStreamServerChannel implements ServerCommunicationChannel
 {
-    final Stream _input;
+    final Stream<List<int>> _input;
     final IOSink _output;
 
     /// The instrumentation service that is to be used by this analysis server.

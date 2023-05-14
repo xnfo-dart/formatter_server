@@ -46,7 +46,7 @@ abstract class IntegrationTestMixin
     /// this request, but for which a response has not yet been sent, will not be
     /// responded to. No further responses or notifications will be sent after
     /// the response to this request has been sent.
-    Future sendServerShutdown() async
+    Future<void> sendServerShutdown() async
     {
         var result = await server.send('server.shutdown', null);
         outOfTestExpect(result, isNull);

@@ -55,8 +55,8 @@ void outOfTestExpect(Object? actual, Matcher matcher,
     fail(_defaultFailFormatter(actual, matcher, reason, matchState, verbose));
 }
 
-String _defaultFailFormatter(
-    actual, Matcher matcher, String? reason, Map matchState, bool verbose)
+String _defaultFailFormatter(actual, Matcher matcher, String? reason,
+    Map<Object?, Object?> matchState, bool verbose)
 {
     var description = StringDescription();
     description.add('Expected: ').addDescriptionOf(matcher).add('\n');
@@ -80,7 +80,8 @@ typedef MatcherCreator = Matcher Function();
 typedef MismatchDescriber = Description Function(Description mismatchDescription);
 
 /// Type of callbacks used to process notifications.
-typedef NotificationProcessor = void Function(String event, Map params);
+typedef NotificationProcessor = void Function(
+    String event, Map<Object?, Object?> params);
 
 /// Base class for analysis server integration tests.
 abstract class AbstractFormatterServerIntegrationTest extends IntegrationTestMixin
@@ -175,7 +176,7 @@ abstract class AbstractFormatterServerIntegrationTest extends IntegrationTestMix
 */
     /// The server is automatically started before every test, and a temporary
     /// [sourceDirectory] is created.
-    Future setUp() async
+    Future<void> setUp() async
     {
         sourceDirectory = Directory(Directory.systemTemp
             .createTempSync('formatterServer')
@@ -212,7 +213,7 @@ abstract class AbstractFormatterServerIntegrationTest extends IntegrationTestMix
     }
 
     /// If [skipShutdown] is not set, shut down the server.
-    Future shutdownIfNeeded()
+    Future<void> shutdownIfNeeded()
     {
         if (skipShutdown)
         {
@@ -253,7 +254,7 @@ abstract class AbstractFormatterServerIntegrationTest extends IntegrationTestMix
   }
 */
     /// Start [server].
-    Future startServer({
+    Future<void> startServer({
         int? diagnosticPort,
         int? servicesPort,
     })
@@ -266,7 +267,7 @@ abstract class AbstractFormatterServerIntegrationTest extends IntegrationTestMix
     }
 
     /// After every test, the server is stopped and [sourceDirectory] is deleted.
-    Future tearDown()
+    Future<void> tearDown()
     {
         return shutdownIfNeeded().then((_)
         {
@@ -357,18 +358,17 @@ class LazyMatcher implements Matcher
         return _matcher.describe(description);
     }
 
-    @override
-    Description describeMismatch(
-        item, Description mismatchDescription, Map matchState, bool verbose)
-    {
-        return _matcher.describeMismatch(item, mismatchDescription, matchState, verbose);
-    }
+  @override
+  Description describeMismatch(Object? item, Description mismatchDescription,
+      Map<Object?, Object?> matchState, bool verbose) {
+    return _matcher.describeMismatch(
+        item, mismatchDescription, matchState, verbose);
+  }
 
-    @override
-    bool matches(item, Map matchState)
-    {
-        return _matcher.matches(item, matchState);
-    }
+  @override
+  bool matches(dynamic item, Map<Object?, Object?> matchState) {
+    return _matcher.matches(item, matchState);
+  }
 }
 
 /// Matcher that matches a String drawn from a limited set.
@@ -386,7 +386,7 @@ class MatchesEnum extends Matcher
     Description describe(Description description) => description.add(this.description);
 
     @override
-    bool matches(item, Map matchState)
+    bool matches(item, Map<Object?, Object?> matchState)
     {
         return allowedValues.contains(item);
     }
@@ -548,7 +548,7 @@ class Server
 
     /// Return a future that will complete when all commands that have been sent
     /// to the server so far have been flushed to the OS buffer.
-    Future flushCommands()
+    Future<void> flushCommands()
     {
         return _process.stdin.flush();
     }
@@ -589,7 +589,7 @@ class Server
             }
 
             _recordStdio('<== $trimmedLine');
-            Map message;
+            Map<Object?, Object?> message;
             try
             {
                 message = json.decoder.convert(trimmedLine) as Map<Object?, Object?>;
@@ -676,7 +676,7 @@ class Server
     /// Start the server. If [profileServer] is `true`, the server will be started
     /// with "--observe" and "--pause-isolates-on-exit", allowing the observatory
     /// to be used.
-    Future start({
+    Future<void> start({
         required String dartSdkPath,
         int? diagnosticPort,
         String? instrumentationLogFile,
@@ -810,7 +810,7 @@ class Server
 /// An error result from a server request.
 class ServerErrorMessage
 {
-    final Map message;
+    final Map<Object?, Object?> message;
 
     ServerErrorMessage(this.message);
 
@@ -838,7 +838,7 @@ class _ListOf extends Matcher
 
     @override
     Description describeMismatch(
-        item, Description mismatchDescription, Map matchState, bool verbose)
+        item, Description mismatchDescription, Map<Object?, Object?> matchState, bool verbose)
     {
         if (item is! List)
         {
@@ -852,7 +852,7 @@ class _ListOf extends Matcher
     }
 
     @override
-    bool matches(item, Map matchState)
+    bool matches(item, Map<Object?, Object?> matchState)
     {
         if (item is! List)
         {
@@ -942,7 +942,7 @@ class _OneOf extends Matcher
     }
 
     @override
-    bool matches(item, Map matchState)
+    bool matches(item, Map<Object?, Object?> matchState)
     {
         for (var choiceMatcher in choiceMatchers)
         {
@@ -993,7 +993,7 @@ abstract class _RecursiveMatcher extends Matcher
 
     @override
     Description describeMismatch(
-        item, Description mismatchDescription, Map matchState, bool verbose)
+        item, Description mismatchDescription, Map<Object?, Object?> matchState, bool verbose)
     {
         var mismatches = matchState['mismatches'] as List<MismatchDescriber>?;
         if (mismatches != null)
@@ -1027,7 +1027,7 @@ abstract class _RecursiveMatcher extends Matcher
     }
 
     @override
-    bool matches(item, Map matchState)
+    bool matches(item, Map<Object?, Object?> matchState)
     {
         var mismatches = <MismatchDescriber>[];
         populateMismatches(item, mismatches);
