@@ -55,7 +55,7 @@ bool mapEqual<K, V>(Map<K, V>? mapA, Map<K, V>? mapB, bool Function(V a, V b) va
 Map<KR, VR> mapMap<KP, VP, KR, VR>(Map<KP, VP> map,
     {KR Function(KP key)? keyCallback, VR Function(VP value)? valueCallback})
 {
-    Map<KR, VR> result = HashMap<KR, VR>();
+    var result = <KR, VR>{};
     map.forEach((key, value)
     {
         KR resultKey;
