@@ -73,8 +73,9 @@ class Driver implements ServerStarter
         if (logFilePath != null)
         {
             _rollLogFiles(logFilePath, 5);
-            allInstrumentationServices
-                .add(InstrumentationLogAdapter(FileInstrumentationLogger(logFilePath)));
+            allInstrumentationServices.add(InstrumentationLogAdapter(
+                FileInstrumentationLogger(logFilePath),
+                watchEventExclusionFiles: {logFilePath}));
         }
         final instrumentationService =
             MulticastInstrumentationService(allInstrumentationServices);
@@ -101,7 +102,7 @@ class Driver implements ServerStarter
 
         _captureExceptions(instrumentationService, () async
         {
-            Future serveResult;
+            Future<void> serveResult;
             var stdioServer = StdioFormatServer(socketServer);
 
             // Creates a channel, then instances a [FormatServer] that listen to requests in that channel.
