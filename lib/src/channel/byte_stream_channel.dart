@@ -19,7 +19,7 @@ class ByteStreamServerChannel implements ServerCommunicationChannel
     final InstrumentationService _instrumentationService;
 
     /// Completer that will be signalled when the input stream is closed.
-    final Completer _closed = Completer();
+    final Completer<void> _closed = Completer();
 
     /// True if [close] has been called.
     bool _closeRequested = false;
@@ -44,7 +44,7 @@ class ByteStreamServerChannel implements ServerCommunicationChannel
     _requestStatistics?.serverChannel = this;*/
 
     /// Future that will be completed when the input stream is closed.
-    Future get closed
+    Future<void> get closed
     {
         return _closed.future;
     }
