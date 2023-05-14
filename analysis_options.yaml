@@ -20,10 +20,12 @@ linter:
     always_use_package_imports: true,
     unnecessary_parenthesis: true,
     curly_braces_in_flow_control_structures: false, #recommended.yaml default:true
+    #unnecessary_breaks: true,
 
 analyzer:
   language:
     strict-casts: true
+    strict-raw-types: true
   errors:
     # Increase the severity of the unused_import hint.
     unused_import: warning

@@ -6,6 +6,8 @@
 
 /// Data structures representing an API definition, and visitor base classes
 /// for visiting those data structures.
+library;
+
 import 'dart:collection';
 
 import 'package:analyzer_utilities/html_dom.dart' as dom;
@@ -68,7 +70,7 @@ class Domain extends ApiNode
 }
 
 /// API visitor that visits the entire API hierarchically by default.
-class HierarchicalApiVisitor extends ApiVisitor
+class HierarchicalApiVisitor extends ApiVisitor<void>
 {
     /// The API to visit.
     final Api api;

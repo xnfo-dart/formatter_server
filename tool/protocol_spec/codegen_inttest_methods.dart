@@ -4,6 +4,8 @@
 
 /// Code generation for the file "integration_test_methods.dart".
 //import 'package:analyzer_utilities/tools.dart';
+library;
+
 import './analyzer_utilities_tools_hook.dart';
 import 'package:path/path.dart' as path;
 
@@ -102,6 +104,8 @@ class CodegenInttestMethodsVisitor extends DartCodegenVisitor with CodeGenerator
         outputHeader(year: '2017');
         writeln();
         writeln('/// Convenience methods for running integration tests.');
+        writeln('library;');
+        writeln();
         writeln("import 'dart:async';");
         writeln();
         writeln("import 'package:$packageName/protocol/protocol_generated.dart';");

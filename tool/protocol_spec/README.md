@@ -13,4 +13,6 @@ generate.dart outputs:
 - /generated/server/protocol_constants.dart (protocol constants for method/params)
 - /generated/server/protocol_generated.dart (serializable api method/params dart classes for response/request protocol messages)
 
-/generated/server/* files are to be transfered to package:formatter_server/protocol/
+`/generated/server/*` files are to be transfered to `package:formatter_server/protocol/`
+
+`/generated/api.html` file is to be transfered to `package:formatter_server/doc/`
