@@ -607,10 +607,8 @@ class ApiReader
             {
                 case 'true':
                     optional = true;
-                    break;
                 case 'false':
                     optional = false;
-                    break;
                 default:
                     throw Exception(
                         '$context: field contains invalid "optional" attribute: "$optionalString"');

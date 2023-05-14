@@ -185,7 +185,6 @@ class CodegenProtocolVisitor extends DartCodegenVisitor with CodeGenerator
                 fieldName = 'params';
                 makeDecoder = 'RequestDecoder(request)';
                 constructorName = 'fromRequest';
-                break;
             case 'requestResult':
                 inputType = 'Response';
                 inputName = 'response';
@@ -193,14 +192,12 @@ class CodegenProtocolVisitor extends DartCodegenVisitor with CodeGenerator
                 makeDecoder =
                     'ResponseDecoder(REQUEST_ID_REFACTORING_KINDS.remove(response.id))';
                 constructorName = 'fromResponse';
-                break;
             case 'notificationParams':
                 inputType = 'Notification';
                 inputName = 'notification';
                 fieldName = 'params';
                 makeDecoder = 'ResponseDecoder(null)';
                 constructorName = 'fromNotification';
-                break;
             case 'refactoringOptions':
                 inputType = 'EditGetRefactoringParams';
                 inputName = 'refactoringParams';
@@ -208,7 +205,6 @@ class CodegenProtocolVisitor extends DartCodegenVisitor with CodeGenerator
                 makeDecoder = 'RequestDecoder(request)';
                 constructorName = 'fromRefactoringParams';
                 extraArgs.add('Request request');
-                break;
             default:
                 return false;
         }

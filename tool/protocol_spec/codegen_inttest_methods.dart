@@ -210,7 +210,6 @@ class CodegenInttestMethodsVisitor extends DartCodegenVisitor with CodeGenerator
                     constructorCall = "$className.fromJson(decoder, 'params', params)";
                 }
                 writeln('_$streamName.add($constructorCall);');
-                writeln('break;');
             });
         }));
     }

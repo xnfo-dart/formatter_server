@@ -499,10 +499,8 @@ class ToHtmlVisitor extends HierarchicalApiVisitor with HtmlMixin, HtmlGenerator
                 {
                     case 'domains':
                         generateDomainsHeader();
-                        break;
                     case 'domain':
                         visitDomain(apiMappings.domains[node]!);
-                        break;
                     case 'head':
                         head(()
                         {
@@ -518,22 +516,16 @@ class ToHtmlVisitor extends HierarchicalApiVisitor with HtmlMixin, HtmlGenerator
                                 writeln(stylesheet);
                             });
                         });
-                        break;
                     case 'refactorings':
                         visitRefactorings(api.refactorings);
-                        break;
                     case 'types':
                         visitTypes(api.types);
-                        break;
                     case 'version':
                         translateHtml(node, squashParagraphs: squashParagraphs);
-                        break;
                     case 'toc':
                         generateTableOfContents();
-                        break;
                     case 'index':
                         generateIndex();
-                        break;
                     default:
                         if (!ApiReader.specialElements.contains(localName))
                         {

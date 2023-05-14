@@ -238,11 +238,9 @@ abstract class IntegrationTestMixin
                 outOfTestExpect(params, isServerConnectedParams);
                 _onServerConnected
                     .add(ServerConnectedParams.fromJson(decoder, 'params', params));
-                break;
             case 'server.error':
                 outOfTestExpect(params, isServerErrorParams);
                 _onServerError.add(ServerErrorParams.fromJson(decoder, 'params', params));
-                break;
             default:
                 fail('Unexpected notification: $event');
         }
