@@ -3,10 +3,13 @@
 // BSD-style license that can be found in the LICENSE file.
 
 /// Code for reading an HTML API description.
+library;
+
 import 'dart:io';
 
 import 'package:analyzer_utilities/html_dom.dart' as dom;
 import 'package:analyzer_utilities/html_generator.dart';
+import 'package:analyzer_utilities/html_parser.dart' as parser;
 import 'package:path/path.dart';
 
 import 'api.dart';
@@ -352,7 +355,7 @@ class ApiReader
     {
         var file = File(filePath);
         var htmlContents = file.readAsStringSync();
-        var document = dom.parse(htmlContents, file.uri);
+        var document = parser.parse(htmlContents, file.uri);
         var htmlElement = document.children
             .singleWhere((element) => element.name.toLowerCase() == 'html');
         return apiFromHtml(htmlElement);

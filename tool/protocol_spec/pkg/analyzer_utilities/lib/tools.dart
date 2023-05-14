@@ -50,7 +50,7 @@ typedef DirectoryContentsComputer = Map<String, FileContentsComputer> Function(
 typedef FileContentsComputer = Future<String> Function(String pkgPath);
 
 /// Mixin class for generating code.
-class CodeGenerator
+mixin CodeGenerator
 {
     _CodeGeneratorState _state = _CodeGeneratorState();
 
@@ -199,8 +199,6 @@ class CodeGenerator
 // This file has been automatically generated. Please do not edit it manually.
 // To regenerate the file, use the script
 // "tool/protocol_spec/generate.dart".
-
-// ignore_for_file: constant_identifier_names
 ''';
         }
         writeln(header.trim());
@@ -331,10 +329,6 @@ abstract class GeneratedContent
             var generateScript = normalize(joinAll(posix.split(generatorPath)));
             print('  $executable $generateScript ${args.join(" ")}');
             fail('Error codes need to be generated');
-        }
-        else
-        {
-            print('All generated files up to date.');
         }
     }
 
@@ -509,7 +503,7 @@ class GeneratedFile extends GeneratedContent
 
 /// Mixin class for generating HTML representations of code that are suitable
 /// for enclosing inside a <pre> element.
-abstract class HtmlCodeGenerator
+mixin HtmlCodeGenerator
 {
     _HtmlCodeGeneratorState _state = _HtmlCodeGeneratorState();
 
