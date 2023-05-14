@@ -6,9 +6,9 @@
 // To regenerate the file, use the script
 // "tool/protocol_spec/generate.dart".
 
-// ignore_for_file: constant_identifier_names
-
 /// Matchers for data types defined in the analysis server API.
+library;
+
 import 'package:test/test.dart';
 
 import 'integration_tests.dart';

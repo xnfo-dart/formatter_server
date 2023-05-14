@@ -262,7 +262,7 @@ class CodegenInttestMethodsVisitor extends DartCodegenVisitor with CodeGenerator
         }
         else
         {
-            futureClass = 'Future';
+            futureClass = 'Future<void>';
         }
 
         writeln('$futureClass $methodName(${args.join(', ')}) async {');

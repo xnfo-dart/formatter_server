@@ -423,7 +423,7 @@ class Notification
     Notification(this.event, [this.params]);
 
     /// Initialize a newly created instance based on the given JSON data.
-     factory Notification.fromJson(Map<Object?, Object?> json)
+    factory Notification.fromJson(Map<Object?, Object?> json)
     {
         return Notification(json[Notification.EVENT] as String,
             json[Notification.PARAMS] as Map<String, Object?>?);

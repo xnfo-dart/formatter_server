@@ -80,8 +80,7 @@ typedef MatcherCreator = Matcher Function();
 typedef MismatchDescriber = Description Function(Description mismatchDescription);
 
 /// Type of callbacks used to process notifications.
-typedef NotificationProcessor = void Function(
-    String event, Map<Object?, Object?> params);
+typedef NotificationProcessor = void Function(String event, Map<Object?, Object?> params);
 
 /// Base class for analysis server integration tests.
 abstract class AbstractFormatterServerIntegrationTest extends IntegrationTestMixin
@@ -358,17 +357,18 @@ class LazyMatcher implements Matcher
         return _matcher.describe(description);
     }
 
-  @override
-  Description describeMismatch(Object? item, Description mismatchDescription,
-      Map<Object?, Object?> matchState, bool verbose) {
-    return _matcher.describeMismatch(
-        item, mismatchDescription, matchState, verbose);
-  }
+    @override
+    Description describeMismatch(Object? item, Description mismatchDescription,
+        Map<Object?, Object?> matchState, bool verbose)
+    {
+        return _matcher.describeMismatch(item, mismatchDescription, matchState, verbose);
+    }
 
-  @override
-  bool matches(dynamic item, Map<Object?, Object?> matchState) {
-    return _matcher.matches(item, matchState);
-  }
+    @override
+    bool matches(dynamic item, Map<Object?, Object?> matchState)
+    {
+        return _matcher.matches(item, matchState);
+    }
 }
 
 /// Matcher that matches a String drawn from a limited set.
@@ -837,8 +837,8 @@ class _ListOf extends Matcher
         description.add('List of ').addDescriptionOf(elementMatcher);
 
     @override
-    Description describeMismatch(
-        item, Description mismatchDescription, Map<Object?, Object?> matchState, bool verbose)
+    Description describeMismatch(item, Description mismatchDescription,
+        Map<Object?, Object?> matchState, bool verbose)
     {
         if (item is! List)
         {
@@ -992,8 +992,8 @@ abstract class _RecursiveMatcher extends Matcher
     }
 
     @override
-    Description describeMismatch(
-        item, Description mismatchDescription, Map<Object?, Object?> matchState, bool verbose)
+    Description describeMismatch(item, Description mismatchDescription,
+        Map<Object?, Object?> matchState, bool verbose)
     {
         var mismatches = matchState['mismatches'] as List<MismatchDescriber>?;
         if (mismatches != null)

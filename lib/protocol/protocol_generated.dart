@@ -6,8 +6,6 @@
 // To regenerate the file, use the script
 // "tool/protocol_spec/generate.dart".
 
-// ignore_for_file: constant_identifier_names
-
 //TODO: use json from the standard library (C code) instead of analyzer_plugin and measure performnace or ask why is was used.
 import 'dart:convert' hide JsonDecoder;
 

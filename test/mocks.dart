@@ -169,8 +169,8 @@ class _IsResponseFailure extends Matcher
     }
 
     @override
-    Description describeMismatch(
-        Object? item, Description mismatchDescription, Map<Object?, Object?> matchState, bool verbose)
+    Description describeMismatch(Object? item, Description mismatchDescription,
+        Map<Object?, Object?> matchState, bool verbose)
     {
         var response = item as Response;
         var id = response.id;
@@ -219,8 +219,8 @@ class _IsResponseSuccess extends Matcher
     }
 
     @override
-    Description describeMismatch(
-        Object? item, Description mismatchDescription, Map<Object?, Object?> matchState, bool verbose)
+    Description describeMismatch(Object? item, Description mismatchDescription,
+        Map<Object?, Object?> matchState, bool verbose)
     {
         var response = item as Response?;
         if (response == null)

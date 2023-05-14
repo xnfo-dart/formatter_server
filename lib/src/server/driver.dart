@@ -107,11 +107,12 @@ class Driver implements ServerStarter
 
             // Creates a channel, then instances a [FormatServer] that listen to requests in that channel.
             //! Important note:
-            // this error zone is handled _captureExceptions (more notes there)
+            // this error zone is handled in _captureExceptions (more notes there)
             // listen onError is handled by FormatServer.error() wich sends an [Notification] Error to client.
-            // Each request is handled in another nested Error Zone for handlers wich logs any exeption error,
-            //   Any unhandled (in Handler from a Request) [RequestFailure] Exeption is
+            // Each request is handled in another nested Error Zone for handlers wich logs any exception error,
+            //   Any unhandled (inside a Handler from a Request) [RequestFailure] Exeption is
             //   sent as a [Response] with Error [RequestError] (please handle them inside each handler).
+            /// Docs in [Zone.handleUncaughtError] and [Zone.errorZone]
             serveResult = stdioServer.serveStdio();
 
             // When stdioServer is closed then..

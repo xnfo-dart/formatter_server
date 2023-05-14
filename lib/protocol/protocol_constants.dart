@@ -6,8 +6,6 @@
 // To regenerate the file, use the script
 // "tool/protocol_spec/generate.dart".
 
-// ignore_for_file: constant_identifier_names
-
 const String PROTOCOL_VERSION = '0.6.2';
 
 const String EDIT_REQUEST_FORMAT = 'edit.format';
