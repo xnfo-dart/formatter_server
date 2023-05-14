@@ -24,12 +24,14 @@ class StdioFormatServer
     /// Begin serving requests over stdio.
     ///
     /// Return a future that will be completed when stdin closes.
-    Future serveStdio()
+    Future<void> serveStdio()
     {
-        //TODO (tekert): check if non-blocking is disabled on stdin
+        // NOTE(tekert): dart:io is non-blocking, IOSink is bloking by default, use tdout.nonBlocking
+        // NOTE(tekert): no need for patch [7 Feb 2023] https://github.com/dart-lang/sdk/commit/e45a1b362addddd5943d76d2f0281cacc7a3c123
+        //   in this server.
         var serverChannel = ByteStreamServerChannel(
             stdin,
-            stdout.nonBlocking,
+            stdout,
             socketServer.instrumentationService,
         );
         socketServer.createFormatServer(serverChannel);

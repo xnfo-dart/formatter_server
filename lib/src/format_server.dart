@@ -4,6 +4,8 @@
 // for details. All rights reserved. Use of this source code is governed by a
 // BSD-style license that can be found in the LICENSE file.
 
+// from legacy_analysis_server.dart
+
 import 'dart:async';
 import 'dart:io' as io;
 
@@ -42,7 +44,7 @@ class FormatServer
 {
     /// A map from the name of a request to a function used to create a request
     /// handler.
-    static final Map<String, HandlerGenerator> handlerGenerators = {
+    static final Map<String, HandlerGenerator> requestHandlerGenerators = {
         EDIT_REQUEST_FORMAT: EditFormatHandler.new,
         SERVER_REQUEST_GET_VERSION: ServerGetVersionHandler.new,
         SERVER_REQUEST_SHUTDOWN: ServerShutdownHandler.new,
@@ -117,7 +119,7 @@ class FormatServer
             //performance.logRequestTiming(request.clientRequestTime);
 
             // Find request name and get the request handler constructor.
-            var generator = handlerGenerators[request.method];
+            var generator = requestHandlerGenerators[request.method];
             if (generator != null)
             {
                 var handler = generator(this, request);

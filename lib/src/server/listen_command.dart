@@ -30,7 +30,7 @@ class ListenCommand extends Command<void>
             allowed: ['stdio', 'http'],
             allowedHelp: {
                 'stdio': 'Open a channel using stdio for communication',
-                'http': '[Not implemented yet.]'
+                'http': '[Not implemented]'
             },
             defaultsTo: 'stdio');
 
