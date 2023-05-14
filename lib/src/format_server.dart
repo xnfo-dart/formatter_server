@@ -59,32 +59,6 @@ class FormatServer
     /// The [ResourceProvider] using which paths are converted into [Resource]s.
     final OverlayResourceProvider resourceProvider;
 
-    /// Key: a file path for which removing of the overlay was requested.
-    /// Value: a timer that will remove the overlay, or cancelled.
-    ///
-    /// This helps for analysis server running remotely, with slow remote file
-    /// systems, in the following scenario:
-    /// 1. User edits file, IDE sends "add overlay".
-    /// 2. User saves file, IDE saves file locally, sends "remove overlay".
-    /// 3. The remove server reads the file on "remove overlay". But the content
-    ///    of the file on the remove machine is not the same as it is locally,
-    ///    and not what the user looks in the IDE. So, analysis results, such
-    ///    as semantic highlighting, are inconsistent with the local file content.
-    /// 4. (after a few seconds) The file is synced to the remove machine,
-    ///    the watch event happens, server reads the file, sends analysis
-    ///    results that are consistent with the local file content.
-    ///
-    /// We try to prevent the inconsistency between moments (3) and (4).
-    /// It is not wrong, we are still in the eventual consistency, but we
-    /// want to keep the inconsistency time shorter.
-    ///
-    /// To do this we keep the last overlay content on "remove overlay",
-    /// and wait for the next watch event in (4). But there might be race
-    /// condition, and when it happens, we still want to get to the eventual
-    /// consistency, so on timer we remove the overlay anyway.
-    // TODO (tekert): check this, i was going to do it in a different way.
-    final Map<String, Timer> _pendingFilesToRemoveOverlay = {};
-
     Duration pendingFilesRemoveOverlayDelay = const Duration(seconds: 10);
 
     /// The next modification stamp for a changed file in the [resourceProvider].
@@ -114,13 +88,7 @@ class FormatServer
     }
 
     /// For tests only
-    Future<void> dispose() async
-    {
-        for (var timer in _pendingFilesToRemoveOverlay.values)
-        {
-            timer.cancel();
-        }
-    }
+    Future<void> dispose() async {}
 
     /// The socket from which requests are being read has been closed.
     void done() {}
@@ -130,7 +98,8 @@ class FormatServer
     void error(Object exception, StackTrace? stackTrace)
     {
         // Don't send to instrumentation service; not an internal error.
-        //TODO(tekert): why? in the lsp implementation intrumentation is used.
+        // NOTE(tekert): why? in the lsp implementation intrumentation is used.
+        // NOTE(tekert): ported sendServerErrorNotification will do intrumentation, so, everything ok.
         sendServerErrorNotification('Socket error', exception, stackTrace);
     }
 
@@ -160,7 +129,7 @@ class FormatServer
             }
         }, (exception, stackTrace)
         {
-            // In case an async handler doesnt catch RequestFailure (protocol parse errors),
+            // In case an async handler doesn't catch RequestFailure (protocol parse errors),
             // send response but don't log it.
             if (exception is RequestFailure)
             {
@@ -305,7 +274,7 @@ class FormatServer
             catch (_) {}
 
             // Prepare the new contents.
-            String newContents;
+            String? newContents;
             if (change is AddContentOverlay)
             {
                 newContents = change.content;
@@ -335,17 +304,7 @@ class FormatServer
             }
             else if (change is RemoveContentOverlay)
             {
-                _pendingFilesToRemoveOverlay.remove(file)?.cancel();
-                _pendingFilesToRemoveOverlay[file] = Timer(
-                    pendingFilesRemoveOverlayDelay,
-                    ()
-                    {
-                        _pendingFilesToRemoveOverlay.remove(file);
-                        resourceProvider.removeOverlay(file);
-                        //_changeFileInDrivers(file);
-                    },
-                );
-                return;
+                newContents = null;
             }
             else
             {
@@ -353,14 +312,18 @@ class FormatServer
                 throw AnalysisException('Illegal change type');
             }
 
-            _pendingFilesToRemoveOverlay.remove(file)?.cancel();
-            resourceProvider.setOverlay(
-                file,
-                content: newContents,
-                modificationStamp: overlayModificationStamp++,
-            );
-
-            //_changeFileInDrivers(file);
+            if (newContents != null)
+            {
+                resourceProvider.setOverlay(
+                    file,
+                    content: newContents,
+                    modificationStamp: overlayModificationStamp++,
+                );
+            }
+            else
+            {
+                resourceProvider.removeOverlay(file);
+            }
         });
     }
 }
