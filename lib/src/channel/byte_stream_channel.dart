@@ -15,7 +15,7 @@ class ByteStreamServerChannel implements ServerCommunicationChannel
     final Stream<List<int>> _input;
     final IOSink _output;
 
-    /// The instrumentation service that is to be used by this analysis server.
+    /// The instrumentation service that is to be used by this formatter server.
     final InstrumentationService _instrumentationService;
 
     /// Completer that will be signalled when the input stream is closed.

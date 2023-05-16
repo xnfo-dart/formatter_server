@@ -6,7 +6,7 @@
 // BSD-style license that can be found in the LICENSE file.
 
 /// Support for client code that needs to interact with the requests, responses
-/// and notifications that are part of the analysis server's wire protocol.
+/// and notifications that are part of the format server's wire protocol.
 library;
 
 import 'dart:convert' hide JsonDecoder;
@@ -17,6 +17,53 @@ import 'package:formatter_server/src/protocol/protocol_internal.dart'
     show ResponseDecoder;
 
 export 'package:analyzer_plugin/protocol/protocol.dart' show Enum;
+
+/// A notification that can be sent from the server about an event that
+/// occurred.
+///
+/// Clients may not extend, implement or mix-in this class.
+class Notification
+{
+    /// The name of the JSON attribute containing the name of the event that
+    /// triggered the notification.
+    static const String EVENT = 'event';
+
+    /// The name of the JSON attribute containing the result values.
+    static const String PARAMS = 'params';
+
+    /// The name of the event that triggered the notification.
+    final String event;
+
+    /// A table mapping the names of notification parameters to their values, or
+    /// `null` if there are no notification parameters.
+    final Map<String, Object?>? params;
+
+    /// Initialize a newly created [Notification] to have the given [event] name.
+    /// If [params] is provided, it will be used as the params; otherwise no
+    /// params will be used.
+    Notification(this.event, [this.params]);
+
+    /// Initialize a newly created instance based on the given JSON data.
+    factory Notification.fromJson(Map<Object?, Object?> json)
+    {
+        return Notification(json[Notification.EVENT] as String,
+            json[Notification.PARAMS] as Map<String, Object?>?);
+    }
+
+    /// Return a table representing the structure of the Json object that will be
+    /// sent to the client to represent this response.
+    Map<String, Object> toJson()
+    {
+        var jsonObject = <String, Object>{};
+        jsonObject[EVENT] = event;
+        final params = this.params;
+        if (params != null)
+        {
+            jsonObject[PARAMS] = params;
+        }
+        return jsonObject;
+    }
+}
 
 /// A request that was received from the client.
 ///
@@ -59,6 +106,16 @@ class Request
     int get hashCode
     {
         return id.hashCode;
+    }
+
+    /// Returns the amount of time (in milliseconds) since the client sent this
+    /// request or `null` if the client did not provide [clientRequestTime].
+    int? get timeSinceRequest
+    {
+        var clientRequestTime = this.clientRequestTime;
+        return clientRequestTime != null
+            ? DateTime.now().millisecondsSinceEpoch - clientRequestTime
+            : null;
     }
 
     @override
@@ -207,7 +264,7 @@ class Request
     ///     'id': String,
     ///     'method': methodName,
     ///     'params': {
-    ///       paramter_name: value
+    ///       parameter_name: value
     ///     }
     ///   }
     ///
@@ -232,6 +289,19 @@ class Request
             return null;
         }
     }
+}
+
+/// An exception that occurred during the handling of a request that requires
+/// that an error be returned to the client.
+///
+/// Clients may not extend, implement or mix-in this class.
+class RequestFailure implements Exception
+{
+    /// The response to be returned as a result of the failure.
+    final Response response;
+
+    /// Initialize a newly created exception to return the given reponse.
+    RequestFailure(this.response);
 }
 
 //TODO (tekert): some methods are not used. can be deleted or refactored.
@@ -305,7 +375,7 @@ class Response
 
     /// Initialize a newly created instance to represent an error condition caused
     /// by a [request] that had invalid parameter.  [path] is the path to the
-    /// invalid parameter, in Javascript notation (e.g. "foo.bar" means that the
+    /// invalid parameter, in JavaScript notation (e.g. "foo.bar" means that the
     /// parameter "foo" contained a key "bar" whose value was the wrong type).
     /// [expectation] is a description of the type of data that was expected.
     Response.invalidParameter(Request request, String path, String expectation)
@@ -395,64 +465,4 @@ class Response
             return null;
         }
     }
-}
-
-/// A notification that can be sent from the server about an event that
-/// occurred.
-///
-/// Clients may not extend, implement or mix-in this class.
-class Notification
-{
-    /// The name of the JSON attribute containing the name of the event that
-    /// triggered the notification.
-    static const String EVENT = 'event';
-
-    /// The name of the JSON attribute containing the result values.
-    static const String PARAMS = 'params';
-
-    /// The name of the event that triggered the notification.
-    final String event;
-
-    /// A table mapping the names of notification parameters to their values, or
-    /// `null` if there are no notification parameters.
-    final Map<String, Object?>? params;
-
-    /// Initialize a newly created [Notification] to have the given [event] name.
-    /// If [params] is provided, it will be used as the params; otherwise no
-    /// params will be used.
-    Notification(this.event, [this.params]);
-
-    /// Initialize a newly created instance based on the given JSON data.
-    factory Notification.fromJson(Map<Object?, Object?> json)
-    {
-        return Notification(json[Notification.EVENT] as String,
-            json[Notification.PARAMS] as Map<String, Object?>?);
-    }
-
-    /// Return a table representing the structure of the Json object that will be
-    /// sent to the client to represent this response.
-    Map<String, Object> toJson()
-    {
-        var jsonObject = <String, Object>{};
-        jsonObject[EVENT] = event;
-        final params = this.params;
-        if (params != null)
-        {
-            jsonObject[PARAMS] = params;
-        }
-        return jsonObject;
-    }
-}
-
-/// An exception that occurred during the handling of a request that requires
-/// that an error be returned to the client.
-///
-/// Clients may not extend, implement or mix-in this class.
-class RequestFailure implements Exception
-{
-    /// The response to be returned as a result of the failure.
-    final Response response;
-
-    /// Initialize a newly created exception to return the given reponse.
-    RequestFailure(this.response);
 }
