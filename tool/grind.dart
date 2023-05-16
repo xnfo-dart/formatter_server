@@ -67,14 +67,21 @@ Future<void> version() async
     print(version);
 }
 
-@Task('Compile to native, --output=<filename> '
-    '(all paths are relative to ./build directory)')
+@Task("Compile to native, --output=<filename> "
+    "(all paths are relative to ./build directory)")
 //@Depends(validateCI)
 Future<void> build() async
 {
     TaskArgs args = context.invocation.arguments;
-    var outName = args.getOption("output");
+    String? outName = args.getOption("output");
     var verbose = !args.getFlag("quiet");
+
+    if (outName == null)
+    {
+        throw("\u001B[31m" +
+            "ERROR: Please provide an output name with: --output=<filename> (output will be inside ./build)" +
+            "\u001B[0m");
+    }
 
     // Get base normalized output Dir and File name from input.
     var outPath = FilePath(outName);
