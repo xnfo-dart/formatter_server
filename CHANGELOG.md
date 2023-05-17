@@ -2,7 +2,19 @@
 Stdio server for handling requests from IDEs using the Dart Polisher formatter.
 
 ## [Unreleased]
-- Grinder build task and pubspec version tool.
+
+## [0.9.3] - 17/5/2023
+
+### Changed
+- Updated compatibility for Dart 3.0
+- Updated libraries and pulled changes done to the legacy analysis_server.
+- Stdout is now blocking instead of non-blocking 
+  (IOSink blocks output by default, i made it non-bloking before and forgot about it).
+- Exclude instrumentation log file from logged watch events to prevent loops.
+- Grinder build task for CI and pubspec version tool (dart run grinder version, to check for version before compiling).
+
+### Github Actions
+- Made some github actions for CI so the vscode extension can pick the artifacts with an action.
 
 ## [0.9.1] - 10/10/2022
 - Refactor The way Handlers are called from Requests, cleaner execution and error handling.
@@ -30,7 +42,8 @@ Stdio server for handling requests from IDEs using the Dart Polisher formatter.
 
 - Some refactoring
 
-[Unreleased]: https://github.com/xnfo-dart/formatter_server/compare/v0.9.1...HEAD
+[Unreleased]: https://github.com/xnfo-dart/formatter_server/compare/v0.9.3...HEAD
+[0.9.3]: https://github.com/xnfo-dart/formatter_server/releases/tag/v0.9.3
 [0.9.1]: https://github.com/xnfo-dart/formatter_server/releases/tag/v0.9.1
 [0.9.0]: https://github.com/xnfo-dart/formatter_server/releases/tag/v0.9.0
 [0.8.8]: https://github.com/xnfo-dart/formatter_server/releases/tag/v0.8.8
