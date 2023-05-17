@@ -94,14 +94,6 @@ jobs:
           echo "Using ${GITHUB_REPOSITORY#*/} @${{env.BUILD_REF}} for checkout"
           git checkout ${{env.BUILD_REF}}
 
-      # TODO: delete this the next tag release. > v0.9.2
-      - name: "Clone Local Dart Polisher package"
-        uses: actions/checkout@v3
-        with:
-          repository: xnfo-dart/dart_polisher
-          path: dart_polisher
-          ref: stable
-
       # Uses https://github.com/dart-lang/setup-dart to get dart
       - name: "Dowload dart-sdk"
         uses: dart-lang/setup-dart@v1
@@ -113,15 +105,6 @@ jobs:
       - name : "Compile"
         id: compile
         run: dart run grinder build --output=${{ matrix.output-name }}
-        continue-on-error: true # TODO: delete this line the next tag release
-
-      # TODO: delete this the next tag release
-      - name : "Compile Old"
-        if: always() && steps.compile.outcome == 'failure'
-        id: compileold
-        run: |
-          mkdir build
-          dart compile exe bin/listen.dart -v -o build/${{ matrix.output-name }}
 
       - name : "Get built version in a env variable"
         run: |
@@ -130,18 +113,17 @@ jobs:
           ./build/${{ matrix.output-name }} --version >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
 
-          VERSION_FILE="./tool/version.dart"
-          if [ -f "$VERSION_FILE" ]; then
-              BUILD_PACKAGE_VERSION=$(dart run tool/version.dart)
-              echo "BUILD_PACKAGE_VERSION=$BUILD_PACKAGE_VERSION" >> $GITHUB_ENV
+          BUILD_PUBSPEC_VERSION=$(dart run grinder version | awk '/version/{getline; print}')
+          if [ -z "$BUILD_PUBSPEC_VERSION" ]; then
+              echo "BUILD_PUBSPEC_VERSION=VERSION_NOT_FOUND" >> $GITHUB_ENV
           else
-              echo "BUILD_PACKAGE_VERSION=VERSION_NOT_FOUND" >> $GITHUB_ENV
+              echo "BUILD_PUBSPEC_VERSION=$BUILD_PUBSPEC_VERSION" >> $GITHUB_ENV
           fi
 
           echo "Built version:"
           ./build/${{ matrix.output-name }} --version
-          echo "Package version: $BUILD_PACKAGE_VERSION"
-        shell: bash
+          echo "Package version: $BUILD_PUBSPEC_VERSION"
+        shell: bash {0}
 
       # https://github.com/actions/upload-artifact#zipped-artifact-downloads
       - name: "Upload all artifacts"
@@ -166,7 +148,7 @@ jobs:
         run: |
           echo '### Build' >> $GITHUB_STEP_SUMMARY
           echo 'Compiled from git ref: `${{ env.BUILD_REF }}`' >> $GITHUB_STEP_SUMMARY
-          echo 'Compiled from package version: `${{ env.BUILD_PACKAGE_VERSION }}`' >> $GITHUB_STEP_SUMMARY
+          echo 'Compiled from package version: `${{ env.BUILD_PUBSPEC_VERSION }}`' >> $GITHUB_STEP_SUMMARY
           printf -- '--version output:\n```\n${{ env.BUILD_COMPILED_VERSION }}\n```\n' >> $GITHUB_STEP_SUMMARY
 
           echo '' >> $GITHUB_STEP_SUMMARY
@@ -198,7 +180,7 @@ jobs:
           mkdir -p ./build-data
           echo '${{ env.BUILD_REF }}' >> ./build-data/ref
           echo '${{ env.BUILD_COMPILED_VERSION }}' >> ./build-data/version
-          echo '${{ env.BUILD_PACKAGE_VERSION }}' >> ./build-data/package_version
+          echo '${{ env.BUILD_PUBSPEC_VERSION }}' >> ./build-data/package_version
 
       - name: Upload build data
         uses: actions/upload-artifact@v3
