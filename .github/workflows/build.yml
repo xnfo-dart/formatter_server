@@ -167,7 +167,7 @@ jobs:
           echo '### Build' >> $GITHUB_STEP_SUMMARY
           echo 'Compiled from git ref: `${{ env.BUILD_REF }}`' >> $GITHUB_STEP_SUMMARY
           echo 'Compiled from package version: `${{ env.BUILD_PACKAGE_VERSION }}`' >> $GITHUB_STEP_SUMMARY
-          printf '--version output:\n```\n${{ env.BUILD_COMPILED_VERSION }}\n```\n' >> $GITHUB_STEP_SUMMARY
+          printf -- '--version output:\n```\n${{ env.BUILD_COMPILED_VERSION }}\n```\n' >> $GITHUB_STEP_SUMMARY
 
           echo '' >> $GITHUB_STEP_SUMMARY
 
