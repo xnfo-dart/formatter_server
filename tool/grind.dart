@@ -52,6 +52,8 @@ Future<void> validateCI() async
 Future<void> generate() async
 {
     Dart.run('tool/protocol_spec/generate.dart');
+
+    log("NOTE: remember to update CHANGELOG in spec_input.html if protocol changes where made.");
 }
 
 // TODO: check the constant version too, return error if they mismatch.
@@ -178,6 +180,7 @@ Future<void> bump() async
         .replaceAll(version.toString(), bumped.toString());
     changelogFile.writeAsStringSync(changelog);
 
+    log("NOTE: remember to update CHANGELOG in spec_input.html if protocol changes where made.");
     log("Updated version to '$bumped'.");
 }
 

@@ -29,7 +29,7 @@ class CLIRunner<T> extends CommandRunner<T>
 void main(List<String> args) async
 {
     var runner =
-        CLIRunner<void>("dartcfmtd", "Formatting Server using Dart Xnfo formatter")
+        CLIRunner<void>("dartfmtd", "Formatting Server using Dart Polisher")
             ..argParser.addFlag(
                 'version',
                 negatable: false,

@@ -28,7 +28,7 @@ on:
   workflow_dispatch:
     inputs:
       buildBranch:
-        description: 'Git tag/branch (tag ie: v5.5.0 for releases, "master" for dev builds) from a successful workflow run of "Build on Tag"'
+        description: 'Git tag/branch (tag ie: v5.5.0 for releases, "master" for dev builds) from a successful workflow run of "Build on Tag" workflow'
         required: true
       workflowRun:
         description: 'Workflow number of a succeful run of release_on_tag.yml", can be ommited if run <ref> was done on a tag/branch'

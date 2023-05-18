@@ -101,7 +101,7 @@ class FormatServer
     {
         // Don't send to instrumentation service; not an internal error.
         // NOTE(tekert): why? in the lsp implementation intrumentation is used.
-        // NOTE(tekert): ported sendServerErrorNotification will do intrumentation, so, everything ok.
+        // NOTE2(tekert): ported sendServerErrorNotification will do intrumentation, so, everything ok.
         sendServerErrorNotification('Socket error', exception, stackTrace);
     }
 

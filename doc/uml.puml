@@ -1,0 +1,437 @@
+@startuml
+set namespaceSeparator ::
+
+class "formatter_server::protocol::protocol.dart::Request" {
+  {static} +String ID
+  {static} +String METHOD
+  {static} +String PARAMS
+  {static} +String CLIENT_REQUEST_TIME
+  +String id
+  +String method
+  +Map<String, Object?> params
+  +int? clientRequestTime
+  +int hashCode
+  +int? timeSinceRequest
+  +bool ==()
+  +Map<String, Object> toJson()
+  -bool _equalLists()
+  -bool _equalMaps()
+  -bool _equalObjects()
+  {static} +Request? fromJson()
+  {static} +Request? fromString()
+}
+
+class "formatter_server::protocol::protocol.dart::RequestFailure" {
+  +Response response
+}
+
+"formatter_server::protocol::protocol.dart::RequestFailure" o-- "formatter_server::protocol::protocol.dart::Response"
+"dart::core::Exception" <|-- "formatter_server::protocol::protocol.dart::RequestFailure"
+
+class "formatter_server::protocol::protocol.dart::Response" {
+  {static} +Response DELAYED_RESPONSE
+  {static} +String ID
+  {static} +String ERROR
+  {static} +String RESULT
+  +String id
+  +RequestError? error
+  +Map<String, Object?>? result
+  +Map<String, Object> toJson()
+  {static} +Response? fromJson()
+}
+
+"formatter_server::protocol::protocol.dart::Response" o-- "formatter_server::protocol::protocol.dart::Response"
+"formatter_server::protocol::protocol.dart::Response" o-- "formatter_server::protocol::protocol_generated.dart::RequestError"
+
+class "formatter_server::protocol::protocol_generated.dart::CodeStyle" {
+  +int code
+  +int hashCode
+  +Map<String, Object> toJson()
+  +String toString()
+  +bool ==()
+}
+
+"analyzer_plugin::src::protocol::protocol_internal.dart::HasToJson" <|-- "formatter_server::protocol::protocol_generated.dart::CodeStyle"
+
+class "formatter_server::protocol::protocol_generated.dart::EditFormatParams" {
+  +String file
+  +int selectionOffset
+  +int selectionLength
+  +bool? selectionOnly
+  +int? lineLength
+  +TabSize? tabSize
+  +bool? insertSpaces
+  +CodeStyle? codeStyle
+  +int hashCode
+  +Map<String, Object> toJson()
+  +Request toRequest()
+  +String toString()
+  +bool ==()
+}
+
+"formatter_server::protocol::protocol_generated.dart::EditFormatParams" o-- "formatter_server::protocol::protocol_generated.dart::TabSize"
+"formatter_server::protocol::protocol_generated.dart::EditFormatParams" o-- "formatter_server::protocol::protocol_generated.dart::CodeStyle"
+"formatter_server::src::protocol::protocol_internal.dart::RequestParams" <|-- "formatter_server::protocol::protocol_generated.dart::EditFormatParams"
+
+class "formatter_server::protocol::protocol_generated.dart::EditFormatResult" {
+  +List<SourceEdit> edits
+  +int selectionOffset
+  +int selectionLength
+  +int hashCode
+  +Map<String, Object> toJson()
+  +Response toResponse()
+  +String toString()
+  +bool ==()
+}
+
+"formatter_server::src::protocol::protocol_internal.dart::ResponseResult" <|-- "formatter_server::protocol::protocol_generated.dart::EditFormatResult"
+
+class "formatter_server::protocol::protocol_generated.dart::RequestError" {
+  +RequestErrorCode code
+  +String message
+  +String? stackTrace
+  +int hashCode
+  +Map<String, Object> toJson()
+  +String toString()
+  +bool ==()
+}
+
+"formatter_server::protocol::protocol_generated.dart::RequestError" o-- "formatter_server::protocol::protocol_generated.dart::RequestErrorCode"
+"analyzer_plugin::src::protocol::protocol_internal.dart::HasToJson" <|-- "formatter_server::protocol::protocol_generated.dart::RequestError"
+
+class "formatter_server::protocol::protocol_generated.dart::RequestErrorCode" {
+  {static} +RequestErrorCode FORMAT_INVALID_FILE
+  {static} +RequestErrorCode FORMAT_WITH_ERRORS
+  {static} +RequestErrorCode FORMAT_RANGE_ERROR
+  {static} +RequestErrorCode INVALID_FILE_PATH_FORMAT
+  {static} +RequestErrorCode INVALID_OVERLAY_CHANGE
+  {static} +RequestErrorCode INVALID_OVERLAY_RANGE
+  {static} +RequestErrorCode INVALID_PARAMETER
+  {static} +RequestErrorCode INVALID_REQUEST
+  {static} +RequestErrorCode SERVER_ALREADY_STARTED
+  {static} +RequestErrorCode SERVER_ERROR
+  {static} +RequestErrorCode UNKNOWN_REQUEST
+  {static} +RequestErrorCode UNSUPPORTED_FEATURE
+  {static} +List<RequestErrorCode> VALUES
+  +String name
+  +String toString()
+  +String toJson()
+}
+
+"formatter_server::protocol::protocol_generated.dart::RequestErrorCode" o-- "formatter_server::protocol::protocol_generated.dart::RequestErrorCode"
+"analyzer_plugin::protocol::protocol.dart::Enum" <|-- "formatter_server::protocol::protocol_generated.dart::RequestErrorCode"
+
+class "formatter_server::protocol::protocol_generated.dart::ServerConnectedParams" {
+  +String version
+  +int pid
+  +int hashCode
+  +Map<String, Object> toJson()
+  +Notification toNotification()
+  +String toString()
+  +bool ==()
+}
+
+"analyzer_plugin::src::protocol::protocol_internal.dart::HasToJson" <|-- "formatter_server::protocol::protocol_generated.dart::ServerConnectedParams"
+
+class "formatter_server::protocol::protocol_generated.dart::ServerErrorParams" {
+  +bool isFatal
+  +String message
+  +String stackTrace
+  +int hashCode
+  +Map<String, Object> toJson()
+  +Notification toNotification()
+  +String toString()
+  +bool ==()
+}
+
+"analyzer_plugin::src::protocol::protocol_internal.dart::HasToJson" <|-- "formatter_server::protocol::protocol_generated.dart::ServerErrorParams"
+
+class "formatter_server::protocol::protocol_generated.dart::ServerGetVersionParams" {
+  +int hashCode
+  +Map<String, Object> toJson()
+  +Request toRequest()
+  +bool ==()
+}
+
+"formatter_server::src::protocol::protocol_internal.dart::RequestParams" <|-- "formatter_server::protocol::protocol_generated.dart::ServerGetVersionParams"
+
+class "formatter_server::protocol::protocol_generated.dart::ServerGetVersionResult" {
+  +String version
+  +String protocol
+  +int hashCode
+  +Map<String, Object> toJson()
+  +Response toResponse()
+  +String toString()
+  +bool ==()
+}
+
+"formatter_server::src::protocol::protocol_internal.dart::ResponseResult" <|-- "formatter_server::protocol::protocol_generated.dart::ServerGetVersionResult"
+
+class "formatter_server::protocol::protocol_generated.dart::ServerShutdownParams" {
+  +int hashCode
+  +Map<String, Object> toJson()
+  +Request toRequest()
+  +bool ==()
+}
+
+"formatter_server::src::protocol::protocol_internal.dart::RequestParams" <|-- "formatter_server::protocol::protocol_generated.dart::ServerShutdownParams"
+
+class "formatter_server::protocol::protocol_generated.dart::ServerShutdownResult" {
+  +int hashCode
+  +Map<String, Object> toJson()
+  +Response toResponse()
+  +bool ==()
+}
+
+"formatter_server::src::protocol::protocol_internal.dart::ResponseResult" <|-- "formatter_server::protocol::protocol_generated.dart::ServerShutdownResult"
+
+class "formatter_server::protocol::protocol_generated.dart::ServerUpdateContentParams" {
+  +Map<String, Object> files
+  +int hashCode
+  +Map<String, Object> toJson()
+  +Request toRequest()
+  +String toString()
+  +bool ==()
+}
+
+"formatter_server::src::protocol::protocol_internal.dart::RequestParams" <|-- "formatter_server::protocol::protocol_generated.dart::ServerUpdateContentParams"
+
+class "formatter_server::protocol::protocol_generated.dart::ServerUpdateContentResult" {
+  +int hashCode
+  +Map<String, Object> toJson()
+  +Response toResponse()
+  +String toString()
+  +bool ==()
+}
+
+"formatter_server::src::protocol::protocol_internal.dart::ResponseResult" <|-- "formatter_server::protocol::protocol_generated.dart::ServerUpdateContentResult"
+
+class "formatter_server::protocol::protocol_generated.dart::TabSize" {
+  +int block
+  +int cascade
+  +int expression
+  +int constructorInitializer
+  +int hashCode
+  +Map<String, Object> toJson()
+  +String toString()
+  +bool ==()
+}
+
+"analyzer_plugin::src::protocol::protocol_internal.dart::HasToJson" <|-- "formatter_server::protocol::protocol_generated.dart::TabSize"
+
+class "formatter_server::src::channel::byte_stream_channel.dart::ByteStreamServerChannel" {
+  -Stream<List<int>> _input
+  -IOSink _output
+  -InstrumentationService _instrumentationService
+  -Completer<void> _closed
+  -bool _closeRequested
+  +Stream<Request> requests
+  +dynamic closed
+  +void close()
+  +void sendNotification()
+  +void sendResponse()
+  -void _outputLine()
+  -void _readRequest()
+}
+
+"formatter_server::src::channel::byte_stream_channel.dart::ByteStreamServerChannel" o-- "dart::async::Stream<List<int>>"
+"formatter_server::src::channel::byte_stream_channel.dart::ByteStreamServerChannel" o-- "dart::io::IOSink"
+"formatter_server::src::channel::byte_stream_channel.dart::ByteStreamServerChannel" o-- "analyzer::instrumentation::service.dart::InstrumentationService"
+"formatter_server::src::channel::byte_stream_channel.dart::ByteStreamServerChannel" o-- "dart::async::Completer<void>"
+"formatter_server::src::channel::byte_stream_channel.dart::ByteStreamServerChannel" o-- "dart::async::Stream<Request>"
+"formatter_server::src::channel::channel.dart::ServerCommunicationChannel" <|-- "formatter_server::src::channel::byte_stream_channel.dart::ByteStreamServerChannel"
+
+abstract class "formatter_server::src::channel::channel.dart::ServerCommunicationChannel" {
+  +Stream<Request> requests
+  +void close()
+  +void sendNotification()
+  +void sendResponse()
+}
+
+"formatter_server::src::channel::channel.dart::ServerCommunicationChannel" o-- "dart::async::Stream<Request>"
+
+class "formatter_server::src::edit::source_edits.dart::LineRange" {
+  +int start
+  +int end
+}
+
+class "formatter_server::src::edit::source_edits.dart::ConvertTab" {
+  -String _indent
+  {static} -String _tabChar
+  -int _lastOffset
+  -StringBuffer _buffer
+  -List<SourceEdit> _edits
+  -String _original
+  +List<SourceEdit> getEdits()
+  +String convertRegexp()
+  +String convert()
+  -void _addTabToBuffer()
+  -String _applyEdits()
+  -String _toString()
+}
+
+class "formatter_server::src::format_server.dart::FormatServerOptions" {
+  +String? clientId
+  +String? clientVersion
+}
+
+class "formatter_server::src::format_server.dart::FormatServer" {
+  {static} +Map<String, Handler Function(FormatServer, Request)> requestHandlerGenerators
+  +ServerCommunicationChannel channel
+  +InstrumentationService instrumentationService
+  +OverlayResourceProvider resourceProvider
+  +Duration pendingFilesRemoveOverlayDelay
+  +int overlayModificationStamp
+  +dynamic dispose()
+  +void done()
+  +void error()
+  +void handleRequest()
+  +bool isValidFilePath()
+  +void sendNotification()
+  +void sendResponse()
+  +bool isAbsoluteAndNormalized()
+  +bool sendResponseErrorIfInvalidFilePath()
+  +void sendServerErrorNotification()
+  +dynamic shutdown()
+  +void updateContent()
+}
+
+"formatter_server::src::format_server.dart::FormatServer" o-- "formatter_server::src::channel::channel.dart::ServerCommunicationChannel"
+"formatter_server::src::format_server.dart::FormatServer" o-- "analyzer::instrumentation::service.dart::InstrumentationService"
+"formatter_server::src::format_server.dart::FormatServer" o-- "analyzer::file_system::overlay_file_system.dart::OverlayResourceProvider"
+
+abstract class "formatter_server::src::handler::abstract_handler.dart::Handler" {
+  +FormatServer server
+  +Request request
+  +dynamic handle()
+  +void sendResponse()
+  +void sendResult()
+}
+
+"formatter_server::src::handler::abstract_handler.dart::Handler" o-- "formatter_server::src::format_server.dart::FormatServer"
+"formatter_server::src::handler::abstract_handler.dart::Handler" o-- "formatter_server::protocol::protocol.dart::Request"
+
+class "formatter_server::src::handler::edit_format.dart::EditFormatHandler" {
+  +dynamic handle()
+}
+
+"formatter_server::src::handler::abstract_handler.dart::Handler" <|-- "formatter_server::src::handler::edit_format.dart::EditFormatHandler"
+
+class "formatter_server::src::handler::edit_format.dart::OffsetRange" {
+  +int start
+  +int end
+}
+
+class "formatter_server::src::handler::edit_format.dart::_SourceMock" {
+  {static} +Source instance
+  +dynamic noSuchMethod()
+}
+
+"formatter_server::src::handler::edit_format.dart::_SourceMock" o-- "analyzer::src::generated::source.dart::Source"
+"analyzer::src::generated::source.dart::Source" <|-- "formatter_server::src::handler::edit_format.dart::_SourceMock"
+
+class "formatter_server::src::handler::server_get_version.dart::ServerGetVersionHandler" {
+  +dynamic handle()
+}
+
+"formatter_server::src::handler::abstract_handler.dart::Handler" <|-- "formatter_server::src::handler::server_get_version.dart::ServerGetVersionHandler"
+
+class "formatter_server::src::handler::server_shutdown.dart::ServerShutdownHandler" {
+  +dynamic handle()
+}
+
+"formatter_server::src::handler::abstract_handler.dart::Handler" <|-- "formatter_server::src::handler::server_shutdown.dart::ServerShutdownHandler"
+
+class "formatter_server::src::handler::server_update_content.dart::ServerUpdateContentHandler" {
+  +dynamic handle()
+}
+
+"formatter_server::src::handler::abstract_handler.dart::Handler" <|-- "formatter_server::src::handler::server_update_content.dart::ServerUpdateContentHandler"
+
+class "formatter_server::src::protocol::protocol_internal.dart::RequestDecoder" {
+  -Request _request
+  +RefactoringKind? refactoringKind
+  +Object mismatch()
+  +Object missingKey()
+}
+
+"formatter_server::src::protocol::protocol_internal.dart::RequestDecoder" o-- "formatter_server::protocol::protocol.dart::Request"
+"formatter_server::src::protocol::protocol_internal.dart::RequestDecoder" o-- "analyzer_plugin::protocol::protocol_common.dart::RefactoringKind"
+"analyzer_plugin::src::protocol::protocol_internal.dart::JsonDecoder" <|-- "formatter_server::src::protocol::protocol_internal.dart::RequestDecoder"
+
+abstract class "formatter_server::src::protocol::protocol_internal.dart::RequestParams" {
+  +Request toRequest()
+}
+
+"analyzer_plugin::src::protocol::protocol_internal.dart::HasToJson" <|-- "formatter_server::src::protocol::protocol_internal.dart::RequestParams"
+
+class "formatter_server::src::protocol::protocol_internal.dart::ResponseDecoder" {
+  +RefactoringKind? refactoringKind
+  +Object mismatch()
+  +Object missingKey()
+}
+
+"formatter_server::src::protocol::protocol_internal.dart::ResponseDecoder" o-- "analyzer_plugin::protocol::protocol_common.dart::RefactoringKind"
+"analyzer_plugin::src::protocol::protocol_internal.dart::JsonDecoder" <|-- "formatter_server::src::protocol::protocol_internal.dart::ResponseDecoder"
+
+abstract class "formatter_server::src::protocol::protocol_internal.dart::ResponseResult" {
+  +Response toResponse()
+}
+
+"analyzer_plugin::src::protocol::protocol_internal.dart::HasToJson" <|-- "formatter_server::src::protocol::protocol_internal.dart::ResponseResult"
+
+class "formatter_server::src::server::driver.dart::Driver" {
+  {static} +String CLIENT_ID
+  {static} +String CLIENT_VERSION
+  {static} +String PROTOCOL_TRAFFIC_LOG
+  {static} +String PROTOCOL_TRAFFIC_LOG_ALIAS
+  +InstrumentationService? instrumentationService
+  +void start()
+  {static} -void _rollLogFiles()
+  -void _captureExceptions()
+  -String _readUuid()
+  -String _generateUuidString()
+}
+
+"formatter_server::src::server::driver.dart::Driver" o-- "analyzer::instrumentation::service.dart::InstrumentationService"
+"formatter_server::starter.dart::ServerStarter" <|-- "formatter_server::src::server::driver.dart::Driver"
+
+class "formatter_server::src::server::error_notifier.dart::FatalException" {
+}
+
+"analyzer::exception::exception.dart::CaughtException" <|-- "formatter_server::src::server::error_notifier.dart::FatalException"
+
+class "formatter_server::src::server::listen_command.dart::ListenCommand" {
+  +String name
+  +String description
+  +String invocation
+  +dynamic run()
+}
+
+"args::command_runner.dart::Command" <|-- "formatter_server::src::server::listen_command.dart::ListenCommand"
+
+class "formatter_server::src::server::stdio_server.dart::StdioFormatServer" {
+  +SocketServer socketServer
+  +dynamic serveStdio()
+}
+
+"formatter_server::src::server::stdio_server.dart::StdioFormatServer" o-- "formatter_server::src::socket_server.dart::SocketServer"
+
+class "formatter_server::src::socket_server.dart::SocketServer" {
+  +InstrumentationService instrumentationService
+  +FormatServer? formatServer
+  +void createFormatServer()
+}
+
+"formatter_server::src::socket_server.dart::SocketServer" o-- "analyzer::instrumentation::service.dart::InstrumentationService"
+"formatter_server::src::socket_server.dart::SocketServer" o-- "formatter_server::src::format_server.dart::FormatServer"
+
+abstract class "formatter_server::starter.dart::ServerStarter" {
+  +InstrumentationService instrumentationService
+  +void start()
+}
+
+"formatter_server::starter.dart::ServerStarter" o-- "analyzer::instrumentation::service.dart::InstrumentationService"
+
+
+@enduml
