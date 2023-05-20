@@ -98,6 +98,8 @@ jobs:
       - name: "Dowload dart-sdk"
         uses: dart-lang/setup-dart@v1
 
+      - run: dart --disable-analytics
+
       - name: Install pub dependencies
         run: dart pub get
 

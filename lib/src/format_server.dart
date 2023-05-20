@@ -131,8 +131,8 @@ class FormatServer
             }
         }, (exception, stackTrace)
         {
-            // In case an async handler doesn't catch RequestFailure (protocol parse errors),
-            // send response but don't log it.
+            // In case an async handler doesn't catch RequestFailure (overlay or protocol parse errors),
+            // send response but don't log it. (notes in README.md#Errors)
             if (exception is RequestFailure)
             {
                 sendResponse(exception.response);

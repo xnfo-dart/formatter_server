@@ -23,14 +23,13 @@ class ListenCommand extends Command<void>
 
         parser.addSeparator('Listen options:');
 
-        // TODO (tekert): stdout blocking vs nonbloling, logs, paths, modes, etc.
+        // TODO (tekert): logs, paths, modes, etc.
         parser.addOption('channel',
             abbr: 'c',
             help: 'Set listen channel.',
-            allowed: ['stdio', 'http'],
+            allowed: ['stdio'],
             allowedHelp: {
-                'stdio': 'Open a channel using stdio for communication',
-                'http': '[Not implemented]'
+                'stdio': 'Open a channel using stdio for communication'
             },
             defaultsTo: 'stdio');
 
