@@ -67,7 +67,7 @@ jobs:
 
       # https://github.com/actions/checkout
       - name: "Clone formatter_server repository"
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           repository: xnfo-dart/formatter_server
           path: formatter_server
